@@ -16,14 +16,7 @@ request.setAttribute("end", end);
 
 <div class="pagination">
 	<ul>
-		 <% if (page.hasPreviousPage()){%>
-               	<li><a href="?page=1&sortType=${sortType}&${searchParams}">&lt;&lt;</a></li>
-                <li><a href="?page=${current-1}&sortType=${sortType}&${searchParams}">&lt;</a></li>
-         <%}else{%>
-                <li class="disabled"><a href="#">&lt;&lt;</a></li>
-                <li class="disabled"><a href="#">&lt;</a></li>
-         <%} %>
- 
+		<!-- 暂时没分页 -->
 		<c:forEach var="i" begin="${begin}" end="${end}">
             <c:choose>
                 <c:when test="${i == current}">
@@ -34,15 +27,7 @@ request.setAttribute("end", end);
                 </c:otherwise>
             </c:choose>
         </c:forEach>
-	  
-	  	 <% if (page.hasNextPage()){%>
-               	<li><a href="?page=${current+1}&sortType=${sortType}&${searchParams}">&gt;</a></li>
-                <li><a href="?page=${page.totalPages}&sortType=${sortType}&${searchParams}">&gt;&gt;</a></li>
-         <%}else{%>
-                <li class="disabled"><a href="#">&gt;</a></li>
-                <li class="disabled"><a href="#">&gt;&gt;</a></li>
-         <%} %>
-
+	 
 	</ul>
 </div>
 
