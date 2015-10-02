@@ -9,6 +9,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="${ctx}/static/jquery/jquery-1.8.0.min.js"></script>
 <script type="text/javascript" src="${ctx}/static/jquery/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="${ctx}/static/jquery/easyui-lang-zh_CN.js"></script>
 <link rel="stylesheet" type="text/css" href="${ctx}/static/styles/main.css" id="swicth-style"/>
 <script type="text/javascript">  
 	function fixWidth(percent)  
@@ -56,13 +57,22 @@
 	function query(){
 		var orderNo = $("#order_no").val();
 		var userName = $("#user_name").val();
-		var osName = $("#os_name").val();
-		var status = $("#status").val();
-		var startTime = $("#startTime").val();
-		var endTime = $("#endTime").val();
+		var osName = $("#o_s_name").val();
+		var ojStatus = $("#o_j_status").val();
+		var owStatus = $("#o_w_status").val();
+		var type = $("#o_type").val();
+		var area = $("#o_area").val();
+		var startTime = $('#o_startTime').datebox('getValue');   
+		var endTime = $('#o_endTime').datebox('getValue');  
+		
+		userName=encodeURI(userName);
+		osName=encodeURI(osName);
+		area=encodeURI(area);
+		
 		$('#dg').datagrid({ url:"${ctx}/m/order/query",
 			queryParams:{'page':1,'rows':15,'orderNo':orderNo,'userName':userName,'osName':osName,
-				'status':status,'startTime':startTime,'endTime':endTime},
+				'ojStatus':ojStatus,'owStatus':owStatus,'type':type,'area':area,'status':status,
+				'startTime':startTime,'endTime':endTime},
 			method:"GET"});
 	}
 	
@@ -170,34 +180,43 @@
 					<tr style="height: 40px;">
 						<td width="100px"><span>订单号:</span></td>
 						<td width="150px"><input id="order_no" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>用户名:</span></td>
+						<td width="100px"><span>用户名/手机号:</span></td>
 						<td width="150px"><input id="user_name" type="text" style="width: 120px"/></td>
 						<td width="100px"><span>加油站:</span></td>
-						<td width="150px"><input id="os_name" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>状态:</span></td>
-						<td width="150px">
-							<select name="select" id="status" style="width: 200px">
+						<td width="150px"><input id="o_s_name" type="text" style="width: 120px"/></td>
+						<td width="100px"><span>地区:</span></td>
+						<td width="150px"><input id="o_area" type="text" style="width: 120px"/></td>
+						<td width="100px"><span>完成状态:</span></td>
+						<td width="100px">
+							<select name="select" id="o_w_status" style="width: 100px">
 							    <option value="-1" selected="selected">全部</option>
-							    <option value="0">等待付款中</option>
-								<option value="1">付款成功</option>
-								<option value="2">付款失败</option>
-								<option value="3">过期</option>
-								<option value="4">撤销成功</option>
-								<option value="5">退款中</option>
-								<option value="6">退款成功</option>
-								<option value="7">退款失败</option>
-								<option value="8">部分退款成功</option>
-								<option value="11">新建预约订单</option>
-								<option value="12">后台加油站已确定-等待付款中</option>
-								<option value="99">删除</option>
+							    <option value="1">已完成</option>
+								<option value="2">未完成</option>
 							</select>
 						</td>
 					</tr>
 					<tr style="height: 40px;">
+					    <td width="100px"><span>类型:</span></td>
+						<td width="100px">
+							<select name="select" id="o_type" style="width: 100px">
+							    <option value="-1" selected="selected">全部</option>
+							    <option value="1">普通订单</option>
+								<option value="4">后台添加订单</option>
+								<option value="3">预约订单</option>
+							</select>
+						</td>
+						<td width="100px"><span>结算状态:</span></td>
+						<td width="100px">
+							<select name="select" id="o_j_status" style="width: 100px">
+							    <option value="-1" selected="selected">全部</option>
+							    <option value="1">已结算</option>
+								<option value="2">未结算</option>
+							</select>
+						</td>
 						<td width="100px"><span>开始时间:</span></td>
-						<td width="150px"><input id="startTime" class="easyui-datebox"></input></td>
+						<td width="150px"><input id="o_startTime" class="easyui-datebox"></input></td>
 						<td width="100px"><span>结束时间:</span></td>
-						<td width="150px"><input id="endTime" class="easyui-datebox"></input></td>
+						<td width="150px"><input id="o_endTime" class="easyui-datebox"></input></td>
 						<td colspan="4" width="100px">&nbsp;</td>
 					</tr>
 					<tr style="height: 40px;">

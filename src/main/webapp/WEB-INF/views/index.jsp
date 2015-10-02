@@ -347,14 +347,14 @@ a:active {
 					class="cs-navi-tab">订单查询</a>
 				</p>
 				<a href="javascript:void(0);" src="${ctx}/m/order/mIndex"
-					class="cs-navi-tab">预约订单</a>
+					class="cs-navi-tab">财务明细</a>
 				</p>
 			</div>
 			<div title="优惠券管理">
-				<a href="javascript:void(0);" src="demo/accordion/basic.html"
+				<a href="javascript:void(0);" src="${ctx}/m/coupon/index"
 					class="cs-navi-tab">优惠券列表</a>
 				</p>
-				<a href="javascript:void(0);" src="demo/accordion/basic.html"
+				<a href="javascript:void(0);" src="${ctx}/m/coupon/uIndex"
 					class="cs-navi-tab">优惠券使用列表</a>
 				</p>
 			</div>

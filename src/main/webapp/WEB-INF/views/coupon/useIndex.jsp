@@ -9,7 +9,6 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="${ctx}/static/jquery/jquery-1.8.0.min.js"></script>
 <script type="text/javascript" src="${ctx}/static/jquery/jquery.easyui.min.js"></script>
-<script type="text/javascript" src="${ctx}/static/jquery/easyui-lang-zh_CN.js"></script>
 <link rel="stylesheet" type="text/css" href="${ctx}/static/styles/main.css" id="swicth-style"/>
 <script type="text/javascript">  
 	function fixWidth(percent)  
@@ -61,7 +60,7 @@
 		//var status = $("#status").val();
 		var startTime = $("#c_startTime").val();
 		var endTime = $("#c_endTime").val();
-		name=encodeURI(name);
+		
 		$('#dg').datagrid({ url:"${ctx}/m/coupon/query",
 			queryParams:{'page':1,'rows':15,'name':name,'faceLimit':faceLimit,'type':type,
 				'startTime':startTime,'endTime':endTime},
@@ -157,7 +156,7 @@
     	$("#restartDialog").dialog('close');
     	$("#showOsDialog").dialog('close');
     	$('#dg').datagrid({ 
-    		url:'${ctx}/m/coupon/query', 
+    		url:'${ctx}/m/coupon/uQuery', 
     		method:'GET',
     		queryParams:{'status':-1},
     		fitCloumns: true , 
@@ -166,11 +165,11 @@
     		pagination:true,//分页控件 
     		columns:[[ 
     		{field:'id',title:'ID',width:50}, 
+    		{field:'userName',title:'用户',width:fixWidth(0.15),align:'right'},
     		{field:'name',title:'名称',width:fixWidth(0.15),align:'right'},
     		{field:'type',title:'类型',width:fixWidth(0.1),align:'right'},
     		{field:'status',title:'状态',width:fixWidth(0.08),align:'right'},
     		{field:'faceValue',title:'面额',width:fixWidth(0.1),align:'right'},
-    		{field:'limitValue',title:'限额',width:fixWidth(0.1),align:'right'},
     		{field:'startTime',title:'有效开始时间',width:fixWidth(0.15),align:'right'},
     		{field:'endTime',title:'有效结束时间',width:fixWidth(0.15),align:'right'},
     		{field:'createTime',title:'创建时间',width:fixWidth(0.15),align:'right'},

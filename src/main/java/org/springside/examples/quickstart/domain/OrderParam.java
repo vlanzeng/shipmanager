@@ -4,6 +4,9 @@ public class OrderParam extends BaseParam {
 	public String orderNo;
 	public String osId;
 	public String osName;
+	public Integer ojStatus;
+	public Integer owStatus;
+	public String area;
 	
 	public String getOrderNo() {
 		return orderNo;
@@ -22,5 +25,23 @@ public class OrderParam extends BaseParam {
 	}
 	public void setOsName(String osName) {
 		this.osName = osName;
+	}
+	public Integer getOjStatus() {
+		return ojStatus;
+	}
+	public void setOjStatus(Integer ojStatus) {
+		this.ojStatus = ojStatus;
+	}
+	public Integer getOwStatus() {
+		return owStatus;
+	}
+	public void setOwStatus(Integer owStatus) {
+		this.owStatus = owStatus;
+	}
+	public String getArea() {
+		return area;
+	}
+	public void setArea(String area) {
+		this.area = area;
 	}
 }

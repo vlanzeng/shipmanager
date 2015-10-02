@@ -60,42 +60,68 @@ public class MorderService {
 		DataGrid<OrderBean> dg = new DataGrid<OrderBean>();
 		StringBuffer whereParam = new StringBuffer();
 		int start = (param.getPage() - 1) * param.getRows();
-		if(!StringUtils.isEmpty(param.getType())){
+		
+		//订单类型
+		if(!StringUtils.isEmpty(param.getType()) && param.getType() >=0){
 			whereParam.append(" and o.type="+param.getType());
 		}
 		
+		//订单号
 		if(!StringUtils.isEmpty(param.getOrderNo())){
-			whereParam.append(" and o.order_no='"+param.getOrderNo()+"'");
+			whereParam.append(" and o.order_no='"+param.getOrderNo().trim()+"'");
 		}
 		
+		//用户名或手机号
 		if(!StringUtils.isEmpty(param.getUserName())){
-			whereParam.append(" and u.user_name='"+param.getUserName() + "'");
+			whereParam.append(" and (u.user_name='"+param.getUserName().trim() + "' or u.phone='"+param.getUserName().trim() + "')");
 		}
 		
+		//加油站
 		if(!StringUtils.isEmpty(param.getOsName())){
-			whereParam.append(" and s.name like '%" + param.getOsName() + "%'");
+			whereParam.append(" and s.name='" + param.getOsName().trim() + "'");
 		}
 		
-		if(!StringUtils.isEmpty(param.getStatus()) && param.getStatus() >=0){
-			whereParam.append(" and o.status="+param.getStatus());
+		//区域
+		if(!StringUtils.isEmpty(param.getArea())){
+			whereParam.append(" and s.name='" + param.getArea().trim() + "'");
+		}
+		
+		//订单结算状态
+		if(!StringUtils.isEmpty(param.getOjStatus()) && param.getOjStatus() >=0){
+			//订单状态  等待付款中-0 付款成功-1 付款失败-2 过期-3 撤销成功-4 退款中-5 退款成功-6 退款失败-7 部分退款成功-8  11-新建预约订单 12-后台加油站以确定 99-删除
+			String s = "1";
+			if(param.getOjStatus() == 2){
+				s = "0,2,3,4,5,6,7,9,11,12";
+			}
+			whereParam.append(" and o.status in ("+s+")");
+		}
+		
+		//订单完成状态
+		if(!StringUtils.isEmpty(param.getOwStatus()) && param.getOwStatus() >=0){
+			//订单状态  等待付款中-0 付款成功-1 付款失败-2 过期-3 撤销成功-4 退款中-5 退款成功-6 退款失败-7 部分退款成功-8  11-新建预约订单 12-后台加油站以确定 99-删除
+			String s = "2,3,5,88,99";
+			if(param.getOjStatus() == 2){
+				s = "0,1,4,6,7,8,11,12";
+			}
+			whereParam.append(" and o.status in ("+s+")");
 		}
 		
 		if(!StringUtils.isEmpty(param.startTime)){
-			whereParam.append(" and o.order_no >='"+param.startTime+"'");
+			whereParam.append(" and o.create_time >='"+param.startTime+"'");
 		}
 		
 		if(!StringUtils.isEmpty(param.getEndTime())){
-			whereParam.append(" and o.order_no<'"+param.getEndTime()+"'");
+			whereParam.append(" and o.create_time<'"+param.getEndTime()+"'");
 		}
 		String sql = "select o.id,o.order_no,o.product_name,o.price,o.num,o.status,o.money,"
 				+ "u.user_name,s.name,o.update_time,o.create_time,o.book_time, o.book_addr "
-				+ "from t_order o left join t_user u on o.user_id=u.id left join t_oil_station s on o.os_id=s.id where o.type in (1,3) "+whereParam.toString()+" "
+				+ "from t_order o left join t_user u on o.user_id=u.id left join t_oil_station s on o.os_id=s.id left join t_city c on s.city_id=c.id where o.type in (1,3,4) "+whereParam.toString()+" "
 				+ "order by o.create_time desc limit "+start+","+param.getRows()+"";
 		Query q = em.createNativeQuery(sql);
 		List<Object[]> infoList = q.getResultList();
 		List<OrderBean> result = new ArrayList<OrderBean>();
 		
-		String totalSql = "select count(1) from t_order o left join t_user u on o.user_id=u.id left join t_oil_station s on o.os_id=s.id where o.type in (1,3) " + whereParam.toString();
+		String totalSql = "select count(1) from t_order o left join t_user u on o.user_id=u.id left join t_oil_station s on o.os_id=s.id where o.type in (1,3,4) " + whereParam.toString();
 		Query q1 = em.createNativeQuery(totalSql);
 		
 		int total = Integer.valueOf(q1.getSingleResult()+"");
