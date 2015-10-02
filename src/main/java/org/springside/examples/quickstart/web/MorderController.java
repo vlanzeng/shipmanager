@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -56,11 +57,22 @@ public class MorderController extends BaseController implements HybConstants{
 		param.setPage(pageInfo[0]);
 		param.setRows(pageInfo[1]);
 		param.setOrderNo(request.getParameter("orderNo"));
-		param.setUserName(request.getParameter("userName"));
-		param.setOsName(request.getParameter("osName"));
+		param.setUserName(CommonUtils.decode(request.getParameter("userName")));
+		param.setOsName(CommonUtils.decode(request.getParameter("osName")));
+		if(!StringUtils.isEmpty(request.getParameter("ojStatus"))){
+			param.setOjStatus(Integer.valueOf(request.getParameter("ojStatus")));
+		}
+		
+		if(!StringUtils.isEmpty(request.getParameter("owStatus"))){
+			param.setOwStatus(Integer.valueOf(request.getParameter("owStatus")));
+		}
+		
+		if(!StringUtils.isEmpty(request.getParameter("type"))){
+			param.setType(Integer.valueOf(request.getParameter("type")));
+		}
+		param.setArea(CommonUtils.decode2(request.getParameter("area")));
 		param.setStartTime(request.getParameter("startTime"));
 		param.setEndTime(request.getParameter("endTime"));
-		param.setStatus(Integer.valueOf(request.getParameter("status")));
 		DataGrid<OrderBean> gb = morderService.getOrderList(param);
 		return CommonUtils.printObjStr2(gb);
 	}

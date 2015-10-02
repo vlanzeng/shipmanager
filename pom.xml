@@ -151,12 +151,6 @@
 			<version>3.0.1</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>com.hyb.lib</groupId>
-			<artifactId>zfclient</artifactId>
-			<version>1.0</version>
-		</dependency>
 		<!-- WEB end -->
 
 		<!-- SECURITY begin -->
