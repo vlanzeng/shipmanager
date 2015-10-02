@@ -14,7 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springside.examples.quickstart.entity.Muser;
 import org.springside.examples.quickstart.entity.User;
+import org.springside.examples.quickstart.repository.MUserDao;
 import org.springside.examples.quickstart.repository.TaskDao;
 import org.springside.examples.quickstart.repository.UserDao;
 import org.springside.examples.quickstart.service.ServiceException;
@@ -42,9 +44,10 @@ public class AccountService {
 	private UserDao userDao;
 	private TaskDao taskDao;
 	private Clock clock = Clock.DEFAULT;
-
-	public List<User> getAllUser() {
-		return (List<User>) userDao.findAll();
+	private MUserDao muserDao;
+	
+	public List<Muser> getAllUser() {
+		return (List<Muser>) muserDao.findAll();
 	}
 
 	public User getUser(Long id) {
@@ -119,4 +122,13 @@ public class AccountService {
 	public void setClock(Clock clock) {
 		this.clock = clock;
 	}
+
+	public MUserDao getMuserDao() {
+		return muserDao;
+	}
+	@Autowired
+	public void setMuserDao(MUserDao muserDao) {
+		this.muserDao = muserDao;
+	}
+	
 }

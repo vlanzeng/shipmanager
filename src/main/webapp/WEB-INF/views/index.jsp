@@ -367,7 +367,7 @@ a:active {
 				</p>
 			</div>
 			<div title="基本信息管理">
-				<a href="javascript:void(0);" src="demo/form/basic.html" class="cs-navi-tab"></a>
+				<a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">用户列表</a>
 				</p>
 			</div>
 		</div>
@@ -394,4 +394,7 @@ a:active {
 		<div id="mm-tabcloseall">关闭全部</div>
 	</div>
 </body>
+<script type="text/javascript">
+
+</script>
 </html>

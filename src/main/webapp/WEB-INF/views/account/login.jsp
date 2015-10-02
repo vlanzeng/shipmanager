@@ -4,13 +4,26 @@
 <%@ page import="org.apache.shiro.authc.IncorrectCredentialsException"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
-
+<link href="${ctx}/static/bootstrap/2.3.2/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
+<link href="${ctx}/static/styles/default.css" type="text/css" rel="stylesheet" />
+<style>
+	body{
+		width:500px;
+		margin:100px auto;		
+		overflow:hidden;
+	}
+	h3{		
+		text-align:center;
+		margin-bottom:100px;
+	}
+</style>
 <html>
 <head>
-	<title>登录页</title>
+	<title>航运宝管理系统</title>
 </head>
 
 <body>
+    <h3>航运宝管理系统</h3>  
 	<form id="loginForm" action="${ctx}/login" method="post" class="form-horizontal">
 	<%
 	String error = (String) request.getAttribute(FormAuthenticationFilter.DEFAULT_ERROR_KEY_ATTRIBUTE_NAME);

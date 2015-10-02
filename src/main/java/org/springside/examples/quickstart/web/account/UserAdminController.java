@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springside.examples.quickstart.entity.Muser;
 import org.springside.examples.quickstart.entity.User;
 import org.springside.examples.quickstart.service.account.AccountService;
+import org.springside.examples.quickstart.utils.CommonUtils;
 
 /**
  * 管理员管理用户的Controller.
@@ -33,11 +35,10 @@ public class UserAdminController {
 	@Autowired
 	private AccountService accountService;
 
-	@RequestMapping(method = RequestMethod.GET)
+	@RequestMapping(value="list",method = RequestMethod.GET)
 	public String list(Model model) {
-		List<User> users = accountService.getAllUser();
+		List<Muser> users = accountService.getAllUser();
 		model.addAttribute("users", users);
-
 		return "account/adminUserList";
 	}
 

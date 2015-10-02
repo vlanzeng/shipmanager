@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
-
+<link href="${ctx}/static/bootstrap/2.3.2/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
 <html>
 <head>
 	<title>用户管理</title>
@@ -14,16 +14,17 @@
 	</c:if>
 	
 	<table id="contentTable" class="table table-striped table-bordered table-condensed">
-		<thead><tr><th>登录名</th><th>用户名</th><th>注册时间<th>管理</th></tr></thead>
+		<thead><tr><th>用户名</th><th>船舶名称</th><th>船舶编号</th><th>手机号</th><th>注册时间</tr></thead>
 		<tbody>
 		<c:forEach items="${users}" var="user">
 			<tr>
-				<td><a href="${ctx}/admin/user/update/${user.id}">${user.loginName}</a></td>
-				<td>${user.name}</td>
+				<td>${user.username}</td>
+				<td>${user.shipname}</td>
+				<td>${user.shipno}</td>
+				<td>${user.phone}</td>
 				<td>
 					<fmt:formatDate value="${user.registerDate}" pattern="yyyy年MM月dd日  HH时mm分ss秒" />
 				</td>
-				<td><a href="${ctx}/admin/user/delete/${user.id}">删除</a></td>
 			</tr>
 		</c:forEach>
 		</tbody>
