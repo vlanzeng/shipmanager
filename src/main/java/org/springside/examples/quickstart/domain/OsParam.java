@@ -5,6 +5,9 @@ public class OsParam extends BaseParam {
 	public String osName;
 	public String cityId;
 	public String cityName;
+	public String addr;
+	public String latitude;
+	public String longitude;
 	
 	public String getOsId() {
 		return osId;
@@ -29,5 +32,23 @@ public class OsParam extends BaseParam {
 	}
 	public void setCityName(String cityName) {
 		this.cityName = cityName;
+	}
+	public String getAddr() {
+		return addr;
+	}
+	public void setAddr(String addr) {
+		this.addr = addr;
+	}
+	public String getLatitude() {
+		return latitude;
+	}
+	public void setLatitude(String latitude) {
+		this.latitude = latitude;
+	}
+	public String getLongitude() {
+		return longitude;
+	}
+	public void setLongitude(String longitude) {
+		this.longitude = longitude;
 	}
 }

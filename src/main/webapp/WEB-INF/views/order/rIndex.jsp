@@ -17,8 +17,6 @@
 	}  
 	
 	function showRestartDialog(id, status){       
-        $("#os_orderId").val(id);  
-        $("#os_old_status").val(status);  
         $("#restartDialog").dialog('open');  
     }  
 	
@@ -54,30 +52,26 @@
 	}
 	
 	function query(){
-		var orderNo = $("#order_no").val();
-		var userName = $("#user_name").val();
-		var osName = $("#os_name").val();
-		var status = $("#status").val();
+		var phone = $("#q_user_phone").val();
 		var startTime = $("#startTime").val();
 		var endTime = $("#endTime").val();
-		$('#dg').datagrid({ url:"${ctx}/m/order/query",
-			queryParams:{'page':1,'rows':15,'orderNo':orderNo,'userName':userName,'osName':osName,
-				'status':status,'startTime':startTime,'endTime':endTime},
+		$('#dg').datagrid({ url:"${ctx}/m/order/rQuery",
+			queryParams:{'page':1,'rows':15,'phone':phone,'startTime':startTime,'endTime':endTime},
 			method:"GET"});
 	}
 	
-	function disOs(){
-		var orderId = $("#os_orderId").val();
-		var osId = $('input[name="os_id_redio"]:checked').val();;
-		if(osId == '' || osId < 0){
-			alert("请选择状态。");
+	function addRecharge(){
+		var phone = $("#user_phone").val();
+		var amount = $("#user_amount").val();
+		if(amount == '' || amount < 0 || phone ==''||phone<0){
+			alert("请输入内容。");
 			return;
 		}
 		$.ajax({
 		    type:'POST',
-		    url: "${ctx}/m/order/uos",
+		    url: "${ctx}/m/order/radd",
 		    cache:false,  
-		    data: {'orderId':orderId,'osId':osId} ,
+		    data: {'phone':phone,'amount':amount} ,
 		    dataType: 'json',
 		    success: function(data){
 		    	if(data.code == 200){
@@ -125,7 +119,7 @@
     	$("#restartDialog").dialog('close');
     	$("#showOsDialog").dialog('close');
     	$('#dg').datagrid({ 
-    		url:'${ctx}/m/order/query', 
+    		url:'${ctx}/m/order/rQuery', 
     		method:'GET',
     		queryParams:{'status':-1},
     		fitCloumns: true , 
@@ -134,26 +128,9 @@
     		pagination:true,//分页控件 
     		columns:[[ 
     		{field:'id',title:'ID',width:fixWidth(0.06)}, 
-    		{field:'orderNo',title:'订单号',width:fixWidth(0.18)}, 
-    		{field:'productName',title:'油品',width:fixWidth(0.06),align:'right'},
-    		{field:'price',title:'单价',width:fixWidth(0.06),align:'right'},
-    		{field:'num',title:'数量',width:fixWidth(0.06),align:'right'},
-    		{field:'status',title:'状态',width:fixWidth(0.06),align:'right'},
-    		{field:'amount',title:'总价',width:fixWidth(0.08),align:'right'},
-    		{field:'userName',title:'用户名',width:fixWidth(0.1),align:'right'},
-    		{field:'osName',title:'加油站',width:fixWidth(0.13),align:'right'},
-    		{field:'updateTime',title:'更新时间',width:fixWidth(0.12),align:'right'},
-    		{field:'createTime',title:'创建时间',width:fixWidth(0.12),align:'right'},
-    		{field:'op',title:'操作',width:155,formatter:function(value,rowData,rowIndex){
-    			var id = rowData.id;
-    			var status = rowData.status;
-    			var str = "";
-    			str += '<a href="#" onclick="showRestartDialog(\''+id+'\','+status+')">设置状态</a>';
-    			if(status == 11){
-    				str += ' | <a href="#" onclick="showOsDialog(\''+id+'\','+status+')">分配加油站</a>';
-    			}
-    			return str;
-    		}} 
+    		{field:'phone',title:'手机号',width:fixWidth(0.18)}, 
+    		{field:'amount',title:'金额',width:fixWidth(0.1),align:'right'},
+    		{field:'createTime',title:'充值时间',width:fixWidth(0.12),align:'right'}
     		]] 
     	});
     });   
@@ -166,32 +143,8 @@
 			<div id="coupon_query_id">
 				<table>
 					<tr style="height: 40px;">
-						<td width="100px"><span>订单号:</span></td>
-						<td width="150px"><input id="order_no" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>用户名:</span></td>
-						<td width="150px"><input id="user_name" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>加油站:</span></td>
-						<td width="150px"><input id="os_name" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>状态:</span></td>
-						<td width="150px">
-							<select name="select" id="status" style="width: 200px">
-							    <option value="-1" selected="selected">全部</option>
-							    <option value="0">等待付款中</option>
-								<option value="1">付款成功</option>
-								<option value="2">付款失败</option>
-								<option value="3">过期</option>
-								<option value="4">撤销成功</option>
-								<option value="5">退款中</option>
-								<option value="6">退款成功</option>
-								<option value="7">退款失败</option>
-								<option value="8">部分退款成功</option>
-								<option value="11">新建预约订单</option>
-								<option value="12">后台加油站已确定-等待付款中</option>
-								<option value="99">删除</option>
-							</select>
-						</td>
-					</tr>
-					<tr style="height: 40px;">
+						<td width="100px"><span>手机号:</span></td>
+						<td width="150px"><input id="q_user_phone" type="text" style="width: 120px"/></td>
 						<td width="100px"><span>开始时间:</span></td>
 						<td width="150px"><input id="startTime" class="easyui-datebox"></input></td>
 						<td width="100px"><span>结束时间:</span></td>
@@ -199,6 +152,9 @@
 						<td colspan="4" width="100px">&nbsp;</td>
 					</tr>
 					<tr style="height: 40px;">
+					</tr>
+					<tr style="height: 40px;">
+					    <td colspan="8" style="text-align: right;"><button type="button" onclick="showRestartDialog()">充值</button></td>
 						<td colspan="8" style="text-align: right;"><button type="button" onclick="query()">查询</button></td>
 					</tr>
 				</table>
@@ -208,37 +164,29 @@
 		    <table id="dg"></table>
 		</div>
 	</div>
-	<div id="restartDialog" class="easyui-dialog" title="更新状态" style="width: 400px; height: 180px;" >
+	<div id="restartDialog" class="easyui-dialog" title="用户充值" style="width: 500px; height: 250px;" >
 		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
 			<div class="data-tips-info">
 				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
-					<tr>
+					<tr style="height: 30px">
 						<td style="width:30%;">
-							选择状态：
+							手机号：
 						</td>
 						<td  style="text-align:left;">
-							<select id="update_order_status" style="width: 200px">
-							    <option value="-1">请选择</option>
-								<option value="0">等待付款中</option>
-								<option value="1">付款成功</option>
-								<option value="2">付款失败</option>
-								<option value="3">过期</option>
-								<option value="4">撤销成功</option>
-								<option value="5">退款中</option>
-								<option value="6">退款成功</option>
-								<option value="7">退款失败</option>
-								<option value="8">部分退款成功</option>
-								<option value="11">新建预约订单</option>
-								<option value="12">后台加油站已确定-等待付款中</option>
-								<option value="99">删除</option>
-							</select>
-							<input type="hidden" id="update_orderId" name="update_orderId"/>
-							<input type="hidden" id="update_old_status" name="update_old_status"/>
+							<input id="user_phone" name="user_phone"/>
+						</td>
+					</tr>
+					<tr style="height: 30px">
+						<td style="width:30%;">
+							金额：
+						</td>
+						<td  style="text-align:left;">
+							<input id="user_amount" name="user_amonut"/>
 						</td>
 					</tr>
 				</table>
 				<div style="text-align:right;margin-right:30px;margin-top: 50px">
-					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-finish'" onclick="updateStatus()">确定</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-finish'" onclick="addRecharge()">确定</a>
 					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-cancel'" onclick="cancel()">取消</a>
 				</div>				
 			</div> 		

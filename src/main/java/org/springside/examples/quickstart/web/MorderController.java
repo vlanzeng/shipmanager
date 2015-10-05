@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springside.examples.quickstart.contants.ErrorConstants;
 import org.springside.examples.quickstart.contants.HybConstants;
+import org.springside.examples.quickstart.domain.BaseParam;
+import org.springside.examples.quickstart.domain.ChargeLogBean;
 import org.springside.examples.quickstart.domain.DataGrid;
 import org.springside.examples.quickstart.domain.OrderBean;
 import org.springside.examples.quickstart.domain.OrderParam;
-import org.springside.examples.quickstart.domain.ResultList;
 import org.springside.examples.quickstart.service.MorderService;
 import org.springside.examples.quickstart.utils.CommonUtils;
 
@@ -113,17 +114,16 @@ public class MorderController extends BaseController implements HybConstants{
 		return CommonUtils.printStr(ErrorConstants.BANK_GET_INFO_ERROR);
 	}
 	
-	
 	/**
 	 * @param request
 	 * @param response
 	 * @throws IOException
 	 * @throws ServletException
 	 */
-	@RequestMapping(value="mIndex", method=RequestMethod.GET)
-	public String mIndex(HttpServletRequest request,
+	@RequestMapping(value="rIndex", method=RequestMethod.GET)
+	public String rIndex(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException{
-		return "order/mIndex";
+		return "order/rIndex";
 	}
 	
 	/**
@@ -132,16 +132,40 @@ public class MorderController extends BaseController implements HybConstants{
 	 * @throws IOException
 	 * @throws ServletException
 	 */
-	@RequestMapping(value="mQuery", method=RequestMethod.GET)
+	@RequestMapping(value="rQuery", method=RequestMethod.GET)
 	@ResponseBody
-	public String mQuery(HttpServletRequest request,
+	public String rQuery(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException{
 		Integer[] pageInfo = getPageInfo(request);
-		OrderParam param = new OrderParam();
+		BaseParam param = new BaseParam();
 		param.setPage(pageInfo[0]);
 		param.setRows(pageInfo[1]);
-		param.setStatus(11);
-		DataGrid<OrderBean> gb = morderService.getOrderList(param);
+		param.setPhone(request.getParameter("phone"));
+		DataGrid<ChargeLogBean> gb = morderService.getRechargeList(param);
 		return CommonUtils.printObjStr2(gb);
+	}
+	
+	/**
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	@RequestMapping(value="radd", method=RequestMethod.POST)
+	@ResponseBody
+	public String rAdd(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException{
+		String amount = request.getParameter("amount");
+		String phone = request.getParameter("phone");
+		try {
+			int res = morderService.recharge(phone, amount);
+			if(res > 0){
+				return CommonUtils.printObjStr(res);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("uStatus error.", e);
+		}
+		return CommonUtils.printStr(ErrorConstants.BANK_GET_INFO_ERROR);
 	}
 }

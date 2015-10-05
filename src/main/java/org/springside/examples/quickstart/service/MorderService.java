@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springside.examples.quickstart.domain.BaseParam;
+import org.springside.examples.quickstart.domain.ChargeLogBean;
 import org.springside.examples.quickstart.domain.DataGrid;
 import org.springside.examples.quickstart.domain.OrderBean;
 import org.springside.examples.quickstart.domain.OrderParam;
@@ -164,5 +166,63 @@ public class MorderService {
 		//设置加油站
 		Integer productId = Integer.valueOf(oils.get(0)[0]+"");
 		return morderDao.updateOs(Integer.valueOf(osId), productId, orderId);
+	}
+
+	public int recharge(String phone, String amount) {
+		//更新用户月
+		//插入充值记录表
+		int r = morderDao.insertLog(phone,amount);
+		if(r > 0){
+			//根据手机号查询ID
+				Long userId = morderDao.queryUserIdForPhone(phone);
+				if(userId <= 0){
+					throw new RuntimeException("充值失败");
+				}
+				int rr = morderDao.updateRecharge(userId, amount);
+				if(rr <= 0){
+					throw new RuntimeException("充值失败");
+				}
+		}
+		return r;
+	}
+	
+	public DataGrid<ChargeLogBean> getRechargeList(BaseParam param){
+		DataGrid<ChargeLogBean> dg = new DataGrid<ChargeLogBean>();
+		StringBuffer whereParam = new StringBuffer();
+		int start = (param.getPage() - 1) * param.getRows();
+		
+		if(!StringUtils.isEmpty(param.phone)){
+			whereParam.append(" and r.phone ='"+param.phone+"'");
+		}
+		
+		if(!StringUtils.isEmpty(param.startTime)){
+			whereParam.append(" and o.create_time >='"+param.startTime+"'");
+		}
+		
+		if(!StringUtils.isEmpty(param.getEndTime())){
+			whereParam.append(" and o.create_time<'"+param.getEndTime()+"'");
+		}
+		String sql = "SELECT r.id,r.phone,r.`status`,r.amount,r.create_time from t_recharge_log r where 1=1 " + 
+		              whereParam.toString() + " " + "order by r.create_time desc limit "+start+","+param.getRows()+"";
+		Query q = em.createNativeQuery(sql);
+		List<Object[]> infoList = q.getResultList();
+		List<ChargeLogBean> result = new ArrayList<ChargeLogBean>();
+		
+		String totalSql = "select count(1) from t_recharge_log r where 1=1 " + whereParam.toString();
+		Query q1 = em.createNativeQuery(totalSql);
+		
+		int total = Integer.valueOf(q1.getSingleResult()+"");
+		for(Object[] o : infoList){
+			ChargeLogBean ob = new ChargeLogBean();
+			ob.setId(Long.valueOf(o[0]+""));
+			ob.setPhone(o[1]+"");
+			ob.setStatus(Integer.valueOf(o[2]+""));
+			ob.setAmount(o[3]==null ? "" :o[3] + "");
+			ob.setCreateTime(o[4]==null ? "" :o[4] + "");
+			result.add(ob);
+		}
+		dg.setTotal(total);
+		dg.setRows(result);
+		return dg;
 	}
 }
