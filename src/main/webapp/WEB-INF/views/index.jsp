@@ -373,9 +373,8 @@ a:active {
 				</p>
 			</div>
 			<div title="油库进油">
-				<a href="javascript:void(0);" src="${ctx}/m/order/index"
-					class="cs-navi-tab">订单查询</a>
-				</p>
+				<p><a href="javascript:void(0);" src="${ctx}/m/os/jyzOIndex" class="cs-navi-tab">加油站订单查询</a></p>
+				<p><a href="javascript:void(0);" src="${ctx}/m/os/adminOIndex" class="cs-navi-tab">admin订单查询</a></p>
 			</div>
 			<div title="优惠券管理">
 				<a href="javascript:void(0);" src="${ctx}/m/coupon/index"

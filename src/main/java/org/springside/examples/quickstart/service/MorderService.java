@@ -8,6 +8,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -16,6 +17,7 @@ import org.springside.examples.quickstart.domain.ChargeLogBean;
 import org.springside.examples.quickstart.domain.DataGrid;
 import org.springside.examples.quickstart.domain.OrderBean;
 import org.springside.examples.quickstart.domain.OrderParam;
+import org.springside.examples.quickstart.domain.OsOilParam;
 import org.springside.examples.quickstart.domain.ResultList;
 import org.springside.examples.quickstart.repository.MorderDao;
 
