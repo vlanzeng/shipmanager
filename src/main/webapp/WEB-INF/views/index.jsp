@@ -366,6 +366,16 @@ a:active {
 					class="cs-navi-tab">加油站列表</a>
 				</p>
 			</div>
+			<div title="资讯管理">
+				<a href="javascript:void(0);" src="${ctx}/m/info/index" class="cs-navi-tab">大宗商品</a>
+				</p>
+				<a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">船舶服务</a>
+				</p>
+				<a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">配货信息</a>
+				</p>
+				<a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">海事服务</a>
+				</p>
+			</div>
 			<div title="基本信息管理">
 				<a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">用户列表</a>
 				</p>
@@ -380,10 +390,6 @@ a:active {
 				</div>
 			</div>
 		</div>
-	</div>
-
-	<div region="south" border="false" id="south">
-		<center>@tianshaojie@foxmail.com</center>
 	</div>
 
 	<div id="mm" class="easyui-menu cs-tab-menu">
