@@ -29,6 +29,8 @@ public class User extends IdEntity {
 	private String password;
 	private String salt;
 	private String roles;
+	private Integer status;
+	private Long osId;
 	private Date registerDate;
 
 	public User() {
@@ -55,7 +57,12 @@ public class User extends IdEntity {
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	public Long getOsId() {
+		return osId;
+	}
+	public void setOsId(Long osId) {
+		this.osId = osId;
+	}
 	// 不持久化到数据库，也不显示在Restful接口的属性.
 	@Transient
 	@JsonIgnore
@@ -89,6 +96,14 @@ public class User extends IdEntity {
 
 	public void setRoles(String roles) {
 		this.roles = roles;
+	}
+	
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
 	@Transient

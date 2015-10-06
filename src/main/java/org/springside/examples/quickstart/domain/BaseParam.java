@@ -10,6 +10,7 @@ public class BaseParam {
 	public Integer rows = 20;
 	public String startTime;
 	public String endTime;
+	public String phone;
 	
 	public Integer getId() {
 		return id;
@@ -64,5 +65,11 @@ public class BaseParam {
 	}
 	public void setEndTime(String endTime) {
 		this.endTime = endTime;
+	}
+	public String getPhone() {
+		return phone;
+	}
+	public void setPhone(String phone) {
+		this.phone = phone;
 	}
 }

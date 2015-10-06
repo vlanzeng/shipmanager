@@ -59,12 +59,12 @@ a:active {
 }
 
 .cs-north {
-	height: 60px;
+	height: 95px;
 }
 
 .cs-north-bg {
 	width: 100%;
-	height: 100%;
+	height: 80px;
 	background: url(themes/gray/images/header_bg.png) repeat-x;
 }
 
@@ -337,6 +337,9 @@ a:active {
 	<div region="north" border="true" class="cs-north">
 		<div class="cs-north-bg">
 			<div class="cs-north-logo">航运宝管理系统</div>
+			<div style="float: right;margin-top: 50px;margin-right: 100px">
+			登录用户：xxx  &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;  <a href="${ctx}/logout">退出</a>
+		</div>
 		</div>
 	</div>
 	<div region="west" border="true" split="true" title=""
@@ -346,8 +349,32 @@ a:active {
 				<a href="javascript:void(0);" src="${ctx}/m/order/index"
 					class="cs-navi-tab">订单查询</a>
 				</p>
+				<a href="javascript:void(0);" src="${ctx}/m/order/index"
+					class="cs-navi-tab">生成客户订单</a>
+				</p>
+			</div>
+			<div title="财务明细">
+				<a href="javascript:void(0);" src="${ctx}/m/order/index"
+					class="cs-navi-tab">加油收入</a>
+				</p>
+				<a href="javascript:void(0);" src="${ctx}/m/order/index"
+					class="cs-navi-tab">进油支出</a>
+				</p>
 				<a href="javascript:void(0);" src="${ctx}/m/order/mIndex"
-					class="cs-navi-tab">财务明细</a>
+					class="cs-navi-tab">提现申请</a>
+				</p>
+			</div>
+			<div title="预约销码">
+				<a href="javascript:void(0);" src="${ctx}/m/order/index"
+					class="cs-navi-tab">预约销码</a>
+				</p>
+				<a href="javascript:void(0);" src="${ctx}/m/order/index"
+					class="cs-navi-tab">生成客户订单</a>
+				</p>
+			</div>
+			<div title="油库进油">
+				<a href="javascript:void(0);" src="${ctx}/m/order/index"
+					class="cs-navi-tab">订单查询</a>
 				</p>
 			</div>
 			<div title="优惠券管理">
@@ -359,10 +386,7 @@ a:active {
 				</p>
 			</div>
 			<div title="加油站管理">
-			    <a href="javascript:void(0);" src="demo/menu/basic.html"
-					class="cs-navi-tab">城市列表</a>
-				</p>
-				<a href="javascript:void(0);" src="demo/menu/basic.html"
+				<a href="javascript:void(0);" src="${ctx}/m/os/index"
 					class="cs-navi-tab">加油站列表</a>
 				</p>
 			</div>
@@ -378,6 +402,17 @@ a:active {
 			</div>
 			<div title="基本信息管理">
 				<a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">用户列表</a>
+				</p>
+			</div>
+			<div title="充值管理">
+				<p><a href="javascript:void(0);" src="${ctx}/m/order/rIndex" class="cs-navi-tab">充值管理</a></p>
+			</div>
+			<div title="广告管理">
+				<p><a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">广告管理</a></p>
+			</div>
+			<div title="系统管理">
+			    <a href="javascript:void(0);" src="${ctx}/m/muser/index"
+					class="cs-navi-tab">后台用户管理</a>
 				</p>
 			</div>
 		</div>

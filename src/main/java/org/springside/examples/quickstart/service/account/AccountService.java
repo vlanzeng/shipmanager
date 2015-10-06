@@ -55,7 +55,7 @@ public class AccountService {
 	}
 
 	public User findUserByLoginName(String loginName) {
-		return userDao.findByLoginName(loginName);
+		return userDao.findByLoginName(loginName, 1);
 	}
 
 	public void registerUser(User user) {

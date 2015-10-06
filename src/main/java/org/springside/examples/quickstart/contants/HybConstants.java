@@ -30,4 +30,18 @@ public interface HybConstants {
 	static final String MERCHANTMY = "abcdefg";
 	
 	static final String USERID = "userId";
+	
+	//admin-系统管理员      cwgly-财务管理员     kfqx客服权限  jygly进油管理员
+	//jyzAdmin-系统管理员     jyzcwqx-加油站财务权限     jyzjygqx加油工权限
+	static final String ADMIN = "admin";
+	static final String CWGLY = "cwgly";
+	static final String KFQX = "kfqx";
+	static final String JYGLY = "jygly";
+	
+	static final String JYZADMIN = "jyzAdmin";
+	static final String JYZCWQX = "jyzcwqx";
+	static final String JYZJYGQX = "jyzjygqx";
+	
+	static final String FW_ADDRESS = "43.254.55.158";
+	
 }
