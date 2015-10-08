@@ -391,13 +391,13 @@ a:active {
 				</p>
 			</div>
 			<div title="资讯管理">
-				<a href="javascript:void(0);" src="${ctx}/m/info/index" class="cs-navi-tab">大宗商品</a>
+				<a href="javascript:void(0);" src="${ctx}/m/info/goods" class="cs-navi-tab">大宗商品</a>
 				</p>
-				<a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">船舶服务</a>
+				<a href="javascript:void(0);" src="${ctx}/m/info/ship" class="cs-navi-tab">船舶服务</a>
 				</p>
-				<a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">配货信息</a>
+				<a href="javascript:void(0);" src="${ctx}/m/info/some" class="cs-navi-tab">配货信息</a>
 				</p>
-				<a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">海事服务</a>
+				<a href="javascript:void(0);" src="${ctx}/m/info/maritime" class="cs-navi-tab">海事服务</a>
 				</p>
 			</div>
 			<div title="基本信息管理">
