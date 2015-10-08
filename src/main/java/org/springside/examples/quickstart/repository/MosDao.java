@@ -34,11 +34,16 @@ public interface MosDao extends CrudRepository<Coupon, Long> {
 	int queryOrderTotal();
 	
 	@Modifying
-	@Query(value="update t_order set status=?1 where status=?2 and id=?3", nativeQuery=true)
-	int updateStatus(Integer status, Integer oldStatus, String orderId);
+	@Query(value="update t_os_buy set status=?1 where status=?2 and id=?3", nativeQuery=true)
+	int updateStatus(Integer status, Integer oldStatus, Long id);
 
 	@Modifying
 	@Query(value="insert into t_oil_station(name,`desc`,address,latitude,longitude,pic_url,phone,city_id,credit,quality,"
 			+ "service,coupon_flag,derate_flag,status,create_time) values(?1,?1,?2,?3,?4,?5,?6,?7,5,5,5,1,1,1,now())", nativeQuery=true)
 	int insertOs(String osName, String addr, String latitude,String longitude,String picurl, String phone, Long cityId);
+	
+	@Modifying
+	@Query(value="insert into t_os_buy(user_name,os_id,order_no,oil_id,price,num,amount,status,create_time) "
+			+ "values(?1,?2,?3,?4,?5,?6,?7,1,now())", nativeQuery=true)
+	int addOsOilOrder(String userNmae,Long osId, String orderNo,Long oilId, String price, Integer num,String amount);
 }

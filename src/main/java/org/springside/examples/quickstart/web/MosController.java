@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -22,8 +23,13 @@ import org.springside.examples.quickstart.contants.ErrorConstants;
 import org.springside.examples.quickstart.contants.HybConstants;
 import org.springside.examples.quickstart.domain.DataGrid;
 import org.springside.examples.quickstart.domain.OilStationBean;
+import org.springside.examples.quickstart.domain.OsOilBean;
+import org.springside.examples.quickstart.domain.OsOilParam;
 import org.springside.examples.quickstart.domain.OsParam;
+import org.springside.examples.quickstart.entity.User;
 import org.springside.examples.quickstart.service.MosService;
+import org.springside.examples.quickstart.service.MuserService;
+import org.springside.examples.quickstart.service.account.ShiroDbRealm.ShiroUser;
 import org.springside.examples.quickstart.utils.CommonUtils;
 
 @Controller
@@ -33,6 +39,8 @@ public class MosController extends BaseController implements HybConstants{
 	
 	@Autowired
     private MosService mosService;
+	@Autowired
+	private MuserService muserService;
 	
 	/**
 	 * @param request
@@ -94,5 +102,103 @@ public class MosController extends BaseController implements HybConstants{
 			logger.error("uStatus error.", e);
 		}
 		return CommonUtils.printStr(ErrorConstants.BANK_GET_INFO_ERROR);
+	}
+	
+	
+	/**
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	@RequestMapping(value="jyzOIndex", method=RequestMethod.GET)
+	public String jyzOIndex(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException{
+		return "os/jyzOIndex";
+	}
+	
+	/**
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	@RequestMapping(value="jyzOQuery", method=RequestMethod.GET)
+	@ResponseBody
+	public String jyzOQuery(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException{
+		Integer[] pageInfo = getPageInfo(request);
+		OsOilParam param = new OsOilParam();
+		param.setPage(pageInfo[0]);
+		param.setRows(pageInfo[1]);
+		param.setStatus(Integer.valueOf(request.getParameter("status")));
+		param.setOrderNo(request.getParameter("orderNo"));
+		param.setOsName(request.getParameter("osName"));
+		param.setStartTime(request.getParameter("startTime"));
+		param.setEndTime(request.getParameter("endTime"));
+		DataGrid<OsOilBean> gb = mosService.getOsBuyOilList(param);
+		return CommonUtils.printObjStr2(gb);
+	}
+	
+	/**
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	@RequestMapping(value="addOsOil", method=RequestMethod.POST)
+	@ResponseBody
+	public String addOsOilOrder(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException{
+		OsOilParam param = new OsOilParam();
+		param.oilId = Long.valueOf(request.getParameter("oilId"));
+		param.num = Integer.valueOf(request.getParameter("num"));
+		param.status = Integer.valueOf(request.getParameter("status"));
+		param.price = request.getParameter("price");
+		ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();	
+		param.userName = user.loginName;
+		param.orderNo = CommonUtils.getMerchantOrderNo("12");
+		param.amount = param.num*param.num+"";
+		try {
+			int res = mosService.addOsOilOrder(param);
+			if(res > 0){
+				return CommonUtils.printObjStr(res);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("uStatus error.", e);
+		}
+		return CommonUtils.printStr(ErrorConstants.BANK_GET_INFO_ERROR);
+	}
+	
+	
+	
+	@RequestMapping(value="upOsOilstatus", method=RequestMethod.POST)
+	@ResponseBody
+	public String upOsOilstatus(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException{
+		String id = request.getParameter("id");
+		String status = request.getParameter("status");
+		String oldStatus = request.getParameter("oldStatus");
+		try {
+			int res = mosService.uStatus(id, status, oldStatus);
+			if(res > 0){
+				return CommonUtils.printObjStr(res);
+			}
+		} catch (Exception e) {
+			logger.error("uStatus error.", e);
+		}
+		return CommonUtils.printStr(ErrorConstants.BANK_GET_INFO_ERROR);
+	}
+	
+	/**
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	@RequestMapping(value="adminOIndex", method=RequestMethod.GET)
+	public String adminOIndex(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException{
+		return "os/adminOIndex";
 	}
 }
