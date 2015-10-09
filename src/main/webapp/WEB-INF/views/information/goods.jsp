@@ -39,14 +39,14 @@
 					<td width="100px">
 						<input type="text" placeholder="发布人手机号"/>
 					</td>
-					<td>
-						<div class="control">
-            				<div class="search-box">
-               				 	<input type="text" placeholder="搜索...."/>
-                					<a href="javascript:void(0);">查询</a>
-            				</div>
-           				 	<a href="${ctx}/info/add" class="release-box">发布资讯</a>
-       				 	</div>
+					<td width="100px">
+               		     <input type="text" placeholder="搜索...."/>
+       				 </td>
+       				 <td width="100px">
+       				    <a href="javascript:void(0);">查询</a>
+       				 </td>
+       				 <td width="100px"
+       				 	 <a href="${ctx}/info/add" class="release-box">发布资讯</a>
        				 </td>
 				</tr>
 			</table>
@@ -78,12 +78,12 @@
 				width : fixWidth(0.15),
 				align : 'right'
 			}, {
-				field : 'desc',
-				title : '详情',
+				field : 'descri',
+				title : '描述',
 				width : fixWidth(0.1),
 				align : 'right'
 			}, {
-				field : 'linkman',
+				field : 'linkMan',
 				title : '联系人',
 				width : fixWidth(0.08),
 				align : 'right'
@@ -112,9 +112,18 @@
 				title : '操作',
 				width : 155,
 				formatter : function(value, rowData, rowIndex) {
+					var id = rowData.id;
+	    			var str = "";
+	    				str += ' <a href="#" onclick="delete(\''+id+'\')">删除</a>';
+	    				str += ' <a href="#" onclick="update(\''+id+'\')">修改</a>';
+	    			return str;
 				}
 			} ] ]
 		});
 	});
+	function fixWidth(percent)  
+	{  
+	    return (document.body.clientWidth-200) * percent ;
+	}  
 </script>
 </html>

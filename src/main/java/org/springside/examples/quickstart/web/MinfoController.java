@@ -1,11 +1,13 @@
 package org.springside.examples.quickstart.web;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,10 +15,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springside.examples.quickstart.contants.HybConstants;
 import org.springside.examples.quickstart.domain.CouponParam;
+import org.springside.examples.quickstart.domain.DataGrid;
+import org.springside.examples.quickstart.entity.Information;
+import org.springside.examples.quickstart.repository.InformationDaoImpl;
 import org.springside.examples.quickstart.utils.CommonUtils;
+
+import com.alibaba.fastjson.JSON;
 @Controller
 @RequestMapping(value="/m/info")
 public class MinfoController extends BaseController implements HybConstants{
+	@Autowired
+	private InformationDaoImpl inforDaoImpl;
 	/**
 	 * 大宗商品页
 	 */
@@ -61,18 +70,39 @@ public class MinfoController extends BaseController implements HybConstants{
 	public String list(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException{
 		Integer[] pageInfo = getPageInfo(request);
-		CouponParam param = new CouponParam();
-		param.setPage(pageInfo[0]);
-		param.setRows(pageInfo[1]);
-		param.setName(CommonUtils.decode(request.getParameter("name")));
-		param.setFaceLimit(request.getParameter("faceLimit"));
-		if(!StringUtils.isEmpty(request.getParameter("type"))){
-			param.setType(Integer.valueOf(request.getParameter("type")));
+		String str =" ";
+		if(request.getParameter("infoType")!=null){
+			str+="info.infoType ="+request.getParameter("infoType");
+		}else{
+			str+="info.infoType =1 ";
 		}
-		param.setStartTime(request.getParameter("startTime"));
-		param.setEndTime(request.getParameter("endTime"));
-		//DataGrid<CouponBean> gb = mcouponService.getCouponList(param);
-		return CommonUtils.printObjStr2(null);
+		if(request.getParameter("infoAction")!=null){
+			str+=" and info.infoAction ="+request.getParameter("infoAction");
+		}
+		if(request.getParameter("infoTypeOne")!=null){
+			str+=" and info.infoTypeOne like \'%"+request.getParameter("infoTypeOne")+"%\'";
+		}
+		if(request.getParameter("infoTypeTwo")!=null){
+			str+=" and info.infoTypeTwo like \'%"+request.getParameter("infoTypeTwo")+"%\'";
+		}
+		if(request.getParameter("city")!=null){
+			str+=" and info.city like \'%"+request.getParameter("city")+"%\'";
+		}
+		str +=" order by info.createTime desc";
+		if(request.getParameter("price")!=null){
+			if(request.getParameter("price").equals(1)){
+				str+=" , info.price asc";
+			}else if(request.getParameter("price").equals(2)){
+				str+=" , info.price desc";
+			}
+		}else{
+			str+=" , info.reviewCount desc";
+		}
+		List<Information> infoList=inforDaoImpl.findInfoByParam(str,pageInfo[0],pageInfo[1]);
+		DataGrid<Information> dg = new DataGrid<Information>();
+		dg.setRows(infoList);
+		dg.setTotal(inforDaoImpl.findInfoByParam(str));
+		return CommonUtils.printObjStr2(dg);
 	}
 	/**
 	 * 条件查询资讯

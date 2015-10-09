@@ -1,9 +1,11 @@
 package org.springside.examples.quickstart.repository;
 
 
+import java.util.List;
+
 import org.springframework.data.repository.CrudRepository;
 import org.springside.examples.quickstart.entity.Information;
 
 public interface InformationDao extends CrudRepository<Information, Long> {
-	//List<Information> findInfoByParam(String param,Integer page,Integer pageSize);
+	List<Information> findInfoByParam(String param,Integer page,Integer pageSize);
 }
