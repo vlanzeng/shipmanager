@@ -21,6 +21,8 @@ import org.springside.examples.quickstart.repository.InformationDaoImpl;
 import org.springside.examples.quickstart.service.InformationService;
 import org.springside.examples.quickstart.utils.CommonUtils;
 
+import com.alibaba.fastjson.JSON;
+
 @Controller
 @RequestMapping(value="/m/info")
 public class MinfoController extends BaseController implements HybConstants{
@@ -90,6 +92,12 @@ public class MinfoController extends BaseController implements HybConstants{
 		if(request.getParameter("city")!=null){
 			str+=" and info.city like \'%"+request.getParameter("city")+"%\'";
 		}
+		if(request.getParameter("phone")!=null){
+			str+=" and info.phone like \'%"+request.getParameter("phone")+"%\'";
+		}
+		if(request.getParameter("title")!=null){
+			str+=" and info.title like \'%"+request.getParameter("title")+"%\'";
+		}
 		str +=" order by info.createTime desc";
 		if(request.getParameter("price")!=null){
 			if(request.getParameter("price").equals(1)){
@@ -109,32 +117,66 @@ public class MinfoController extends BaseController implements HybConstants{
 	/**
 	 * 条件查询资讯
 	 */
-	@RequestMapping(value="query", method=RequestMethod.GET)
+	@RequestMapping(value="query", method=RequestMethod.POST)
 	@ResponseBody
 	public String query(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException{
 		Integer[] pageInfo = getPageInfo(request);
-		CouponParam param = new CouponParam();
-		param.setPage(pageInfo[0]);
-		param.setRows(pageInfo[1]);
-		param.setName(CommonUtils.decode(request.getParameter("name")));
-		param.setFaceLimit(request.getParameter("faceLimit"));
-		if(!StringUtils.isEmpty(request.getParameter("type"))){
-			param.setType(Integer.valueOf(request.getParameter("type")));
+		String str =" ";
+		if(request.getParameter("infoType")!=null){
+			str+="info.infoType ="+request.getParameter("infoType");
+		}else{
+			str+="info.infoType =1 ";
 		}
-		param.setStartTime(request.getParameter("startTime"));
-		param.setEndTime(request.getParameter("endTime"));
-		//DataGrid<CouponBean> gb = mcouponService.getCouponList(param);
-		return CommonUtils.printObjStr2(null);
+		if(request.getParameter("infoAction")!=null){
+			str+=" and info.infoAction ="+request.getParameter("infoAction");
+		}
+		if(request.getParameter("infoTypeOne")!=null){
+			str+=" and info.infoTypeOne like \'%"+request.getParameter("infoTypeOne")+"%\'";
+		}
+		if(request.getParameter("infoTypeTwo")!=null){
+			str+=" and info.infoTypeTwo like \'%"+request.getParameter("infoTypeTwo")+"%\'";
+		}
+		if(!request.getParameter("city").equals("-1")){
+			str+=" and info.city like \'%"+request.getParameter("city")+"%\'";
+		}
+		if(request.getParameter("phone")!=null&&request.getParameter("phone")!=""){
+			str+=" and info.phone like \'%"+request.getParameter("phone")+"%\'";
+		}
+		if(request.getParameter("title")!=null){
+			str+=" and info.title like \'%"+request.getParameter("title")+"%\'";
+		}
+		str +=" order by info.createTime desc";
+		if(request.getParameter("price")!=null){
+			if(request.getParameter("price").equals(1)){
+				str+=" , info.price asc";
+			}else if(request.getParameter("price").equals(2)){
+				str+=" , info.price desc";
+			}
+		}else{
+			str+=" , info.reviewCount desc";
+		}
+		List<Information> infoList=inforDaoImpl.findInfoByParam(str,pageInfo[0],pageInfo[1]);
+		DataGrid<Information> dg = new DataGrid<Information>();
+		dg.setRows(infoList);
+		dg.setTotal(inforDaoImpl.findInfoByParam(str));
+		return CommonUtils.printObjStr2(dg);
 	}
 	/**
 	 * 新增资讯
 	 */
-	@RequestMapping(value="add", method=RequestMethod.GET)
+	@RequestMapping(value="add", method=RequestMethod.POST)
 	@ResponseBody
 	public String add(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException{
-		return CommonUtils.printObjStr2(null);
+		String info = request.getParameter("info");
+		Information infor = JSON.parseObject(info, Information.class);
+		infor=InformationService.getInfoDao().save(infor);
+		if(infor.getId()!=null){
+			return CommonUtils.printStr("200", "资讯详情");
+		}else{
+			return CommonUtils.printStr("400", "保存失败");
+		}
 	}
 	/**
 	 * 修改资讯
