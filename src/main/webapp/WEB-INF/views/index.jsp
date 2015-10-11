@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <html>
 <head>
@@ -338,82 +339,88 @@ a:active {
 		<div class="cs-north-bg">
 			<div class="cs-north-logo">航运宝管理系统</div>
 			<div style="float: right;margin-top: 50px;margin-right: 100px">
-			登录用户：xxx  &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;  <a href="${ctx}/logout">退出</a>
+			登录用户：<shiro:principal/>  &nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;  <a href="${ctx}/logout">退出</a>
 		</div>
 		</div>
 	</div>
-	<div region="west" border="true" split="true" title=""
-		class="cs-west">
-		<div class="easyui-accordion" fit="true" border="false">
-			<div title="订单管理">
-				<a href="javascript:void(0);" src="${ctx}/m/order/index"
-					class="cs-navi-tab">订单查询</a>
-				</p>
-				<a href="javascript:void(0);" src="${ctx}/m/order/index"
-					class="cs-navi-tab">生成客户订单</a>
-				</p>
-			</div>
-			<div title="财务明细">
-				<a href="javascript:void(0);" src="${ctx}/m/order/index"
-					class="cs-navi-tab">加油收入</a>
-				</p>
-				<a href="javascript:void(0);" src="${ctx}/m/order/index"
-					class="cs-navi-tab">进油支出</a>
-				</p>
-				<a href="javascript:void(0);" src="${ctx}/m/order/mIndex"
-					class="cs-navi-tab">提现申请</a>
-				</p>
-			</div>
-			<div title="预约销码">
-				<a href="javascript:void(0);" src="${ctx}/m/order/index"
-					class="cs-navi-tab">预约销码</a>
-				</p>
-				<a href="javascript:void(0);" src="${ctx}/m/order/index"
-					class="cs-navi-tab">生成客户订单</a>
-				</p>
-			</div>
-			<div title="油库进油">
-				<p><a href="javascript:void(0);" src="${ctx}/m/os/jyzOIndex" class="cs-navi-tab">加油站订单查询</a></p>
-				<p><a href="javascript:void(0);" src="${ctx}/m/os/adminOIndex" class="cs-navi-tab">admin订单查询</a></p>
-			</div>
-			<div title="优惠券管理">
-				<a href="javascript:void(0);" src="${ctx}/m/coupon/index"
-					class="cs-navi-tab">优惠券列表</a>
-				</p>
-				<a href="javascript:void(0);" src="${ctx}/m/coupon/uIndex"
-					class="cs-navi-tab">优惠券使用列表</a>
-				</p>
-			</div>
-			<div title="加油站管理">
-				<a href="javascript:void(0);" src="${ctx}/m/os/index"
-					class="cs-navi-tab">加油站列表</a>
-				</p>
-			</div>
-			<div title="资讯管理">
-				<a href="javascript:void(0);" src="${ctx}/m/info/goods" class="cs-navi-tab">大宗商品</a>
-				</p>
-				<a href="javascript:void(0);" src="${ctx}/m/info/ship" class="cs-navi-tab">船舶服务</a>
-				</p>
-				<a href="javascript:void(0);" src="${ctx}/m/info/some" class="cs-navi-tab">配货信息</a>
-				</p>
-				<a href="javascript:void(0);" src="${ctx}/m/info/maritime" class="cs-navi-tab">海事服务</a>
-				</p>
-			</div>
-			<div title="基本信息管理">
-				<a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">用户列表</a>
-				</p>
-			</div>
-			<div title="充值管理">
-				<p><a href="javascript:void(0);" src="${ctx}/m/order/rIndex" class="cs-navi-tab">充值管理</a></p>
-			</div>
-			<div title="广告管理">
+	//admin-系统管理员      cwgly-财务管理员     kfqx客服权限  jygly进油管理员
+	//jyzAdmin-系统管理员     jyzcwqx-加油站财务权限     jyzjygqx加油工权限
+	<div region="west" border="true" split="true" title="" class="cs-west">
+	    <div class="easyui-accordion" fit="true" border="false">
+			<shiro:hasAnyRoles name="jyzAdmin,jyzjygqx,admin,kfqx">	    
+				<div title="订单管理">
+				    <shiro:hasAnyRoles name="jyzAdmin,jyzjygqx,admin,kfqx">
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">订单查询</a></p>
+					</shiro:hasAnyRoles>
+					<shiro:hasAnyRoles name="jyzAdmin,jyzjygqx">
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">生成客户订单</a></p>
+					</shiro:hasAnyRoles> 
+				</div>
+			</shiro:hasAnyRoles> 
+			<shiro:hasAnyRoles name="jyzAdmin,jyzcwqx,admin,cwgly">
+				<div title="财务明细">
+				    <shiro:hasAnyRoles name="jyzAdmin,jyzcwqx">
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">加油收入</a></p>
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">进油支出</a></p>
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请</a></p>
+					</shiro:hasAnyRoles>
+					<shiro:hasAnyRoles name="admin,cwgly">
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">明细查询</a></p>
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请列表</a></p>
+					</shiro:hasAnyRoles>
+				</div>
+			</shiro:hasAnyRoles>
+			<shiro:hasAnyRoles name="jyzAdmin,jyzjygqx">
+				<div title="预约销码">
+					<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">预约销码</a></p>
+					<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">预约订单查询</a></p>
+				</div>
+			</shiro:hasAnyRoles>
+			<shiro:hasAnyRoles name="jyzAdmin,jyzjygqx">
+				<div title="油库进油">
+					<p><a href="javascript:void(0);" src="${ctx}/m/os/jyzOIndex" class="cs-navi-tab">加油站订单查询</a></p>
+					<p><a href="javascript:void(0);" src="${ctx}/m/os/adminOIndex" class="cs-navi-tab">admin订单查询</a></p>
+				</div>
+			</shiro:hasAnyRoles>
+			<shiro:hasAnyRoles name="admin,kfqx">
+				<div title="优惠券管理">
+					<p><a href="javascript:void(0);" src="${ctx}/m/coupon/index" class="cs-navi-tab">优惠券列表</a></p>
+					<p><a href="javascript:void(0);" src="${ctx}/m/coupon/uIndex" class="cs-navi-tab">优惠券使用列表</a></p>
+				</div>
+			</shiro:hasAnyRoles>
+			<shiro:hasAnyRoles name="admin,kfqx">
+				<div title="资讯管理">
+					<p><a href="javascript:void(0);" src="${ctx}/m/info/goods" class="cs-navi-tab">大宗商品</a>
+					</p>
+					<p><a href="javascript:void(0);" src="${ctx}/m/info/ship" class="cs-navi-tab">船舶服务</a>
+					</p>
+					<p><a href="javascript:void(0);" src="${ctx}/m/info/some" class="cs-navi-tab">配货信息</a>
+					</p>
+					<p><a href="javascript:void(0);" src="${ctx}/m/info/maritime" class="cs-navi-tab">海事服务</a>
+					</p>
+				</div>
+				<div title="广告管理">
 				<p><a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">广告管理</a></p>
+				<div title="用户管理">
+					<p><a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">用户列表</a></p>
+				</div>
 			</div>
-			<div title="系统管理">
-			    <a href="javascript:void(0);" src="${ctx}/m/muser/index"
-					class="cs-navi-tab">后台用户管理</a>
-				</p>
-			</div>
+			</shiro:hasAnyRoles>
+			<shiro:hasAnyRoles name="admin,cwgly">
+				<div title="充值管理">
+					<p><a href="javascript:void(0);" src="${ctx}/m/order/rIndex" class="cs-navi-tab">充值管理</a></p>
+				</div>
+			</shiro:hasAnyRoles>
+			<shiro:hasAnyRoles name="admin">
+			 	<div title="加油站管理">
+					<p><a href="javascript:void(0);" src="${ctx}/m/os/index" class="cs-navi-tab">加油站列表</a></p>
+				</div>
+			</shiro:hasAnyRoles>
+			<shiro:hasAnyRoles name="admin,jyzAdmin">
+				<div title="系统管理">
+				    <p><a href="javascript:void(0);" src="${ctx}/m/muser/index" class="cs-navi-tab">后台用户管理</a></p>
+				</div>
+			</shiro:hasAnyRoles>
 		</div>
 	</div>
 	<div id="mainPanle" region="center" border="true" border="false">

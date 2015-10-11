@@ -62,7 +62,7 @@ public class ManagerUserController extends BaseController implements HybConstant
 	@ResponseBody
 	public String query(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException{
-		ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();			
+		ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();	
 		Integer[] pageInfo = getPageInfo(request);
 		MuserParam param = new MuserParam();
 		param.setPage(pageInfo[0]);

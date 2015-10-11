@@ -43,7 +43,7 @@ public class ShiroDbRealm extends AuthorizingRealm {
 		}
 		if (user != null) {
 			byte[] salt = Encodes.decodeHex(user.getSalt());
-			return new SimpleAuthenticationInfo(new ShiroUser(user.getId(), user.getLoginName(), user.getName()),
+			return new SimpleAuthenticationInfo(new ShiroUser(user.getId(), user.getLoginName(), user.getName(), user.getRoles()),
 					user.getPassword(), ByteSource.Util.bytes(salt), getName());
 		} else {
 			return null;
@@ -85,6 +85,14 @@ public class ShiroDbRealm extends AuthorizingRealm {
 		public Long id;
 		public String loginName;
 		public String name;
+		public String roles;
+		
+		public ShiroUser(Long id, String loginName, String name, String roles) {
+			this.id = id;
+			this.loginName = loginName;
+			this.name = name;
+			this.roles = roles;
+		}
 
 		public ShiroUser(Long id, String loginName, String name) {
 			this.id = id;
@@ -102,6 +110,42 @@ public class ShiroDbRealm extends AuthorizingRealm {
 		@Override
 		public String toString() {
 			return loginName;
+		}
+		
+		public Long getId() {
+			return id;
+		}
+
+		public void setId(Long id) {
+			this.id = id;
+		}
+
+		public String getLoginName() {
+			return loginName;
+		}
+
+		public void setLoginName(String loginName) {
+			this.loginName = loginName;
+		}
+		
+		public String hasRole(){
+			return roles;
+		}
+		
+		public boolean hasRole(String role){
+			return roles.equalsIgnoreCase(role);
+		}
+
+		public String getRoles() {
+			return roles;
+		}
+
+		public void setRoles(String roles) {
+			this.roles = roles;
+		}
+
+		public void setName(String name) {
+			this.name = name;
 		}
 
 		/**

@@ -8,7 +8,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -17,9 +16,10 @@ import org.springside.examples.quickstart.domain.ChargeLogBean;
 import org.springside.examples.quickstart.domain.DataGrid;
 import org.springside.examples.quickstart.domain.OrderBean;
 import org.springside.examples.quickstart.domain.OrderParam;
-import org.springside.examples.quickstart.domain.OsOilParam;
+import org.springside.examples.quickstart.domain.PushOsBean;
 import org.springside.examples.quickstart.domain.ResultList;
 import org.springside.examples.quickstart.repository.MorderDao;
+import org.springside.examples.quickstart.utils.JPushUtil;
 
 @Component
 @Transactional
@@ -167,7 +167,27 @@ public class MorderService {
 		//获取优惠券信息
 		//设置加油站
 		Integer productId = Integer.valueOf(oils.get(0)[0]+"");
-		return morderDao.updateOs(Integer.valueOf(osId), productId, orderId);
+		int r = morderDao.updateOs(Integer.valueOf(osId), productId, orderId);
+		if(r > 0){
+			//获取推送消息 推送消息
+			List<Object[]> orders = morderDao.queryOrderInfo(orderId);
+			if(orders == null || orders.size() <= 0){
+				throw new RuntimeException("操作异常。");
+			}
+			//t.id,t.order_no,t.book_addr,t.book_time,t.num,u.phone,o.price
+		    PushOsBean bean = new PushOsBean();
+		   	bean.setOsId(Long.valueOf(osId));
+		   	bean.setOrderId(Long.valueOf(orderId));
+		   	bean.setOrderNo(orders.get(0)[1]+"");
+		   	bean.setAddr(orders.get(0)[2]+"");
+		   	bean.setBookTime(orders.get(0)[3]+"");
+		   	bean.setNum(Integer.valueOf(orders.get(0)[4]+""));
+		   	bean.setPrice(orders.get(0)[6]+"");
+		    bean.setProductId(Long.valueOf(productId+""));
+		   	bean.setProductName(productName);
+			JPushUtil.pushOrderOs(orders.get(0)[5]+"", bean);
+		}
+		return 1;
 	}
 
 	public int recharge(String phone, String amount) {

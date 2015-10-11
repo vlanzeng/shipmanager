@@ -41,11 +41,15 @@ public interface MorderDao extends CrudRepository<Coupon, Long> {
 	@Query(value="update t_order set status=?1 where status=?2 and id=?3", nativeQuery=true)
 	int updateStatus(Integer status, Integer oldStatus, String orderId);
 
-	@Query(value="select id,name,price from t_oil o where o.os_id=?1 and name=?2 and o.status=1;", nativeQuery=true)
+	@Query(value="select id,name,price from t_oil o where (o.os_id=?1 or o.os_id=0) and name=?2 and o.status=1", nativeQuery=true)
 	List<Object[]> queryOilInfo(String osId, String productName);
 
-	@Query(value="select id,info from t_derate o where o.os_id=?1 and o.status=1;", nativeQuery=true)
+	@Query(value="select id,info from t_derate o where o.os_id=?1 and o.status=1", nativeQuery=true)
 	List<Object[]> queryDerateInfo(String osId);
+	
+	@Query(value="select t.id,t.order_no,t.book_addr,t.book_time,t.num,u.phone,o.price "
+			+ "from t_order t,t_user u,t_oil o WHERE t.user_id=u.id and t.product_id=o.id and t.id=?1", nativeQuery=true)
+	List<Object[]> queryOrderInfo(String orderId);
 
 	@Modifying
 	@Query(value="insert into t_recharge_log(phone,amount,status,type,create_time) values(?1,?2,1,1,now())", nativeQuery=true)

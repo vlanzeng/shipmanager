@@ -58,18 +58,18 @@ public class MuserService {
 		}
 		//用户名或手机号
 		if(!StringUtils.isEmpty(param.getUserName())){
-			whereParam.append(" and s.login_name='"+param.getUserName().trim() + "'");
+			whereParam.append(" and u.login_name='"+param.getUserName().trim() + "'");
 		}
 		if(!StringUtils.isEmpty(param.startTime)){
-			whereParam.append(" and o.register_date >='"+param.startTime+"'");
+			whereParam.append(" and u.register_date >='"+param.startTime+"'");
 		}
 		
 		if(!StringUtils.isEmpty(param.getEndTime())){
-			whereParam.append(" and o.register_date<'"+param.getEndTime()+"'");
+			whereParam.append(" and u.register_date<'"+param.getEndTime()+"'");
 		}
 		
 		if(HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles())){
-			whereParam.append(" and u.roles in ('jyzAdmin','jyzcwqx','jyzjygqx') and o.os_id="+user.getOsId());
+			whereParam.append(" and u.roles in ('jyzAdmin','jyzcwqx','jyzjygqx') and u.os_id="+user.getOsId());
 		}
 		
 		String sql = "SELECT u.id,u.login_name,u.os_id,u.roles,u.register_date,u.status, s.name as osName "
