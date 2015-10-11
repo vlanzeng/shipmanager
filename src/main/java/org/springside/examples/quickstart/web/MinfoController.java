@@ -18,14 +18,16 @@ import org.springside.examples.quickstart.domain.CouponParam;
 import org.springside.examples.quickstart.domain.DataGrid;
 import org.springside.examples.quickstart.entity.Information;
 import org.springside.examples.quickstart.repository.InformationDaoImpl;
+import org.springside.examples.quickstart.service.InformationService;
 import org.springside.examples.quickstart.utils.CommonUtils;
 
-import com.alibaba.fastjson.JSON;
 @Controller
 @RequestMapping(value="/m/info")
 public class MinfoController extends BaseController implements HybConstants{
 	@Autowired
 	private InformationDaoImpl inforDaoImpl;
+	@Autowired
+	private InformationService InformationService;
 	/**
 	 * 大宗商品页
 	 */
@@ -150,6 +152,8 @@ public class MinfoController extends BaseController implements HybConstants{
 	@ResponseBody
 	public String delete(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException{
-		return CommonUtils.printObjStr2(null);
+		String id  = request.getParameter("id");
+		InformationService.getInfoDao().delete(Long.parseLong(id));
+		return CommonUtils.printStr("200", "删除成功");
 	}
 }
