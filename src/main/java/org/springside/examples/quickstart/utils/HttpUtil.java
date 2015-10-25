@@ -16,8 +16,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
 import cn.jpush.api.JPushClient;
-import cn.jpush.api.common.APIConnectionException;
-import cn.jpush.api.common.APIRequestException;
 import cn.jpush.api.push.PushResult;
 import cn.jpush.api.push.model.PushPayload;
 
@@ -68,15 +66,9 @@ public class HttpUtil {
              PushResult result = jpushClient.sendPush(payload);
             System.out.println("Got result - " + result);
 
-         } catch (APIConnectionException e) {
-             // Connection error, should retry later
-        	 System.out.println("Connection error, should retry later"+e);
-         } catch (APIRequestException e) {
+         }catch (Exception e) {
              // Should review the error, and fix the request
         	 System.out.println("Should review the error, and fix the request"+e);
-        	 System.out.println("HTTP Status: " + e.getStatus());
-        	 System.out.println("Error Code: " + e.getErrorCode());
-        	 System.out.println("Error Message: " + e.getErrorMessage());
          }
 	}
     

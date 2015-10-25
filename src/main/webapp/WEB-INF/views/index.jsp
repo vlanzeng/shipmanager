@@ -353,39 +353,40 @@ a:active {
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">订单查询</a></p>
 					</shiro:hasAnyRoles>
 					<shiro:hasAnyRoles name="jyzAdmin,jyzjygqx">
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">生成客户订单</a></p>
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">生成客户订单(没有做)</a></p>
 					</shiro:hasAnyRoles> 
 				</div>
 			</shiro:hasAnyRoles> 
 			<shiro:hasAnyRoles name="jyzAdmin,jyzcwqx,admin,cwgly">
 				<div title="财务明细">
-				    <shiro:hasAnyRoles name="jyzAdmin,jyzcwqx">
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">加油收入</a></p>
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">进油支出</a></p>
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请</a></p>
+				    <shiro:hasAnyRoles name="jyzAdmin,jyzcwqx,admin">
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/income/index" class="cs-navi-tab">加油收入</a></p>
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/purchase/index" class="cs-navi-tab">进油支出</a></p>
+						<%-- <p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请</a></p> --%>
 					</shiro:hasAnyRoles>
-					<shiro:hasAnyRoles name="admin,cwgly">
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">明细查询</a></p>
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请列表</a></p>
+					<shiro:hasAnyRoles name="jyzAdmin,jyzcwqx">
+					<%-- 	<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">明细查询</a></p> --%>
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请列表(没有做)</a></p>
 					</shiro:hasAnyRoles>
 				</div>
 			</shiro:hasAnyRoles>
-			<shiro:hasAnyRoles name="jyzAdmin,jyzjygqx">
+			<shiro:hasAnyRoles name="admin">
 				<div title="预约销码">
-					<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">预约销码</a></p>
-					<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">预约订单查询</a></p>
+					<p><a href="javascript:void(0);" src="${ctx}/m/order/subscribe/logout" class="cs-navi-tab">预约销码（没有做）</a></p>
+					<p><a href="javascript:void(0);" src="${ctx}/m/order/subscribe/index" class="cs-navi-tab">预约订单查询</a></p>
 				</div>
 			</shiro:hasAnyRoles>
 			<shiro:hasAnyRoles name="jyzAdmin,jyzjygqx">
 				<div title="油库进油">
-					<p><a href="javascript:void(0);" src="${ctx}/m/os/jyzOIndex" class="cs-navi-tab">加油站订单查询</a></p>
-					<p><a href="javascript:void(0);" src="${ctx}/m/os/adminOIndex" class="cs-navi-tab">admin订单查询</a></p>
+				<%-- 	<p><a href="javascript:void(0);" src="${ctx}/m/os/jyzOIndex" class="cs-navi-tab">加油站订单查询</a></p>
+					<p><a href="javascript:void(0);" src="${ctx}/m/os/adminOIndex" class="cs-navi-tab">admin订单查询</a></p> --%>
+						<p><a href="javascript:void(0);" src="${ctx}/m/os/history" class="cs-navi-tab">订单管理</a>
 				</div>
 			</shiro:hasAnyRoles>
-			<shiro:hasAnyRoles name="admin,kfqx">
+			<shiro:hasAnyRoles name="jyzAdmin">
 				<div title="优惠券管理">
-					<p><a href="javascript:void(0);" src="${ctx}/m/coupon/index" class="cs-navi-tab">优惠券列表</a></p>
-					<p><a href="javascript:void(0);" src="${ctx}/m/coupon/uIndex" class="cs-navi-tab">优惠券使用列表</a></p>
+					<p><a href="javascript:void(0);" src="${ctx}/m/coupon/index" class="cs-navi-tab">优惠券管理</a></p>
+					<p><a href="javascript:void(0);" src="${ctx}/m/coupon/uIndex" class="cs-navi-tab">优惠券发放记录</a></p>
 				</div>
 			</shiro:hasAnyRoles>
 			<shiro:hasAnyRoles name="admin,kfqx">

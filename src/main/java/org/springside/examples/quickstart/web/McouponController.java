@@ -43,7 +43,21 @@ public class McouponController extends BaseController implements HybConstants{
 		return "coupon/index";
 	}
 	
+	
 	/**
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	@RequestMapping(value="uIndex", method=RequestMethod.GET)
+	public String useIndex(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException{
+		return "coupon/useIndex";
+	}
+	
+	/**
+	 * 优惠券查询
 	 * @param request
 	 * @param response
 	 * @throws IOException
@@ -67,6 +81,35 @@ public class McouponController extends BaseController implements HybConstants{
 		DataGrid<CouponBean> gb = mcouponService.getCouponList(param);
 		return CommonUtils.printObjStr2(gb);
 	}
+	
+	
+	
+	/**
+	 *  优惠券使用查询
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	@RequestMapping(value="/use/query", method=RequestMethod.GET)
+	@ResponseBody
+	public String queryUse(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException{
+		Integer[] pageInfo = getPageInfo(request);
+		CouponParam param = new CouponParam();
+		param.setPage(pageInfo[0]);
+		param.setRows(pageInfo[1]);
+		param.setName(CommonUtils.decode(request.getParameter("name")));
+		param.setFaceLimit(request.getParameter("faceLimit"));
+		if(!StringUtils.isEmpty(request.getParameter("type"))){
+			param.setType(Integer.valueOf(request.getParameter("type")));
+		}
+		param.setStartTime(request.getParameter("startTime"));
+		param.setEndTime(request.getParameter("endTime"));
+		DataGrid<CouponBean> gb = mcouponService.getCouponList(param);
+		return CommonUtils.printObjStr2(gb);
+	}
+	
 	
 	/**
 	 * @param request

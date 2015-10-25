@@ -18,9 +18,9 @@
 	}  
 	
 	function showRestartDialog(id, status){       
-		$("#update_old_status").val(status);
-		$("#update_orderId").val(id);  
+        $("#update_orderId").val(id);  
         $("#os_old_status").val(status);  
+        $("#update_old_status").val(status);
         $("#restartDialog").dialog('open');  
     }  
 	
@@ -58,22 +58,22 @@
 	function query(){
 		var orderNo = $("#order_no").val();
 		var userName = $("#user_name").val();
-		var osName = $("#o_s_name").val();
+		/* var osName = $("#o_s_name").val(); */
 		var ojStatus = $("#o_j_status").val();
 		var owStatus = $("#o_w_status").val();
 		var type = $("#o_type").val();
-		var area = $("#o_area").val();
+	/* 	var area = $("#o_area").val(); */
 		var startTime = $('#o_startTime').datebox('getValue');   
 		var endTime = $('#o_endTime').datebox('getValue');  
-		
+		var otherStatus = [];
+		otherStatus.push(11);
 		userName=encodeURI(userName);
-		osName=encodeURI(osName);
-		area=encodeURI(area);
-		
+	//	osName=encodeURI(osName);
+	//	area=encodeURI(area);
 		$('#dg').datagrid({ url:"${ctx}/m/order/query",
-			queryParams:{'page':1,'rows':15,'orderNo':orderNo,'userName':userName,'osName':osName,
-				'ojStatus':ojStatus,'owStatus':owStatus,'type':type,'area':area,'status':status,
-				'startTime':startTime,'endTime':endTime},
+			queryParams:{'page':1,'rows':15,'orderNo':orderNo,'userName':userName,
+				'ojStatus':ojStatus,'owStatus':owStatus,'type':type,'status':status,
+				'startTime':startTime,'endTime':endTime,'otherStatus':otherStatus.join(",")},
 			method:"GET"});
 	}
 	
@@ -81,9 +81,8 @@
 		var orderId = $("#os_orderId").val();
 	    var productName = $("#os_name").val();  
 		var osId = $('input[name="os_id_redio"]:checked').val();
-		alert(osId);
+		alert("..."+osId);
 		if(osId == '' || osId < 0){
-			alert("请选择状态。");
 			return;
 		}
 		$.ajax({
@@ -138,10 +137,12 @@
     $(document).ready(function(){
     	$("#restartDialog").dialog('close');
     	$("#showOsDialog").dialog('close');
+    	var otherStatus = [];
+    	otherStatus.push(11);
     	$('#dg').datagrid({ 
     		url:'${ctx}/m/order/query', 
     		method:'GET',
-    		queryParams:{'status':-1},
+    		queryParams:{'status':-1,'otherStatus':otherStatus.join(",")},
     		fitCloumns: true , 
     		nowrap: true , 
     		singleSelect: true,
@@ -162,11 +163,7 @@
     			var status = rowData.status;
     			var productName = rowData.productName;
     			var str = "";
-    			str += '<a href="#" onclick="showRestartDialog(\''+id+'\',\''+rowData.statusId+'\')">设置状态</a>';
-    			if(status == 11){
-    				str += ' | <a href="#" onclick="showOsDialog(\''+id+'\',\''+productName+'\')">分配加油站</a>';
-    			}
-    			str += ' | <a href="#" onclick="delOrder(\''+id+'\')">删除</a>';
+    			str += '<a href="#" onclick="showRestartDialog(\''+id+'\','+rowData.statusId+')">设置状态</a>';
     			return str;
     		}} 
     		]] 
@@ -196,11 +193,20 @@
 			<div id="coupon_query_id">
 				<table>
 					<tr style="height: 40px;">
-						<td width="100px"><span>订单号:</span></td>
-						<td width="150px"><input id="order_no" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>用户名/手机号:</span></td>
+					<!-- 	<td width="100px"><span>订单号:</span></td>
+						<td width="150px"><input id="order_no" type="text" style="width: 120px"/></td> -->
+						<td width="150px"><span>用户名/手机号:</span></td>
 						<td width="150px"><input id="user_name" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>加油站:</span></td>
+						
+						
+							<td width="100px"><span>开始时间:</span></td>
+						<td width="150px"><input id="o_startTime" class="easyui-datebox"></input></td>
+						<td width="100px"><span>结束时间:</span></td>
+						<td width="150px"><input id="o_endTime" class="easyui-datebox"></input></td>
+						<td width="100px;"></td>
+						<td colspan="3" style="text-align: right;"><button type="button" onclick="query()">查询</button></td>
+						
+					<!-- 	<td width="100px"><span>加油站:</span></td>
 						<td width="150px"><input id="o_s_name" type="text" style="width: 120px"/></td>
 						<td width="100px"><span>地区:</span></td>
 						<td width="150px"><input id="o_area" type="text" style="width: 120px"/></td>
@@ -211,9 +217,9 @@
 							    <option value="1">已完成</option>
 								<option value="2">未完成</option>
 							</select>
-						</td>
+						</td> -->
 					</tr>
-					<tr style="height: 40px;">
+		<!-- 			<tr style="height: 40px;">
 					    <td width="100px"><span>类型:</span></td>
 						<td width="100px">
 							<select name="select" id="o_type" style="width: 100px">
@@ -236,10 +242,7 @@
 						<td width="100px"><span>结束时间:</span></td>
 						<td width="150px"><input id="o_endTime" class="easyui-datebox"></input></td>
 						<td colspan="4" width="100px">&nbsp;</td>
-					</tr>
-					<tr style="height: 40px;">
-						<td colspan="8" style="text-align: right;"><button type="button" onclick="query()">查询</button></td>
-					</tr>
+					</tr> -->
 				</table>
 			</div>
 		</div>

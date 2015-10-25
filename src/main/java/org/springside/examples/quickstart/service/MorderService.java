@@ -18,6 +18,7 @@ import org.springside.examples.quickstart.domain.OrderBean;
 import org.springside.examples.quickstart.domain.OrderParam;
 import org.springside.examples.quickstart.domain.PushOsBean;
 import org.springside.examples.quickstart.domain.ResultList;
+import org.springside.examples.quickstart.entity.OrderStatus;
 import org.springside.examples.quickstart.repository.MorderDao;
 import org.springside.examples.quickstart.utils.JPushUtil;
 
@@ -44,7 +45,7 @@ public class MorderService {
 			bean.setId(Long.valueOf(o[0] + ""));
 			bean.setProductName(o[1] + "");
 			bean.setNum(Integer.parseInt(o[2] + ""));
-			bean.setStatus(Integer.valueOf(o[3] + ""));
+			bean.setStatus(OrderStatus.status.get(o[3].toString()));
 			bean.setOrderNo(o[4] + "");
 			bean.setBookTime(o[5] + "");
 			bean.setBookAddr(o[6] + "");
@@ -60,7 +61,7 @@ public class MorderService {
 		return rl;
 	}
 	
-	public DataGrid<OrderBean> getOrderList(OrderParam param){
+	public DataGrid<OrderBean> getOrderListIncome(OrderParam param){
 		DataGrid<OrderBean> dg = new DataGrid<OrderBean>();
 		StringBuffer whereParam = new StringBuffer();
 		int start = (param.getPage() - 1) * param.getRows();
@@ -69,6 +70,20 @@ public class MorderService {
 		if(!StringUtils.isEmpty(param.getType()) && param.getType() >=0){
 			whereParam.append(" and o.type="+param.getType());
 		}
+		
+		//订单状态，自己添加的
+		if(  null!=param.getOtherStatus()&& param.getOtherStatus().length>0){
+			whereParam.append(" and o.status in ( "  );
+			for (int i = 0; i < param.getOtherStatus().length; i++) {
+					if(i==0){
+						whereParam.append(param.getOtherStatus()[i]);
+					}else{
+						whereParam.append(","+param.getOtherStatus()[i]);
+					}
+			}
+			whereParam.append(" ) "  );
+		}
+				
 		
 		//订单号
 		if(!StringUtils.isEmpty(param.getOrderNo())){
@@ -82,7 +97,7 @@ public class MorderService {
 		
 		//加油站
 		if(!StringUtils.isEmpty(param.getOsName())){
-			whereParam.append(" and s.name='" + param.getOsName().trim() + "'");
+			whereParam.append(" and s.name like '%" + param.getOsName().trim() + "%'");
 		}
 		
 		//区域
@@ -92,31 +107,59 @@ public class MorderService {
 		
 		//订单结算状态
 		if(!StringUtils.isEmpty(param.getOjStatus()) && param.getOjStatus() >=0){
-			//订单状态  等待付款中-0 付款成功-1 付款失败-2 过期-3 撤销成功-4 退款中-5 退款成功-6 退款失败-7 部分退款成功-8  11-新建预约订单 12-后台加油站以确定 99-删除
+			//订单状态  等待付款中-0 付款成功-1 付款失败-2 过期-3 撤销成功-4 退款中-5 
+			//退款成功-6 退款失败-7 部分退款成功-8  11-新建预约订单 12-后台加油站以确定 99-删除
 			String s = "1";
-			if(param.getOjStatus() == 2){
-				s = "0,2,3,4,5,6,7,9,11,12";
+			if(param.getOjStatus() == 1){
+				whereParam.append(" and o.status in ("+s+")");
+			}else{
+				whereParam.append(" and o.status not in ("+s+")");
 			}
-			whereParam.append(" and o.status in ("+s+")");
 		}
+		
+		whereParam.append(" and o.status not in (99)"); //  删除状态
 		
 		//订单完成状态
 		if(!StringUtils.isEmpty(param.getOwStatus()) && param.getOwStatus() >=0){
 			//订单状态  等待付款中-0 付款成功-1 付款失败-2 过期-3 撤销成功-4 退款中-5 退款成功-6 退款失败-7 部分退款成功-8  11-新建预约订单 12-后台加油站以确定 99-删除
-			String s = "2,3,5,88,99";
-			if(param.getOjStatus() == 2){
-				s = "0,1,4,6,7,8,11,12";
+			String s = "1,9,88"; //完成
+			if(param.getOwStatus()== 1){
+				//s = "0,1,4,6,7,8,11,12";
+				whereParam.append(" and o.status in ("+s+")");
+			}else{
+				whereParam.append(" and o.status not  in ("+s+")");
 			}
-			whereParam.append(" and o.status in ("+s+")");
 		}
 		
 		if(!StringUtils.isEmpty(param.startTime)){
-			whereParam.append(" and o.create_time >='"+param.startTime+"'");
+			whereParam.append(" and  DATE_FORMAT(o.create_time,'%Y-%m-%d')  >='"+param.startTime+"'");
 		}
 		
 		if(!StringUtils.isEmpty(param.getEndTime())){
-			whereParam.append(" and o.create_time<'"+param.getEndTime()+"'");
+			whereParam.append(" and    DATE_FORMAT(o.create_time,'%Y-%m-%d')  <='"+param.getEndTime()+"'");
 		}
+		
+		if(!StringUtils.isEmpty(param.getOsId())){
+			whereParam.append(" and o.os_id<'"+param.getOsId()+"'");
+		}
+		
+		
+		// 价格区间
+		if( null!= param.getRegion()){
+			if(param.getRegion().length==2){
+				if( null != param.getRegion()[0]){
+					whereParam.append(" and o.money >=  " + param.getRegion()[0]);
+				}
+				if( null != param.getRegion()[1]){
+					whereParam.append(" and o.money <  " + param.getRegion()[1]);
+				}
+			}else{
+				if( null != param.getRegion()[0]){
+					whereParam.append(" and o.money >=  " + param.getRegion()[0]);
+				}
+			}
+		}
+		
 		String sql = "select o.id,o.order_no,o.product_name,o.price,o.num,o.status,o.money,"
 				+ "u.user_name,s.name,o.update_time,o.create_time,o.book_time, o.book_addr "
 				+ "from t_order o left join t_user u on o.user_id=u.id left join t_oil_station s on o.os_id=s.id left join t_city c on s.city_id=c.id where o.type in (1,3,4) "+whereParam.toString()+" "
@@ -136,7 +179,8 @@ public class MorderService {
 			ob.setProductName(o[2] + "");
 			ob.setPrice(o[3]==null ? "" : o[3] + "");
 			ob.setNum(Integer.valueOf(o[4]+""));
-			ob.setStatus(Integer.valueOf(o[5]+""));
+			ob.setStatus(OrderStatus.status.get(o[5].toString()));
+			ob.setStatusId(o[5].toString());
 			ob.setAmount(o[6]==null ? "" :o[6] + "");
 			ob.setUserName(o[7]==null ? "" :o[7] + "");
 			ob.setOsName(o[8]==null ? "" :o[8] + "");
@@ -152,6 +196,87 @@ public class MorderService {
 		return dg;
 	}
 
+	
+	public DataGrid<OrderBean> getOrderListPurchase(OrderParam param){
+		DataGrid<OrderBean> dg = new DataGrid<OrderBean>();
+		StringBuffer whereParam = new StringBuffer();
+		int start = (param.getPage() - 1) * param.getRows();
+		
+		
+		//订单号
+		if(!StringUtils.isEmpty(param.getOrderNo())){
+			whereParam.append(" and o.order_no='"+param.getOrderNo().trim()+"'");
+		}
+		
+		
+		//加油站
+		if(!StringUtils.isEmpty(param.getOsName())){
+			whereParam.append(" and s.name like '%" + param.getOsName().trim() + "%'");
+		}
+		
+		
+		//订单结算状态
+		if(!StringUtils.isEmpty(param.getOjStatus()) && param.getOjStatus() >=0){
+			// 1 未付款  2 已付款  3 已交货
+			whereParam.append(" and o.status in ("+param.getOjStatus() +")");
+		}
+		
+		
+		if(!StringUtils.isEmpty(param.startTime)){
+			whereParam.append(" and o.create_time >='"+param.startTime+"'");
+		}
+		
+		if(!StringUtils.isEmpty(param.getEndTime())){
+			whereParam.append(" and o.create_time<'"+param.getEndTime()+"'");
+		}
+		
+		// 价格区间
+		if( null!= param.getRegion()){
+			if(param.getRegion().length==2){
+				if( null != param.getRegion()[0]){
+					whereParam.append(" and o.amount >=  " + param.getRegion()[0]);
+				}
+				if( null != param.getRegion()[1]){
+					whereParam.append(" and o.amount <  " + param.getRegion()[1]);
+				}
+			}else{
+				if( null != param.getRegion()[0]){
+					whereParam.append(" and o.amount >=  " + param.getRegion()[0]);
+				}
+			}
+		}
+		
+		String sql = "  SELECT o.*,os.name FROM  t_os_buy o  LEFT JOIN t_oil_station  os ON  o.os_id = os.id where 1=1   "+whereParam.toString()
+				+ " order by o.create_time desc limit "+start+","+param.getRows()+"";
+		Query q = em.createNativeQuery(sql);
+		List<Object[]> infoList = q.getResultList();
+		List<OrderBean> result = new ArrayList<OrderBean>();
+		
+		String totalSql = " SELECT count(*) FROM  t_os_buy o  LEFT JOIN t_oil_station  os ON  o.os_id = os.id where 1=1 " + whereParam.toString();
+		Query q1 = em.createNativeQuery(totalSql);
+		
+		int total = Integer.valueOf(q1.getSingleResult()+"");
+		for(Object[] o : infoList){
+			OrderBean ob = new OrderBean();
+			ob.setId(Long.valueOf(o[0]+""));
+			ob.setOrderNo(o[3] + "");
+			//ob.setProductName(o[2] + "");
+			ob.setPrice(o[6]==null ? "" : o[6] + "");
+			ob.setNum(Integer.valueOf(o[7]+""));
+			ob.setStatus(OrderStatus.status.get(o[9].toString()));
+			ob.setStatusId(o[9].toString());
+			ob.setAmount(o[8]==null ? "" :o[8] + "");
+			ob.setUserName(o[1]==null ? "" :o[1] + "");
+			ob.setOsName(o[12]==null ? "" :o[12] + "");
+			ob.setUpdateTime(o[11]== null ?  "" : o[11]+"");
+			ob.setCreateTime(o[10]==null ? "" :o[10] + "");
+			result.add(ob);
+		}
+		dg.setTotal(total);
+		dg.setRows(result);
+		return dg;
+	}
+	
 	public int uStatus(String orderId, String status, String oldStatus) {
 		return morderDao.updateStatus(Integer.valueOf(status), Integer.valueOf(oldStatus), orderId);
 	}
@@ -247,4 +372,9 @@ public class MorderService {
 		dg.setRows(result);
 		return dg;
 	}
+	
+	public void  delOrder(Long id) throws Exception{
+		morderDao.deleteOrder(id);
+	}
+	
 }

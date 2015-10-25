@@ -143,15 +143,15 @@ public class MosService {
 		}
 		
 		if(!StringUtils.isEmpty(param.getOsName())){
-			whereParam.append(" and s.name='"+param.getOsName()+"'");
+			whereParam.append(" and s.name like '%"+param.getOsName()+"%'");
 		}
 		
 		if(!StringUtils.isEmpty(param.startTime)){
-			whereParam.append(" and b.create_time >='"+param.startTime+"'");
+			whereParam.append(" and    DATE_FORMAT( b.create_time,'%Y-%m-%d') >='"+param.startTime+"'");
 		}
 		
 		if(!StringUtils.isEmpty(param.getEndTime())){
-			whereParam.append(" and b.create_time<'"+param.getEndTime()+"'");
+			whereParam.append(" and DATE_FORMAT( b.create_time,'%Y-%m-%d') <='"+param.getEndTime()+"'");
 		}
 		String sql = "select b.id,b.user_name,b.os_id,s.name os_name,b.order_no,b.oil_id,o.name oil_name,b.price,b.num,b.amount,"
 				+ "b.status,b.create_time "

@@ -3,6 +3,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -18,8 +19,7 @@
 	}  
 	
 	function showRestartDialog(id, status){       
-		$("#update_old_status").val(status);
-		$("#update_orderId").val(id);  
+        $("#update_orderId").val(id);  
         $("#os_old_status").val(status);  
         $("#restartDialog").dialog('open');  
     }  
@@ -29,7 +29,7 @@
         $("#os_name").val(productName);  
         $("#showOsDialog").dialog('open');  
     	$('#os_dg').datagrid({ 
-    		url:'${ctx}/m/os/query', 
+    		url:'${ctx}/m/os/query/income', 
     		method:'GET',
     		queryParams:{'status':-1},
     		fitCloumns: true , 
@@ -61,6 +61,7 @@
 		var osName = $("#o_s_name").val();
 		var ojStatus = $("#o_j_status").val();
 		var owStatus = $("#o_w_status").val();
+		var priceRegion = $("#o_price_region").val();
 		var type = $("#o_type").val();
 		var area = $("#o_area").val();
 		var startTime = $('#o_startTime').datebox('getValue');   
@@ -70,10 +71,10 @@
 		osName=encodeURI(osName);
 		area=encodeURI(area);
 		
-		$('#dg').datagrid({ url:"${ctx}/m/order/query",
+		$('#dg').datagrid({ url:"${ctx}/m/order/query/income",
 			queryParams:{'page':1,'rows':15,'orderNo':orderNo,'userName':userName,'osName':osName,
 				'ojStatus':ojStatus,'owStatus':owStatus,'type':type,'area':area,'status':status,
-				'startTime':startTime,'endTime':endTime},
+				'startTime':startTime,'endTime':endTime,'priceRegion':priceRegion},
 			method:"GET"});
 	}
 	
@@ -122,9 +123,8 @@
 		    dataType: 'json',
 		    success: function(data){
 		    	if(data.code == 200){
-		    		$("#restartDialog").dialog('close');
+		    		$("#showOsDialog").dialog('close');
 		    		alert("更新成功");
-		    		query();
 		    	}else{
 		    		alert(data.msg);  
 		    	}
@@ -139,7 +139,7 @@
     	$("#restartDialog").dialog('close');
     	$("#showOsDialog").dialog('close');
     	$('#dg').datagrid({ 
-    		url:'${ctx}/m/order/query', 
+    		url:'${ctx}/m/order/query/income', 
     		method:'GET',
     		queryParams:{'status':-1},
     		fitCloumns: true , 
@@ -147,73 +147,70 @@
     		singleSelect: true,
     		pagination:true,//分页控件 
     		columns:[[ 
-    		{field:'orderNo',title:'订单号',width:fixWidth(0.16)}, 
-    		{field:'productName',title:'油品',width:fixWidth(0.04),align:'right'},
+    		{field:'orderNo',title:'订单号',width:300}, 
+    		{field:'productName',title:'油品',width:200,align:'right'},
     		{field:'num',title:'数量',width:fixWidth(0.03),align:'right'},
     		{field:'status',title:'状态',width:fixWidth(0.06),align:'right'},
     		{field:'amount',title:'总价',width:fixWidth(0.05),align:'right'},
     		{field:'userName',title:'用户名',width:fixWidth(0.15),align:'right'},
     		{field:'osName',title:'加油站',width:fixWidth(0.15),align:'right'},
-    		{field:'bookTime',title:'预约时间',width:fixWidth(0.1),align:'right'},
-    		{field:'bookAddr',title:'预约地址',width:fixWidth(0.15),align:'right'},
-    		{field:'createTime',title:'创建时间',width:fixWidth(0.12),align:'right'},
-    		{field:'op',title:'操作',width:155,formatter:function(value,rowData,rowIndex){
+    	/* 	{field:'bookTime',title:'预约时间',width:fixWidth(0.1),align:'right'},
+    		{field:'bookAddr',title:'预约地址',width:fixWidth(0.15),align:'right'}, */
+    		{field:'createTime',title:'创建时间',width:200,align:'right'}
+    /* 		{field:'op',title:'操作',width:155,formatter:function(value,rowData,rowIndex){
     			var id = rowData.id;
     			var status = rowData.status;
     			var productName = rowData.productName;
     			var str = "";
-    			str += '<a href="#" onclick="showRestartDialog(\''+id+'\',\''+rowData.statusId+'\')">设置状态</a>';
+    			str += '<a href="#" onclick="showRestartDialog(\''+id+'\','+status+')">设置状态</a>';
     			if(status == 11){
     				str += ' | <a href="#" onclick="showOsDialog(\''+id+'\',\''+productName+'\')">分配加油站</a>';
     			}
-    			str += ' | <a href="#" onclick="delOrder(\''+id+'\')">删除</a>';
     			return str;
-    		}} 
+    		}}  */
     		]] 
     	});
     });   
-    
-    function delOrder(id){
-    	$.ajax({
-    	     type: 'POST',
-    	     url: '${ctx}/m/order/delOrder', 
-    	    data: {"id":id} ,
-    	    success: function(result){
-				   if(result.status==200){
-					   query();
-				   }else{
-					   alert("系统错误");
-				   }
-    	    }
-    	});
-    }
 </script>
 </head>
 
 <body>
 	<div id="contentWrap">
 		<div class="" style="">
-			<div id="coupon_query_id">
+			<div id="coupon_query_id" style="position: relative;">
 				<table>
 					<tr style="height: 40px;">
 						<td width="100px"><span>订单号:</span></td>
 						<td width="150px"><input id="order_no" type="text" style="width: 120px"/></td>
 						<td width="100px"><span>用户名/手机号:</span></td>
 						<td width="150px"><input id="user_name" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>加油站:</span></td>
-						<td width="150px"><input id="o_s_name" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>地区:</span></td>
-						<td width="150px"><input id="o_area" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>完成状态:</span></td>
+					<!-- 	<td width="100px"><span>加油站:</span></td>
+						<td width="150px"><input id="o_s_name" type="text" style="width: 120px"/></td> -->
+					<!-- 	<td width="100px"><span>地区:</span></td>
+						<td width="150px"><input id="o_area" type="text" style="width: 120px"/></td> -->
+				<!-- 		<td width="100px"><span>完成状态:</span></td>
 						<td width="100px">
 							<select name="select" id="o_w_status" style="width: 100px">
 							    <option value="-1" selected="selected">全部</option>
 							    <option value="1">已完成</option>
 								<option value="2">未完成</option>
 							</select>
+						</td> -->
+								<td width="100px"><span>结算状态:</span></td>
+						<td width="100px">
+							<select name="select" id="o_j_status" style="width: 100px">
+							    <option value="-1" selected="selected">全部</option>
+							    <option value="1">已结算</option>
+								<option value="2">未结算</option>
+							</select>
 						</td>
+							<td width="100px"><span>开始时间:</span></td>
+						<td width="150px"><input id="o_startTime" class="easyui-datebox"></input></td>
+						<td width="100px"><span>结束时间:</span></td>
+						<td width="150px"><input id="o_endTime" class="easyui-datebox"></input></td>
+						<td colspan="4" width="100px">&nbsp;</td>
 					</tr>
-					<tr style="height: 40px;">
+		<!-- 			<tr style="height: 40px;">
 					    <td width="100px"><span>类型:</span></td>
 						<td width="100px">
 							<select name="select" id="o_type" style="width: 100px">
@@ -223,27 +220,30 @@
 								<option value="3">预约订单</option>
 							</select>
 						</td>
-						<td width="100px"><span>结算状态:</span></td>
-						<td width="100px">
-							<select name="select" id="o_j_status" style="width: 100px">
+					</tr> -->
+						<tr style="width: 40px;">
+						<td><span>价格区间:</span></td>
+						<td>
+							<select name="select" id="o_price_region" style="width: 125px;">
 							    <option value="-1" selected="selected">全部</option>
-							    <option value="1">已结算</option>
-								<option value="2">未结算</option>
+							    <option value="1">0-5万</option>
+								<option value="2">5-10万</option>
+								<option value="3">10万以上</option>
 							</select>
-						</td>
-						<td width="100px"><span>开始时间:</span></td>
-						<td width="150px"><input id="o_startTime" class="easyui-datebox"></input></td>
-						<td width="100px"><span>结束时间:</span></td>
-						<td width="150px"><input id="o_endTime" class="easyui-datebox"></input></td>
-						<td colspan="4" width="100px">&nbsp;</td>
-					</tr>
-					<tr style="height: 40px;">
-						<td colspan="8" style="text-align: right;"><button type="button" onclick="query()">查询</button></td>
-					</tr>
+							</td>
+							   <shiro:hasAnyRoles name="jyzAdmin,jyzcwqx">
+							<td width="100px"><span>加油站:</span></td>
+						<td width="150px"><input id="o_s_name" type="text" style="width: 120px"/></td> 
+							</shiro:hasAnyRoles>
+						</tr>
+						
 				</table>
+					<div style="width: 80px;height: 25px;position: absolute;right: 50px;top: 50px;">
+					<button type="button" onclick="query()">查询</button>
+					</div>
 			</div>
 		</div>
-		<div class="pageColumn" style="margin-top: 50px">
+		<div class="pageColumn" style="margin-top: 30px">
 		    <table id="dg"></table>
 		</div>
 	</div>

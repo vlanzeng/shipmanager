@@ -5,8 +5,6 @@ import org.springside.examples.quickstart.contants.HybConstants;
 import org.springside.examples.quickstart.domain.PushOsBean;
 
 import cn.jpush.api.JPushClient;
-import cn.jpush.api.common.APIConnectionException;
-import cn.jpush.api.common.APIRequestException;
 import cn.jpush.api.push.PushResult;
 import cn.jpush.api.push.model.Options;
 import cn.jpush.api.push.model.Platform;
@@ -43,10 +41,7 @@ public class JPushUtil {
 	        JSONObject obj = new JSONObject();
 	        System.out.println(obj.get("dddddddddd"));
 	        return result.isResultOK();
-	     } catch (APIConnectionException e) {
-	    	 System.out.println("Connection error, should retry later"+e);
-	    	 logger.error("Connection error, should retry later",e);
-	     } catch (APIRequestException e) {
+	     } catch (Exception e) {
 	    	 System.out.println("Should review the error, and fix the request"+e);
 	    	 logger.error("Should review the error, and fix the request",e);
 	     }

@@ -61,4 +61,9 @@ public interface MorderDao extends CrudRepository<Coupon, Long> {
 	
 	@Query(value="select u.id from t_user u where u.phone=?1 and u.status=0", nativeQuery=true)
 	long queryUserIdForPhone(String phone);
+	
+	@Query(value=" update t_order set status = 99 where id = ?1 ", nativeQuery=true)
+	@Modifying
+	public  void  deleteOrder(Long id);
+	
 }

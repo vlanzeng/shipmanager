@@ -3,6 +3,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -28,7 +29,7 @@
         $("#os_name").val(productName);  
         $("#showOsDialog").dialog('open');  
     	$('#os_dg').datagrid({ 
-    		url:'${ctx}/m/coupon/query', 
+    		url:'${ctx}/m/os/query/purchase', 
     		method:'GET',
     		queryParams:{'status':-1},
     		fitCloumns: true , 
@@ -55,16 +56,18 @@
 	}
 	
 	function query(){
-		var name = $("#c_name").val();
-		var faceLimit = $("#c_face").val();
-		var type = $("#c_type").val();
-		//var status = $("#status").val();
-		var startTime = $("#c_startTime").val();
-		var endTime = $("#c_endTime").val();
-		name=encodeURI(name);
-		$('#dg').datagrid({ url:"${ctx}/m/coupon/query",
-			queryParams:{'page':1,'rows':15,'name':name,'faceLimit':faceLimit,'type':type,
-				'startTime':startTime,'endTime':endTime},
+		var orderNo = $("#order_no").val();
+		var osName = $("#o_s_name").val();
+		var owStatus = $("#o_w_status").val();
+		var priceRegion = $("#o_price_region").val();
+		var startTime = $('#o_startTime').datebox('getValue');   
+		var endTime = $('#o_endTime').datebox('getValue');  
+		
+		osName=encodeURI(osName);
+		
+		$('#dg').datagrid({ url:"${ctx}/m/order/query/purchase",
+			queryParams:{'page':1,'rows':15,'orderNo':orderNo,'osName':osName,
+				'owStatus':owStatus,'startTime':startTime,'endTime':endTime,'priceRegion':priceRegion},
 			method:"GET"});
 	}
 	
@@ -97,47 +100,19 @@
 		});
 	}
 	
-	function showCreatePage(){
-		$("#restartDialog").dialog('open');  
-	}
-	
-	function create(){
-		var name = $("#coupon_name").val();
-		var faceLimit = $("#face_limit").val();
-		var type = $("#coupon_type").val();
-		var startTime = $('#coupon_startTime').datebox('getValue');   
-		var endTime = $('#coupon_endTime').datebox('getValue');   
+	function updateStatus(){
+		var orderId = $("#update_orderId").val();
+		var status = $("#update_order_status").val();
+		var oldStatus = $("#update_old_status").val();
 		if(status < 0){
 			alert("请选择状态。");
 			return;
 		}
 		$.ajax({
 		    type:'POST',
-		    url: "${ctx}/m/coupon/add",
+		    url: "${ctx}/m/order/uStatus",
 		    cache:false,  
-		    data: {'name':name,'faceLimit':faceLimit,'type':type,'startTime':startTime,'endTime':endTime} ,
-		    dataType: 'json',
-		    success: function(data){
-		    	if(data.code == 200){
-		    		$("#restartDialog").dialog('close');
-		    		alert("添加成功");
-		    		query();
-		    	}else{
-		    		alert(data.msg);  
-		    	}
-		    },  
-		    error : function() {  
-		    	alert("操作异常，请稍后再试。");  
-		    }  
-		});
-	}
-	
-	function updateStatus(id, status){
-		$.ajax({
-		    type:'POST',
-		    url: "${ctx}/m/coupon/status",
-		    cache:false,  
-		    data: {'id':id,'status':status} ,
+		    data: {'orderId':orderId,'status':status,'oldStatus':oldStatus} ,
 		    dataType: 'json',
 		    success: function(data){
 		    	if(data.code == 200){
@@ -157,7 +132,7 @@
     	$("#restartDialog").dialog('close');
     	$("#showOsDialog").dialog('close');
     	$('#dg').datagrid({ 
-    		url:'${ctx}/m/coupon/query', 
+    		url:'${ctx}/m/order/query/purchase', 
     		method:'GET',
     		queryParams:{'status':-1},
     		fitCloumns: true , 
@@ -165,43 +140,27 @@
     		singleSelect: true,
     		pagination:true,//分页控件 
     		columns:[[ 
-    		{field:'id',title:'ID',width:50}, 
-    		{field:'name',title:'名称',width:fixWidth(0.15),align:'right'},
-    		{field:'type',title:'类型',width:fixWidth(0.1),align:'right',formatter:function(value){
-				if(value==1){
-					return "柴油";
-				}else if(value==2){
-					return "机油";
-				}else{
-					return "180";
-				}
-				
-    		}},
-    		{field:'status',title:'状态',width:fixWidth(0.08),align:'right',formatter:function(value){
-    			if(value==0){
-    				return "已失效";
-    			}else if(value==1){
-    				return "生效中";
-    			}else{
-    				return  "不可用";
-    			}
-    		}},
-    		{field:'faceValue',title:'面额',width:fixWidth(0.1),align:'right'},
-    		{field:'limitValue',title:'限额',width:fixWidth(0.1),align:'right'},
-    		{field:'startTime',title:'有效开始时间',width:fixWidth(0.15),align:'right'},
-    		{field:'endTime',title:'有效结束时间',width:fixWidth(0.15),align:'right'},
-    		{field:'createTime',title:'创建时间',width:fixWidth(0.15),align:'right'},
-    		{field:'op',title:'操作',width:155,formatter:function(value,rowData,rowIndex){
+    		{field:'orderNo',title:'订单号',width:300}, 
+    	/* 	{field:'productName',title:'油品',width:200,align:'right'}, */
+    		{field:'num',title:'数量',width:fixWidth(0.1),align:'right'},
+    		{field:'status',title:'状态',width:fixWidth(0.06),align:'right'},
+    		{field:'amount',title:'总价',width:fixWidth(0.1),align:'right'},
+    		{field:'userName',title:'用户名',width:fixWidth(0.20),align:'right'},
+    		{field:'osName',title:'加油站',width:fixWidth(0.20),align:'right'},
+    	/* 	{field:'bookTime',title:'预约时间',width:fixWidth(0.1),align:'right'},
+    		{field:'bookAddr',title:'预约地址',width:fixWidth(0.15),align:'right'}, */
+    		{field:'createTime',title:'创建时间',width:200,align:'right'}
+/*     		{field:'op',title:'操作',width:155,formatter:function(value,rowData,rowIndex){
     			var id = rowData.id;
     			var status = rowData.status;
+    			var productName = rowData.productName;
     			var str = "";
-    			if(status == 1){
-    				str += ' <a href="#" onclick="updateStatus(\''+id+'\',0)">失效</a>';
-    			}else{
-    				str += ' <a href="#" onclick="updateStatus(\''+id+'\',1)">生效</a>';
+    			str += '<a href="#" onclick="showRestartDialog(\''+id+'\','+status+')">设置状态</a>';
+    			if(status == 11){
+    				str += ' | <a href="#" onclick="showOsDialog(\''+id+'\',\''+productName+'\')">分配加油站</a>';
     			}
     			return str;
-    		}} 
+    		}}  */
     		]] 
     	});
     });   
@@ -211,85 +170,91 @@
 <body>
 	<div id="contentWrap">
 		<div class="" style="">
-			<div id="coupon_query_id">
+			<div id="coupon_query_id" style="position: relative;">
 				<table>
 					<tr style="height: 40px;">
-						<td width="100px"><span>名称:</span></td>
-						<td width="150px"><input id="c_name" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>面额:</span></td>
-						<td width="150px"><input id="c_face" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>类型:</span></td>
-						<td width="150px">
-							<select name="type" id="c_type" style="width: 200px">
+						<td width="100px"><span>订单号:</span></td>
+						<td width="150px"><input id="order_no" type="text" style="width: 120px"/></td>
+							<!-- <td width="100px"><span>用户名/手机号:</span></td> -->
+						<!-- <td width="150px"><input id="user_name" type="text" style="width: 120px"/></td> -->
+					<!-- 	<td width="100px"><span>加油站:</span></td>
+						<td width="150px"><input id="o_s_name" type="text" style="width: 120px"/></td> -->
+					<!-- 	<td width="100px"><span>地区:</span></td>
+						<td width="150px"><input id="o_area" type="text" style="width: 120px"/></td> -->
+						<td width="100px"><span>订单状态:</span></td>
+						<td width="100px">
+							<select name="select" id="o_w_status" style="width: 100px">
 							    <option value="-1" selected="selected">全部</option>
-								<option value="1">柴油  </option>
-								<option value="2">机油</option>
-								<option value="3">180</option>
+							    <option value="1">未付款</option>
+								<option value="2">已付款</option>
+								<option value="3">已交货</option>
 							</select>
 						</td>
-					</tr>
-					<tr style="height: 40px;">
 						<td width="100px"><span>开始时间:</span></td>
-						<td width="150px"><input id="c_startTime" class="easyui-datebox"></input></td>
+						<td width="150px"><input id="o_startTime" class="easyui-datebox"></input></td>
 						<td width="100px"><span>结束时间:</span></td>
-						<td width="150px"><input id="c_endTime" class="easyui-datebox"></input></td>
+						<td width="150px"><input id="o_endTime" class="easyui-datebox"></input></td>
 						<td colspan="4" width="100px">&nbsp;</td>
 					</tr>
-					<tr style="height: 40px;">
-					    <td colspan="8" style="text-align: right;"><button type="button" onclick="showCreatePage()">添加</button></td>
-					    &nbsp;&nbsp;
-						<td colspan="8" style="text-align: right;"><button type="button" onclick="query()">查询</button></td>
-					</tr>
+						<tr style="width: 40px;">
+						<td><span>价格区间:</span></td>
+						<td>
+							<select name="select" id="o_price_region" style="width: 125px;">
+							    <option value="-1" selected="selected">全部</option>
+							    <option value="4">0-59万</option>
+								<option value="5">59-100万</option>
+								<option value="6">100万以上</option>
+							</select>
+							</td>
+							
+								   <shiro:hasAnyRoles name="jyzAdmin,jyzcwqx">
+							<td width="100px"><span>加油站:</span></td>
+						<td width="150px"><input id="o_s_name" type="text" style="width: 120px"/></td> 
+							</shiro:hasAnyRoles>
+							
+						</tr>
+						
 				</table>
+					<div style="width: 80px;height: 25px;position: absolute;right: 50px;top: 50px;">
+					<button type="button" onclick="query()">查询</button>
+					</div>
 			</div>
 		</div>
-		<div class="pageColumn" style="margin-top: 50px">
+		<div class="pageColumn" style="margin-top: 30px">
 		    <table id="dg"></table>
 		</div>
 	</div>
-	<div id="restartDialog" class="easyui-dialog" title="添加优惠券" style="width: 650px; height: 380px;" >
+	<div id="restartDialog" class="easyui-dialog" title="更新状态" style="width: 400px; height: 180px;" >
 		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
 			<div class="data-tips-info">
 				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
-					<tr style="height: 30px">
+					<tr>
 						<td style="width:30%;">
-							优惠券名称：
+							选择状态：
 						</td>
 						<td  style="text-align:left;">
-							<input id="coupon_name" name="coupon_name"/>
-						</td>
-					</tr>
-					<tr style="height: 30px">
-						<td style="width:30%;">
-							限额-面额：
-						</td>
-						<td  style="text-align:left;">
-							<input id="face_limit" name="face_limit"/>(格式：100-30)
-						</td>
-					</tr>
-					<tr style="height: 30px">
-						<td style="width:30%;">
-							类型：
-						</td>
-						<td  style="text-align:left;">
-							<select id="coupon_type">
-								<option value="1">柴油  </option>
-								<option value="2">机油</option>
-								<option value="3">180</option>
+							<select id="update_order_status" style="width: 200px">
+							    <option value="-1">请选择</option>
+								<option value="0">等待付款中</option>
+								<option value="1">付款成功</option>
+								<option value="2">付款失败</option>
+								<option value="3">过期</option>
+								<option value="4">撤销成功</option>
+								<option value="5">退款中</option>
+								<option value="6">退款成功</option>
+								<option value="7">退款失败</option>
+								<option value="8">部分退款成功</option>
+								<option value="11">新建预约订单</option>
+								<option value="12">后台加油站已确定-等待付款中</option>
+								<option value="99">删除</option>
 							</select>
-						</td>
-					</tr>
-					<tr style="height: 30px">
-						<td style="width:30%;">
-							有效期：
-						</td>
-						<td  style="text-align:left;">
-							<input id="coupon_startTime" class="easyui-datebox"></input>--<input id="coupon_endTime" class="easyui-datebox"></input>
+							<input type="hidden" id="update_orderId" name="update_orderId"/>
+							<input type="hidden" id="update_old_status" name="update_old_status"/>
 						</td>
 					</tr>
 				</table>
 				<div style="text-align:right;margin-right:30px;margin-top: 50px">
-					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-finish'" onclick="create()">确定</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-finish'" onclick="updateStatus()">确定</a>
 					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-cancel'" onclick="cancel()">取消</a>
 				</div>				
 			</div> 		

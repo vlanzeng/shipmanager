@@ -57,15 +57,15 @@ public class McouponService {
 		}
 		
 		if(!StringUtils.isEmpty(param.startTime)){
-			whereParam.append(" and c.create_time >='"+param.startTime+"'");
+			whereParam.append(" and  DATE_FORMAT(c.create_time,'%Y-%m-%d')   >='"+param.startTime+"'");
 		}
 		
 		if(!StringUtils.isEmpty(param.getEndTime())){
-			whereParam.append(" and o.create_time<'"+param.getEndTime()+"'");
+			whereParam.append(" and  DATE_FORMAT(c.create_time,'%Y-%m-%d')  <='"+param.getEndTime()+"'");
 		}
 		
 		String sql = "select id,name,face_value,limit_value,os_id,type,status,start_time,end_time,create_time"
-				+ " from t_coupon c where 1=1 " + whereParam.toString()
+				+ " from t_coupon c   where 1=1 " + whereParam.toString()
 				+ " order by c.create_time desc limit "+start+","+param.getRows()+"";
 		Query q = em.createNativeQuery(sql);
 		List<Object[]> infoList = q.getResultList();
@@ -87,8 +87,9 @@ public class McouponService {
 			bean.setStartTime(o[7] + "");
 			bean.setEndTime(o[8] + "");
 			try {
-				bean.setCreateTime(fromat.parse(o[9] + ""));
+				bean.setCreateTime(fromat.parse(o[9].toString()).toLocaleString());
 			} catch (ParseException e) {
+				e.printStackTrace();
 			}
 			result.add(bean);
 		}

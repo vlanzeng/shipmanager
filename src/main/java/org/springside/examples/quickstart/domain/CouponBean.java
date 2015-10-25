@@ -13,9 +13,14 @@ public class CouponBean {
 	private Integer effectiveDay;
 	private String startTime;
 	private String endTime;
-	private Date createTime;
+	private String createTime;
 	private Integer status;
-	
+	public String getCreateTime() {
+		return createTime;
+	}
+	public void setCreateTime(String createTime) {
+		this.createTime = createTime;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -75,12 +80,6 @@ public class CouponBean {
 	}
 	public void setEndTime(String endTime) {
 		this.endTime = endTime;
-	}
-	public Date getCreateTime() {
-		return createTime;
-	}
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
 	}
 	public Integer getStatus() {
 		return status;

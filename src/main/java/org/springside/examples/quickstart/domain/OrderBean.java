@@ -13,7 +13,7 @@ public class OrderBean {
 	private String money;
 	private Integer num;
 	private String price;
-	private Integer status;
+	private String status;
 	private String orderNo;
 	private String sftOrderNo;
 	private String bookTime;
@@ -21,6 +21,7 @@ public class OrderBean {
 	private String updateTime;
 	private String createTime;
 	
+	private String statusId;
 	private Long userId;
 	private String phone;
 	private String userName;
@@ -29,6 +30,13 @@ public class OrderBean {
 	private Long couponId;
 	private String amount;
 	
+	
+	public String getStatusId() {
+		return statusId;
+	}
+	public void setStatusId(String statusId) {
+		this.statusId = statusId;
+	}
 	public Long getUserId() {
 		return userId;
 	}
@@ -113,10 +121,10 @@ public class OrderBean {
 	public void setMoney(String money) {
 		this.money = money;
 	}
-	public Integer getStatus() {
+	public String getStatus() {
 		return status;
 	}
-	public void setStatus(Integer status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 	public String getOrderNo() {

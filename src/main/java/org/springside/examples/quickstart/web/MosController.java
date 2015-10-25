@@ -42,6 +42,17 @@ public class MosController extends BaseController implements HybConstants{
 	@Autowired
 	private MuserService muserService;
 	
+	
+	
+	/**
+	 *   历史订单
+	 * @return
+	 */
+	@RequestMapping(value="/history", method=RequestMethod.GET)
+	public String history(){
+		return "/os/history";
+	}
+	
 	/**
 	 * @param request
 	 * @param response
@@ -133,7 +144,7 @@ public class MosController extends BaseController implements HybConstants{
 		param.setRows(pageInfo[1]);
 		param.setStatus(Integer.valueOf(request.getParameter("status")));
 		param.setOrderNo(request.getParameter("orderNo"));
-		param.setOsName(request.getParameter("osName"));
+		param.setOsName(CommonUtils.decode(request.getParameter("osName")));
 		param.setStartTime(request.getParameter("startTime"));
 		param.setEndTime(request.getParameter("endTime"));
 		DataGrid<OsOilBean> gb = mosService.getOsBuyOilList(param);
