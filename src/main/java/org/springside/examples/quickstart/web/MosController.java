@@ -68,9 +68,11 @@ public class MosController extends BaseController implements HybConstants{
 		OsParam param = new OsParam();
 		param.setPage(pageInfo[0]);
 		param.setRows(pageInfo[1]);
-		param.setOsName(request.getParameter("osName"));
-		param.setCityName(request.getParameter("cityName"));
+		param.setOsName(CommonUtils.decode(request.getParameter("osName")));
+		param.setCityName(CommonUtils.decode(request.getParameter("cityName")));
 		param.setStatus(Integer.valueOf(request.getParameter("status")));
+		param.setStartTime(request.getParameter("startTime"));
+		param.setEndTime(request.getParameter("endTime"));
 		DataGrid<OilStationBean> gb = mosService.getOsList(param);
 		return CommonUtils.printObjStr2(gb);
 	}
@@ -83,17 +85,109 @@ public class MosController extends BaseController implements HybConstants{
 	 */
 	@RequestMapping(value="add", method=RequestMethod.POST)
 	@ResponseBody
-	public String rAdd(@RequestParam("file") MultipartFile file,HttpServletRequest request,
+	public String rAdd(@RequestParam(required=false) MultipartFile file,HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException{
 		OsParam param = new OsParam();
-		param.osName = request.getParameter("name");
-		param.addr = request.getParameter("addr");
-		param.phone = request.getParameter("phone");
-		param.latitude = request.getParameter("latitude");
-		param.longitude = request.getParameter("langitude");
-		param.cityId = request.getParameter("cityId");
+//		if(request.getParameter("add_os_name")!=null){
+//			param.setOsName(CommonUtils.decode(request.getParameter("add_os_name")));
+//		}
+//		if(request.getParameter("add_os_addr")!=null){
+//			param.setAddr(CommonUtils.decode(request.getParameter("add_os_addr")));
+//		}
+		param.osName = request.getParameter("add_os_name");
+		param.addr = request.getParameter("add_os_addr");
+		param.phone = request.getParameter("add_os_phone");
+		param.latitude = request.getParameter("add_os_latitude");
+		param.longitude = request.getParameter("add_os_longitude");
+		param.cityId = request.getParameter("add_os_city");
 		try {
 			int res = mosService.updatePicUrl(file, param, request);
+			if(res > 0){
+				return CommonUtils.printObjStr(res);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("uStatus error.", e);
+		}
+		return CommonUtils.printStr(ErrorConstants.BANK_GET_INFO_ERROR);
+	}
+	
+	@RequestMapping(value="addnima", method=RequestMethod.POST)
+	@ResponseBody
+	public String rAddnima(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException{
+		OsParam param = new OsParam();
+		if(request.getParameter("add_os_name")!=null){
+			param.setOsName(CommonUtils.decode(request.getParameter("add_os_name")));
+		}
+		if(request.getParameter("add_os_addr")!=null){
+			param.setAddr(CommonUtils.decode(request.getParameter("add_os_addr")));
+		}
+		//param.osName = request.getParameter("add_os_name");
+		//param.addr = request.getParameter("add_os_addr");
+		param.phone = request.getParameter("add_os_phone");
+		param.latitude = request.getParameter("add_os_latitude");
+		param.longitude = request.getParameter("add_os_longitude");
+		param.cityId = request.getParameter("add_os_city");
+		try {
+			//int res = mosService.updatePicUrl(file, param, request);
+			int res=0;
+			if(res > 0){
+				return CommonUtils.printObjStr(res);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("uStatus error.", e);
+		}
+		return CommonUtils.printStr(ErrorConstants.BANK_GET_INFO_ERROR);
+	}
+	
+	@RequestMapping(value="updateStatus", method=RequestMethod.POST)
+	@ResponseBody
+	public String osUpdateStatus(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException{
+		//OsParam param = new OsParam();
+//		param.osName = request.getParameter("name");
+//		param.addr = request.getParameter("addr");
+//		param.phone = request.getParameter("phone");
+//		param.latitude = request.getParameter("latitude");
+//		param.longitude = request.getParameter("langitude");
+//		param.cityId = request.getParameter("cityId");
+		//param.setId(request.getParameter("osId")==null?null:Integer.valueOf(request.getParameter("osId")));
+		//param.setStatus(request.getParameter("status")==null?null:Integer.valueOf(request.getParameter("status")));
+		String osId = request.getParameter("osId");
+		String status = request.getParameter("status");
+		try {
+			//int res = mosService.updatePicUrl(file, param, request);
+			int res = mosService.updateStaus(osId, status);
+			if(res > 0){
+				return CommonUtils.printObjStr(res);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("uStatus error.", e);
+		}
+		return CommonUtils.printStr(ErrorConstants.BANK_GET_INFO_ERROR);
+	}
+	
+	@RequestMapping(value="deleteOS", method=RequestMethod.POST)
+	@ResponseBody
+	public String osDelete(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException{
+		//OsParam param = new OsParam();
+//		param.osName = request.getParameter("name");
+//		param.addr = request.getParameter("addr");
+//		param.phone = request.getParameter("phone");
+//		param.latitude = request.getParameter("latitude");
+//		param.longitude = request.getParameter("langitude");
+//		param.cityId = request.getParameter("cityId");
+		//param.setId(request.getParameter("osId")==null?null:Integer.valueOf(request.getParameter("osId")));
+		//param.setStatus(request.getParameter("status")==null?null:Integer.valueOf(request.getParameter("status")));
+		String osId = request.getParameter("osId");
+		//String status = request.getParameter("status");
+		try {
+			//int res = mosService.updatePicUrl(file, param, request);
+			int res = mosService.deleteOS(osId);
 			if(res > 0){
 				return CommonUtils.printObjStr(res);
 			}

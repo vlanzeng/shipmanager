@@ -61,4 +61,11 @@ public interface MorderDao extends CrudRepository<Coupon, Long> {
 	
 	@Query(value="select u.id from t_user u where u.phone=?1 and u.status=0", nativeQuery=true)
 	long queryUserIdForPhone(String phone);
+	
+	@Query(value="select count(*) from t_user_bank where user_id=?1", nativeQuery=true)
+	int queryUserBankCount(Long userId);
+	
+	@Modifying
+	@Query(value="insert into t_user_bank(user_id, fund, update_time) values(?1,?2,now())", nativeQuery=true)
+	int insertUserBank(Long userId, float amount);
 }

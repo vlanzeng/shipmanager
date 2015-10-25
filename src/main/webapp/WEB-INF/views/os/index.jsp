@@ -61,15 +61,19 @@
 	function query(){
 		var name = $("#c_name").val();
 		var faceLimit = $("#c_face").val();
+		var cityName= $("#c_city").val();
 		var type = $("#c_type").val();
 		//var status = $("#status").val();
-		var startTime = $("#c_startTime").val();
-		var endTime = $("#c_endTime").val();
+		var startTime = $("#c_startTime").datebox('getValue');
+		var endTime = $("#c_endTime").datebox('getValue');
 		name=encodeURI(name);
-		$('#dg').datagrid({ url:"${ctx}/m/coupon/query",
-			queryParams:{'page':1,'rows':15,'name':name,'faceLimit':faceLimit,'type':type,
-				'startTime':startTime,'endTime':endTime},
-			method:"GET"});
+		cityName=encodeURI(cityName);
+// 		$('#dg').datagrid({ url:"${ctx}/m/os/query",
+// 			queryParams:{'page':1,'rows':15,'name':name,'faceLimit':faceLimit,'type':type,'cityName':cityName,
+// 				'startTime':startTime,'endTime':endTime},
+// 			method:"GET"});
+		$('#dg').datagrid('reload',
+				{'page':1,'rows':15,'osName':name, 'cityName':cityName,'startTime':startTime,'endTime':endTime,'status':-1 });
 	}
 	
 	function disOs(){
@@ -106,15 +110,72 @@
 	}
 	
 	function create(){
-		$('#file_upload').uploadify("upload");
+		//$('#file_upload').uploadify("upload");
+        	var name = $("#add_os_name").val();
+      	var addr = $("#add_os_addr").val();
+      	var phone = $("#add_os_phone").val();
+      	var latitude = $("#add_os_latitude").val();
+      	var langitude = $("#add_os_longitude").val();
+      	var cityId = $("#add_os_city").val();
+//       	name=encodeURI(name);
+//       	addr=encodeURI(addr);
+		$("#addform")[0].action = "${ctx}/m/os/addnima?add_os_name="+name+"&add_os_addr="+addr+"&add_os_phone="+phone+"&add_os_latitude="+latitude+"&add_os_longitude="+langitude+"&add_os_city="+cityId;
+		//$("#addform")[0].action = "${ctx}/m/os/add";
+		$("#addform").submit();
+//         $("#file_upload").uploadify({  
+//         	'buttonText' : '选择图片',  
+//             'height' : 30,  
+//             'swf':'${ctx}/static/audio/uploadify.swf',
+//             'uploader' : '${ctx}/m/os/add/add',  
+//             'width' : 120,  
+//             'fileSizeLimit': '1MB',  
+//             'auto':false,  
+//             'fileObjName'   : 'file',  
+//             'method': 'post',
+//             'fileDesc'       : '支持格式:jpg/gif/jpeg/png/bmp.', //如果配置了以下的'fileExt'属性，那么这个属性是必须的  
+//             'fileExt'        : '*.jpg;*.gif;*.jpeg;*.png;*.bmp',//允许的格式    
+//             'queueID'  : 'some_file_queue',
+//             'onUploadStart' : function(file) {  
+//             	var name = $("#add_os_name").val();
+//             	var addr = $("#add_os_addr").val();
+//             	var phone = $("#add_os_phone").val();
+//             	var latitude = $("#add_os_latitude").val();
+//             	var langitude = $("#add_os_longitude").val();
+//             	var cityId = $("#add_os_city").val();
+//                 //$("#file_upload").uploadify("settings", "formData", {'method':'post','name':name,'addr':addr,'phone':phone,'latitude':latitude,'langitude':langitude,'cityId':cityId});  
+//             },  
+//             'onUploadSuccess' : function(file, data, response) {  
+//             	var o =  eval("("+data+")");
+//             	if(o.code == 200){
+// 	            	alert("创建成功。");
+// 	            	$("#restartDialog").dialog('close');
+//             	}else{
+//             		alert(o.msg);  
+//             	}
+//             },
+//             'onFallback' : function() {//检测FLASH失败调用  
+//                 alert("您未安装FLASH控件，无法上传图片！请安装FLASH控件后再试。");  
+//             },
+//             onComplete: function (event, queueID, fileObj, response, data) {     
+//                 //$('<li></li>').appendTo('.files').text(response);  
+//                 //var picIndexPlus = picIndex++;  
+//                 var uploadPath =response;  
+// //                 $('#picBefore').before(picTpl(picIndexPlus));  
+// //                 var uploadImgPathId = "uploadImgPath" + (picIndexPlus);  
+// //                 document.getElementById(uploadImgPathId).value=uploadPath;  
+//             },
+// 			'onSelect':function(file){
+// 				$("#file_name_").html(file.name);
+//             }
+//         });
 	}
 	
 	function updateStatus(id, status){
 		$.ajax({
 		    type:'POST',
-		    url: "${ctx}/m/coupon/status",
+		    url: "${ctx}/m/os/updateStatus",
 		    cache:false,  
-		    data: {'id':id,'status':status} ,
+		    data: {'osId':id,'status':status} ,
 		    dataType: 'json',
 		    success: function(data){
 		    	if(data.code == 200){
@@ -129,46 +190,80 @@
 		    }  
 		});
 	}
+	
+	function deleteStatus(id, status){
+		$.ajax({
+		    type:'POST',
+		    url: "${ctx}/m/os/deleteOS",
+		    cache:false,  
+		    data: {'osId':id} ,
+		    dataType: 'json',
+		    success: function(data){
+		    	if(data.code == 200){
+		    		$("#showOsDialog").dialog('close');
+		    		alert("删除成功");
+		    	}else{
+		    		alert(data.msg);  
+		    	}
+		    },  
+		    error : function() {  
+		    	alert("操作异常，请稍后再试。");  
+		    }  
+		});
+	}
+	
+	
 
     $(document).ready(function(){
     	$("#restartDialog").dialog('close');
     	$("#showOsDialog").dialog('close');
     	
-        $("#file_upload").uploadify({  
-        	'buttonText' : '选择图片',  
-            'height' : 30,  
-            'swf':'${ctx}/static/audio/uploadify.swf',
-            'uploader' : '${ctx}/m/os/add',  
-            'width' : 120,  
-            'fileSizeLimit': '1MB',  
-            'auto':false,  
-            'fileObjName'   : 'file',  
-            'method': 'post',
-            'fileDesc'       : '支持格式:jpg/gif/jpeg/png/bmp.', //如果配置了以下的'fileExt'属性，那么这个属性是必须的  
-            'fileExt'        : '*.jpg;*.gif;*.jpeg;*.png;*.bmp',//允许的格式    
-            'queueID'  : 'some_file_queue',
-            'onUploadStart' : function(file) {  
-            	var name = $("#add_os_name").val();
-            	var addr = $("#add_os_addr").val();
-            	var phone = $("#add_os_phone").val();
-            	var latitude = $("#add_os_latitude").val();
-            	var langitude = $("#add_os_longitude").val();
-            	var cityId = $("#add_os_city").val();
-                $("#file_upload").uploadify("settings", "formData", {'method':'post','name':name,'addr':addr,'phone':phone,'latitude':latitude,'langitude':langitude,'cityId':cityId});  
-            },  
-            'onUploadSuccess' : function(file, data, response) {  
-            	var o =  eval("("+data+")");
-            	if(o.code == 200){
-	            	alert("创建成功。");
-	            	$("#restartDialog").dialog('close');
-            	}else{
-            		alert(o.msg);  
-            	}
-            },
-			'onSelect':function(file){
-				$("#file_name_").html(file.name);
-            }
-        });
+//         $("#file_upload").uploadify({  
+//         	'buttonText' : '选择图片',  
+//             'height' : 30,  
+//             'swf':'${ctx}/static/audio/uploadify.swf',
+//             'uploader' : '${ctx}/m/os/add/add',  
+//             'width' : 120,  
+//             'fileSizeLimit': '1MB',  
+//             'auto':false,  
+//             'fileObjName'   : 'file',  
+//             'method': 'post',
+//             'fileDesc'       : '支持格式:jpg/gif/jpeg/png/bmp.', //如果配置了以下的'fileExt'属性，那么这个属性是必须的  
+//             'fileExt'        : '*.jpg;*.gif;*.jpeg;*.png;*.bmp',//允许的格式    
+//             'queueID'  : 'some_file_queue',
+//             'onUploadStart' : function(file) {  
+//             	var name = $("#add_os_name").val();
+//             	var addr = $("#add_os_addr").val();
+//             	var phone = $("#add_os_phone").val();
+//             	var latitude = $("#add_os_latitude").val();
+//             	var langitude = $("#add_os_longitude").val();
+//             	var cityId = $("#add_os_city").val();
+//                 //$("#file_upload").uploadify("settings", "formData", {'method':'post','name':name,'addr':addr,'phone':phone,'latitude':latitude,'langitude':langitude,'cityId':cityId});  
+//             },  
+//             'onUploadSuccess' : function(file, data, response) {  
+//             	var o =  eval("("+data+")");
+//             	if(o.code == 200){
+// 	            	alert("创建成功。");
+// 	            	$("#restartDialog").dialog('close');
+//             	}else{
+//             		alert(o.msg);  
+//             	}
+//             },
+//             'onFallback' : function() {//检测FLASH失败调用  
+//                 alert("您未安装FLASH控件，无法上传图片！请安装FLASH控件后再试。");  
+//             },
+//             onComplete: function (event, queueID, fileObj, response, data) {     
+//                 //$('<li></li>').appendTo('.files').text(response);  
+//                 //var picIndexPlus = picIndex++;  
+//                 var uploadPath =response;  
+// //                 $('#picBefore').before(picTpl(picIndexPlus));  
+// //                 var uploadImgPathId = "uploadImgPath" + (picIndexPlus);  
+// //                 document.getElementById(uploadImgPathId).value=uploadPath;  
+//             },
+// 			'onSelect':function(file){
+// 				$("#file_name_").html(file.name);
+//             }
+//         });
     	
     	$('#dg').datagrid({ 
     		url:'${ctx}/m/os/query', 
@@ -193,7 +288,7 @@
     			var id = rowData.id;
     			var status = rowData.status;
     			var str = "";
-    			str += ' <a href="#" onclick="updateStatus(\''+id+'\',0)">删除</a>';
+    			str += ' <a href="#" onclick="deleteOS(\''+id+'\',0)">删除</a>';
     			if(status == 1){
     				str += ' <a href="#" onclick="updateStatus(\''+id+'\',0)">失效</a>';
     			}else{
@@ -216,7 +311,7 @@
 						<td width="100px"><span>名称:</span></td>
 						<td width="150px"><input id="c_name" type="text" style="width: 120px"/></td>
 						<td width="100px"><span>城市:</span></td>
-						<td width="150px"><input id="c_face" type="text" style="width: 120px"/></td>
+						<td width="150px"><input id="c_city" type="text" style="width: 120px"/></td>
 					</tr>
 					<tr style="height: 40px;">
 						<td width="100px"><span>开始时间:</span></td>
@@ -236,6 +331,8 @@
 		    <table id="dg"></table>
 		</div>
 	</div>
+	
+	<form id="addform"　action="${ctx}/m/os/add" enctype="multipart/form-data" method="post">
 	<div id="restartDialog" class="easyui-dialog" title="添加加油站" style="width: 650px; height: 380px;" >
 		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
 			<div class="data-tips-info">
@@ -285,7 +382,7 @@
 							所属城市：
 						</td>
 						<td  style="text-align:left;">
-							<select id="add_os_city" style="width: 150px">
+							<select id="add_os_city" name="add_os_city" style="width: 150px">
 								<option value="1">上海  </option>
 								<option value="2">南京</option>
 								<option value="3">仪征</option>
@@ -305,7 +402,7 @@
 							加油站图片：
 						</td>
 						<td  style="text-align:left;">
-							<input id="file_upload" name="file_upload" type="file" multiple="true"/>
+							<input id="file_upload" name="file" type="file" multiple="true"/>
 							<div id="some_file_queue" style="display: none;"></div>
 						</td>
 					</tr>
@@ -317,6 +414,7 @@
 			</div> 		
 		</div>
 	</div>
+	</form>
 	
 	<div id="showOsDialog" class="easyui-dialog" title="分配加油站" style="width: 800px; height: 580px;" >
 		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			

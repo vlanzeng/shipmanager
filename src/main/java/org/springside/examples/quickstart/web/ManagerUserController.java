@@ -121,4 +121,21 @@ public class ManagerUserController extends BaseController implements HybConstant
 		}
 		return CommonUtils.printStr(ErrorConstants.BANK_GET_INFO_ERROR);
 	}
+	
+//	@RequestMapping(value="delete", method=RequestMethod.POST)
+//	@ResponseBody
+//	public String delete(HttpServletRequest request,
+//			HttpServletResponse response) throws IOException, ServletException{
+//		String userId = request.getParameter("id");
+//		String status = request.getParameter("status");
+//		try {
+//			int res = muserService.delete(userId);
+//			if(res > 0){
+//				return CommonUtils.printObjStr(res);
+//			}
+//		} catch (Exception e) {
+//			logger.error("uStatus error.", e);
+//		}
+//		return CommonUtils.printStr(ErrorConstants.BANK_GET_INFO_ERROR);
+//	}
 }

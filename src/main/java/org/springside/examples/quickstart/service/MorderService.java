@@ -9,6 +9,7 @@ import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springside.examples.quickstart.domain.BaseParam;
@@ -17,12 +18,13 @@ import org.springside.examples.quickstart.domain.DataGrid;
 import org.springside.examples.quickstart.domain.OrderBean;
 import org.springside.examples.quickstart.domain.OrderParam;
 import org.springside.examples.quickstart.domain.PushOsBean;
+import org.springside.examples.quickstart.domain.RechargeParam;
 import org.springside.examples.quickstart.domain.ResultList;
 import org.springside.examples.quickstart.repository.MorderDao;
 import org.springside.examples.quickstart.utils.JPushUtil;
 
 @Component
-@Transactional
+@EnableTransactionManagement
 public class MorderService {
 	@Autowired
 	private MorderDao morderDao;
@@ -190,25 +192,38 @@ public class MorderService {
 		return 1;
 	}
 
+	@Transactional
 	public int recharge(String phone, String amount) {
+		//根据手机号查询ID
+		Long userId =-1L;
+		try{
+		userId= morderDao.queryUserIdForPhone(phone);
+		}catch(Exception e){
+			return -1;
+		}
+		if(userId <= 0){
+			//throw new RuntimeException("充值失败:手机号不存在");
+			return -1;
+		}
+		int rr= -1;
+		try{
+			rr = morderDao.queryUserBankCount(userId);
+			if(rr <=0){
+				rr = morderDao.insertUserBank(userId, 0);
+				if(rr <= 0){
+					return -2;
+				}
+			}
+		}catch(Exception e){
+			return -2;
+		}
 		//更新用户月
 		//插入充值记录表
 		int r = morderDao.insertLog(phone,amount);
-		if(r > 0){
-			//根据手机号查询ID
-				Long userId = morderDao.queryUserIdForPhone(phone);
-				if(userId <= 0){
-					throw new RuntimeException("充值失败");
-				}
-				int rr = morderDao.updateRecharge(userId, amount);
-				if(rr <= 0){
-					throw new RuntimeException("充值失败");
-				}
-		}
 		return r;
 	}
 	
-	public DataGrid<ChargeLogBean> getRechargeList(BaseParam param){
+	public DataGrid<ChargeLogBean> getRechargeList(RechargeParam param){
 		DataGrid<ChargeLogBean> dg = new DataGrid<ChargeLogBean>();
 		StringBuffer whereParam = new StringBuffer();
 		int start = (param.getPage() - 1) * param.getRows();
@@ -218,13 +233,26 @@ public class MorderService {
 		}
 		
 		if(!StringUtils.isEmpty(param.startTime)){
-			whereParam.append(" and o.create_time >='"+param.startTime+"'");
+			whereParam.append(" and r.create_time >='"+param.startTime+"'");
 		}
 		
 		if(!StringUtils.isEmpty(param.getEndTime())){
-			whereParam.append(" and o.create_time<'"+param.getEndTime()+"'");
+			whereParam.append(" and r.create_time<'"+param.getEndTime()+"'");
 		}
-		String sql = "SELECT r.id,r.phone,r.`status`,r.amount,r.create_time from t_recharge_log r where 1=1 " + 
+		
+		if(!StringUtils.isEmpty(param.getCname())){
+			whereParam.append(" and exists (select * from t_user c where r.phone=c.phone and c.ship_name like '%"+param.getCname()+"%')");
+		}
+		
+		if(param.getAmountStart() != null){
+			whereParam.append(" and r.amount>="+param.getAmountStart());
+		}
+		
+		if(param.getAmountEnd() != null){
+			whereParam.append(" and r.amount <= "+param.getAmountEnd());
+		}
+		
+		String sql = "SELECT r.id,r.phone,r.status,r.amount,r.create_time, b.user_name,b.ship_name from t_recharge_log r, t_user b where 1=1 and r.phone=b.phone " + 
 		              whereParam.toString() + " " + "order by r.create_time desc limit "+start+","+param.getRows()+"";
 		Query q = em.createNativeQuery(sql);
 		List<Object[]> infoList = q.getResultList();
@@ -241,10 +269,69 @@ public class MorderService {
 			ob.setStatus(Integer.valueOf(o[2]+""));
 			ob.setAmount(o[3]==null ? "" :o[3] + "");
 			ob.setCreateTime(o[4]==null ? "" :o[4] + "");
+			ob.setUsername(o[5]==null?"":o[5]+"");
+			ob.setShipname(o[6]==null?"":o[6]+"");
 			result.add(ob);
 		}
 		dg.setTotal(total);
 		dg.setRows(result);
 		return dg;
 	}
+	
+	public DataGrid<ChargeLogBean> getRechargeSumList(RechargeParam param){
+		DataGrid<ChargeLogBean> dg = new DataGrid<ChargeLogBean>();
+		StringBuffer whereParam = new StringBuffer();
+		int start = (param.getPage() - 1) * param.getRows();
+		
+		if(!StringUtils.isEmpty(param.phone)){
+			whereParam.append(" and r.phone ='"+param.phone+"'");
+		}
+		
+		if(!StringUtils.isEmpty(param.startTime)){
+			whereParam.append(" and r.create_time >='"+param.startTime+"'");
+		}
+		
+		if(!StringUtils.isEmpty(param.getEndTime())){
+			whereParam.append(" and r.create_time<'"+param.getEndTime()+"'");
+		}
+		
+		if(!StringUtils.isEmpty(param.getCname())){
+			whereParam.append(" and exists (select * from t_user c where r.phone=c.phone and c.ship_name like '%"+param.getCname()+"%')");
+		}
+		
+		if(param.getAmountStart() != null){
+			whereParam.append(" and r.amount>="+param.getAmountStart());
+		}
+		
+		if(param.getAmountEnd() != null){
+			whereParam.append(" and r.amount <= "+param.getAmountEnd());
+		}
+		
+		String sql = "SELECT r.phone,sum(r.amount), b.user_name,b.ship_name from t_recharge_log r, t_user b where 1=1 and r.phone=b.phone " + 
+		              whereParam.toString() + " " + "group by 1,3,4 order by r.create_time desc limit "+start+","+param.getRows()+"";
+		Query q = em.createNativeQuery(sql);
+		List<Object[]> infoList = q.getResultList();
+		List<ChargeLogBean> result = new ArrayList<ChargeLogBean>();
+		
+		String totalSql = "select count(1) from t_recharge_log r where 1=1 " + whereParam.toString();
+		Query q1 = em.createNativeQuery(totalSql);
+		
+		int total = Integer.valueOf(q1.getSingleResult()+"");
+		for(Object[] o : infoList){
+			ChargeLogBean ob = new ChargeLogBean();
+			//ob.setId(Long.valueOf(o[0]+""));
+			ob.setPhone(o[0]+"");
+			//ob.setStatus(Integer.valueOf(o[2]+""));
+			ob.setAmount(o[1]==null ? "" :o[1] + "");
+			//ob.setCreateTime(o[4]==null ? "" :o[4] + "");
+			ob.setUsername(o[2]==null?"":o[2]+"");
+			ob.setShipname(o[3]==null?"":o[3]+"");
+			result.add(ob);
+		}
+		dg.setTotal(total);
+		dg.setRows(result);
+		return dg;
+	}
+	
 }
+

@@ -46,6 +46,18 @@ public class MosService {
 	public int uStatus(String orderId, String status, String oldStatus) {
 		return mosDao.updateStatus(Integer.valueOf(status), Integer.valueOf(oldStatus),Long.valueOf(orderId));
 	}
+	
+	public int updateStaus(String sosId, String sstatus){
+		Integer status = Integer.valueOf(sstatus);
+		Long id = Long.valueOf(sosId);
+		
+		return mosDao.updateOSStatus(status, id);
+	}
+	
+	public int deleteOS(String osid){
+		Long id = Long.valueOf(osid);
+		return mosDao.deleteOSStatus(id);
+	}
 
 	public DataGrid<OilStationBean> getOsList(OsParam param) {
 		DataGrid<OilStationBean> dg = new DataGrid<OilStationBean>();
@@ -53,18 +65,18 @@ public class MosService {
 		int start = (param.getPage() - 1) * param.getRows();
 		
 		if(!StringUtils.isEmpty(param.getOsName())){
-			whereParam.append(" and o.name ='" + param.getOsName() + "'");
+			whereParam.append(" and o.name like '%" + param.getOsName() + "%'");
 		}
 		
 		if(!StringUtils.isEmpty(param.getStatus()) && param.getStatus() >=0){
 			whereParam.append(" and o.status="+param.getStatus());
 		}
 		
-		if(!StringUtils.isEmpty(param.getCityId()) && param.getStatus() >=0){
+		if(!StringUtils.isEmpty(param.getCityId()) ){
 			whereParam.append(" and o.city_id="+param.getCityId());
 		}
 		
-		if(!StringUtils.isEmpty(param.getCityName()) && param.getStatus() >=0){
+		if(!StringUtils.isEmpty(param.getCityName()) ){
 			whereParam.append(" and c.name ='"+param.getCityName() + "'");
 		}
 		if(!StringUtils.isEmpty(param.startTime)){

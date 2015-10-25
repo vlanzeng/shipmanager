@@ -20,4 +20,8 @@ public interface MUserDao extends PagingAndSortingRepository<Muser, Long> {
 	@Query(value="insert into ss_user(login_name,name,password,salt,roles,os_id,status,register_date) "
 			+ "values(?1,?1,?2,?3,?4,?5,1,now())", nativeQuery=true)
 	int add(String userNmae,String pwd, String salt, String role, Long osId);
+	
+	@Modifying
+	@Query(value="update ss_user set status=?1 where id=?2", nativeQuery=true)
+	int updateStatus(String status, String id);
 }

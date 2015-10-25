@@ -47,6 +47,11 @@ public class MuserService {
 			return dg;
 		}
 		
+		//jyzadmin只操作自己加油站的用户
+		if(HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles())){
+			whereParam.append(" and u.os_id="+user.getOsId());
+		}
+		
 		int start = (param.getPage() - 1) * param.getRows();
 		//订单类型
 		if(!StringUtils.isEmpty(param.getStatus()) && param.getStatus()>= 0){
@@ -84,12 +89,12 @@ public class MuserService {
 		int total = Integer.valueOf(q1.getSingleResult()+"");
 		for(Object[] o : infoList){
 			MuserBean ob = new MuserBean();
-			ob.setId(Long.valueOf(o[0] + ""));
+			ob.setId(o[0]==null?null:Long.valueOf(o[0] + ""));
 			ob.setUserName(o[1]+"");
 			ob.setOsId(o[2]==null?-1:Long.valueOf(o[2]+""));
 			ob.setRole(o[3]+"");
 			ob.setCreateTime(o[4]+"");
-			ob.setStatus(Integer.valueOf(o[5]+""));
+			ob.setStatus(o[5]==null?null:Integer.valueOf(o[5]+""));
 			ob.setOsName(o[6]==null?"":o[6]+"");
 			result.add(ob);
 		}
@@ -117,7 +122,8 @@ public class MuserService {
 
 	public int uStatus(String userId, String status) {
 		// TODO Auto-generated method stub
-		return 0;
+		int res= muserDao.updateStatus(status, userId);
+		return res;
 	}
 
 }

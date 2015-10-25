@@ -55,17 +55,21 @@
 	}
 	
 	function query(){
-		var name = $("#c_name").val();
+		var name = $("#u_name").val();
 		var faceLimit = $("#c_face").val();
 		var type = $("#c_type").val();
 		//var status = $("#status").val();
 		var startTime = $("#c_startTime").val();
 		var endTime = $("#c_endTime").val();
+		var osName = $("#u_osName").val();
 		name=encodeURI(name);
-		$('#dg').datagrid({ url:"${ctx}/m/coupon/query",
-			queryParams:{'page':1,'rows':15,'name':name,'faceLimit':faceLimit,'type':type,
-				'startTime':startTime,'endTime':endTime},
-			method:"GET"});
+		osName=encodeURI(osName);
+// 		$('#dg').datagrid({ url:"${ctx}/m/coupon/query",
+// 			queryParams:{'page':1,'rows':15,'name':name,'faceLimit':faceLimit,'type':type,
+// 				'startTime':startTime,'endTime':endTime},
+// 			method:"GET"});
+		$('#dg').datagrid('reload',
+				{'name':name, 'osName':osName });
 	}
 	
 	function disOs(){
@@ -150,7 +154,7 @@
 	function updateStatus(id, status){
 		$.ajax({
 		    type:'POST',
-		    url: "${ctx}/m/coupon/status",
+		    url: "${ctx}/m/muser/status",
 		    cache:false,  
 		    data: {'id':id,'status':status} ,
 		    dataType: 'json',

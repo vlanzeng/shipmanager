@@ -9,6 +9,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="${ctx}/static/jquery/jquery-1.8.0.min.js"></script>
 <script type="text/javascript" src="${ctx}/static/jquery/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="${ctx}/static/jquery/easyui-lang-zh_CN.js"></script>
 <link rel="stylesheet" type="text/css" href="${ctx}/static/styles/main.css" id="swicth-style"/>
 <script type="text/javascript">  
 	function fixWidth(percent)  
@@ -53,20 +54,74 @@
 	
 	function query(){
 		var phone = $("#q_user_phone").val();
-		var startTime = $("#startTime").val();
-		var endTime = $("#endTime").val();
+		var startTime = $("#startTime").datebox('getValue');
+		var endTime = $("#endTime").datebox('getValue');
+		var amountStart = $("#c_charge_start").val();
+		var amountEnd = $("#c_charge_end").val();
+		var cname = $("#c_name").val();		
+		
+		if(!isMoney(amountStart) || !isMoney(amountEnd)){
+			alert('请输入正确的金额');
+			return;
+		}
+		$("#dgsumdiv").hide();
+		$("#dgdiv").show();
 		$('#dg').datagrid({ url:"${ctx}/m/order/rQuery",
-			queryParams:{'page':1,'rows':15,'phone':phone,'startTime':startTime,'endTime':endTime},
+			queryParams:{'page':1,'rows':15,'phone':phone,
+				'startTime':startTime,'endTime':endTime,
+				'amountStart':amountStart,
+				'amountEnd':amountEnd,
+				'cname':cname},
 			method:"GET"});
+	}
+	
+	function querySum(){
+		var phone = $("#q_user_phone").val();
+		var startTime = $("#startTime").datebox('getValue');
+		var endTime = $("#endTime").datebox('getValue');
+		var amountStart = $("#c_charge_start").val();
+		var amountEnd = $("#c_charge_end").val();
+		var cname = $("#c_name").val();		
+		
+		if(!isMoney(amountStart) || !isMoney(amountEnd)){
+			alert('请输入正确的金额');
+			return;
+		}
+		
+		$("#dgdiv").hide();
+		$("#dgsumdiv").show();
+		
+		$('#dgsum').datagrid({ url:"${ctx}/m/order/rQuerySum",
+			queryParams:{'page':1,'rows':15,'phone':phone,
+				'startTime':startTime,'endTime':endTime,
+				'amountStart':amountStart,
+				'amountEnd':amountEnd,
+				'cname':cname},
+			method:"GET"});
+	}
+	
+	function isMoney(num){
+		if(num.trim().length == 0){
+			return true;
+		}
+		if(/^[0-9]+(\.[0-9])?[0-9]*$/.test(num)){
+			if(num == 0){
+				return false;
+			}
+			return true;
+		}
+		return false;
 	}
 	
 	function addRecharge(){
 		var phone = $("#user_phone").val();
 		var amount = $("#user_amount").val();
-		if(amount == '' || amount < 0 || phone ==''||phone<0){
-			alert("请输入内容。");
-			return;
+		
+		if( !isMoney(amount)){
+			alert("请输入正确的金额");
+			return false;
 		}
+		
 		$.ajax({
 		    type:'POST',
 		    url: "${ctx}/m/order/radd",
@@ -76,7 +131,13 @@
 		    success: function(data){
 		    	if(data.code == 200){
 		    		$("#restartDialog").dialog('close');
-		    		alert("更新成功");
+		    		alert("充值成功");
+
+					$("#dgsumdiv").hide();
+					$("#dgdiv").show();
+					$('#dg').datagrid({ url:"${ctx}/m/order/rQuery",
+						queryParams:{'page':1,'rows':15},
+						method:"GET"});
 		    	}else{
 		    		alert(data.msg);  
 		    	}
@@ -129,10 +190,32 @@
     		columns:[[ 
     		{field:'id',title:'ID',width:fixWidth(0.06)}, 
     		{field:'phone',title:'手机号',width:fixWidth(0.18)}, 
+    		{field:'username',title:'用户名',width:fixWidth(0.18)}, 
+    		{field:'shipname',title:'船舶名',width:fixWidth(0.18)}, 
     		{field:'amount',title:'金额',width:fixWidth(0.1),align:'right'},
-    		{field:'createTime',title:'充值时间',width:fixWidth(0.12),align:'right'}
+    		{field:'createTime',title:'充值时间',width:fixWidth(0.20),align:'right'}
     		]] 
     	});
+    	
+    	$("#dgsum").datagrid({ 
+    		url:'${ctx}/m/order/rQuery', 
+    		method:'GET',
+    		queryParams:{'status':-1},
+    		fitCloumns: true , 
+    		nowrap: true , 
+    		singleSelect: true,
+    		pagination:true,//分页控件 
+    		columns:[[ 
+//     		{field:'id',title:'ID',width:fixWidth(0.06)}, 
+    		{field:'phone',title:'手机号',width:fixWidth(0.20)}, 
+    		{field:'username',title:'用户名',width:fixWidth(0.20)}, 
+    		{field:'shipname',title:'船舶名',width:fixWidth(0.20)}, 
+    		{field:'amount',title:'金额',width:fixWidth(0.20),align:'right'}
+//     		{field:'createTime',title:'充值时间',width:fixWidth(0.12),align:'right'}
+    		]] 
+    	});
+    	
+    	$("#dgsumdiv").hide();
     });   
 </script>
 </head>
@@ -152,16 +235,29 @@
 						<td colspan="4" width="100px">&nbsp;</td>
 					</tr>
 					<tr style="height: 40px;">
+						<td width="100px"><span>充值金额范围:</span></td>
+						<td width="150px"><input id="c_charge_start" type="text" style="width: 120px"/></td>
+						<td width="100px"><span>--</span></td>
+						<td width="150px"><input id="c_charge_end" type="text" style="width: 120px" ></input></td>
+						<td width="100px"><span>船舶名称:</span></td>
+						<td width="150px"><input id="c_name" type="text" style="width: 120px"></input></td>
+						<td colspan="4" width="100px">&nbsp;</td>
+					</tr>
+					<tr style="height: 40px;">
 					</tr>
 					<tr style="height: 40px;">
 					    <td colspan="8" style="text-align: right;"><button type="button" onclick="showRestartDialog()">充值</button></td>
 						<td colspan="8" style="text-align: right;"><button type="button" onclick="query()">查询</button></td>
+						<td colspan="8" style="text-align: right;"><button type="button" onclick="querySum()">统计查询</button></td>
 					</tr>
 				</table>
 			</div>
 		</div>
-		<div class="pageColumn" style="margin-top: 50px">
+		<div class="pageColumn" style="margin-top: 50px" id='dgdiv'>
 		    <table id="dg"></table>
+		</div>
+		<div class="pageColumn" style="margin-top: 50px" id='dgsumdiv'>
+		    <table id="dgsum"></table>
 		</div>
 	</div>
 	<div id="restartDialog" class="easyui-dialog" title="用户充值" style="width: 500px; height: 250px;" >
