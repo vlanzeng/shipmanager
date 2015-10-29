@@ -123,6 +123,7 @@
 		    	if(data.code == 200){
 		    		$("#showOsDialog").dialog('close');
 		    		alert("更新成功");
+		    		query();
 		    	}else{
 		    		alert(data.msg);  
 		    	}

@@ -20,6 +20,8 @@ public class ErrorConstants {
 	/**充值失败**/
 	public static final String RECHARGE_PHONE_NOT_EXISTS_ERROR = "10040001";
 	public static final String RECHARGE_GENERAL_ERROR = "10040002";
+	/**添加用户类错误**/
+	public static final String MUSER_ALREADY_EXISTS_ERROR = "10050001";
 	
 	public static String getErrorMsg(String code){
 		if(SUCCESS.equalsIgnoreCase(code)){
@@ -36,6 +38,8 @@ public class ErrorConstants {
 			return "充值失败:电话号码无对应用户";
 		}else if(RECHARGE_GENERAL_ERROR.equalsIgnoreCase(code)){
 			return "充值失败";
+		}else if(MUSER_ALREADY_EXISTS_ERROR.equalsIgnoreCase(code)){
+			return "用户已存在";
 		}
 		return "";
 	}

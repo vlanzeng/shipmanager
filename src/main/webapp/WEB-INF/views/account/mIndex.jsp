@@ -17,6 +17,40 @@
 	    return (document.body.clientWidth-200) * percent ;
 	}  
 	
+	function deleteuser(id){
+		
+		if(id.length == 0){
+			alert('删除错误');
+			return;
+		}
+		
+		$.ajax({
+		    type:'POST',
+		    url: "${ctx}/m/muser/delete",
+		    cache:false,  
+		    data: {'id':id} ,
+		    dataType: 'json',
+		    success: function(data){
+		    	if(data.code == 200){
+		    		$("#restartDialog").dialog('close');
+		    		alert("更新成功");
+		    		query();
+		    	}else{
+		    		alert(data.msg);  
+		    	}
+		    },  
+		    error : function() {  
+		    	alert("操作异常，请稍后再试。");  
+		    }  
+		});
+	}
+	
+	function modify(id, username){
+		$("#mod_name").val(username);
+		$("#mod_id").val(id);
+		$("#showOsDialog").dialog('open');
+	}
+	
 	function showRestartDialog(id, status){       
         $("#update_orderId").val(id);  
         $("#os_old_status").val(status);  
@@ -72,25 +106,34 @@
 				{'name':name, 'osName':osName });
 	}
 	
+	function isEmptyStr(str){
+		if(typeof str == "undefined" || str==null ||
+				str.trim().length == 0)
+			return true;
+		return false;
+	}
+	
 	function disOs(){
-		var orderId = $("#os_orderId").val();
-	    var productName = $("#os_name").val();  
-		var osId = $('input[name="os_id_redio"]:checked').val();
-		alert(osId);
-		if(osId == '' || osId < 0){
-			alert("请选择状态。");
-			return;
-		}
+		var mod_name = $("#mod_name").val();
+	    var mod_pwd = $("#mod_pwd").val(); 
+	    var id = $("#mod_id").val();
+		
+	    if(isEmptyStr(mod_name) || isEmptyStr(mod_pwd)){
+	    	alert("用户名和密码不能为空。。");
+	    	return;
+	    }
+
 		$.ajax({
 		    type:'POST',
-		    url: "${ctx}/m/order/uos",
+		    url: "${ctx}/m/muser/updateMuser",
 		    cache:false,  
-		    data: {'orderId':orderId,'osId':osId,'productName':productName} ,
+		    data: {'userName':mod_name,'pwd':mod_pwd,'id':id} ,
 		    dataType: 'json',
 		    success: function(data){
 		    	if(data.code == 200){
-		    		$("#restartDialog").dialog('close');
+		    		$("#showOsDialog").dialog('close');
 		    		alert("更新成功");
+		    		query();
 		    	}else{
 		    		alert(data.msg);  
 		    	}
@@ -102,24 +145,31 @@
 	}
 	
 	function showCreatePage(){
+		var role = $("#user_role").val();
 		$("#restartDialog").dialog('open');  
-		$('#os_dg').datagrid({ 
-    		url:'${ctx}/m/os/query', 
-    		method:'GET',
-    		queryParams:{'status':-1},
-    		fitCloumns: true , 
-    		nowrap: true , 
-    		singleSelect: true,
-    		pagination:true,//分页控件 
-    		columns:[[ 
-    		{field:'id',title:'ID',width:50,formatter:function(value,row,index){
-    		    return "<input name='os_id_redio' type='radio' value='"+value+"'>";
-    		}}, 
-    		{field:'name',title:'加油站',width:150}, 
-    		{field:'address',title:'地址',width:200,align:'right'},
-    		{field:'cityName',title:'城市',width:70,align:'right'}
-    		]] 
-    	});
+		
+		if(role == 'admin' || role=='user'){
+			$("#os_row").hide()
+			return;
+		}
+// 		$('#os_dg').datagrid({ 
+//     		url:'${ctx}/m/os/query', 
+//     		method:'GET',
+//     		queryParams:{'status':-1},
+//     		fitCloumns: true , 
+//     		nowrap: true , 
+//     		singleSelect: true,
+//     		pagination:true,//分页控件 
+//     		columns:[[ 
+//     		{field:'id',title:'ID',width:50,formatter:function(value,row,index){
+//     		    return "<input name='os_id_redio' type='radio' value='"+value+"'>";
+//     		}}, 
+//     		{field:'name',title:'加油站',width:150}, 
+//     		{field:'address',title:'地址',width:200,align:'right'},
+//     		{field:'cityName',title:'城市',width:70,align:'right'}
+//     		]] 
+//     	});
+		//$("#os_row").hide();
 	}
 	
 	function create(){
@@ -127,6 +177,17 @@
 		var pwd = $("#user_pwd").val();
 		var role = $("#user_role").val();
 		var osId = $('input[name="os_id_redio"]:checked').val();  
+		
+		if(userName.trim().length==0 || pwd.trim().length==0  || role.trim().length==0){
+			alert('请输入用户名、密码');
+			return;
+		}
+		
+		if(role !='admin' && role !='user' && osId.trim().length==0){
+			alert('请选择加油站');
+			return;
+		}		
+		
 		if(status < 0){
 			alert("请选择状态。");
 			return;
@@ -141,6 +202,7 @@
 		    	if(data.code == 200){
 		    		$("#restartDialog").dialog('close');
 		    		alert("添加成功");
+		    		query();
 		    	}else{
 		    		alert(data.msg);  
 		    	}
@@ -162,6 +224,7 @@
 		    	if(data.code == 200){
 		    		$("#showOsDialog").dialog('close');
 		    		alert("更新成功");
+		    		query();
 		    	}else{
 		    		alert(data.msg);  
 		    	}
@@ -173,6 +236,50 @@
 	}
 
     $(document).ready(function(){
+    	
+    	$("#user_role").change(function(){
+    		if(this.value !='admin' && this.value != 'user'){
+    			$("#os_row").show();
+    			$('#os_dg').datagrid({ 
+    	    		url:'${ctx}/m/os/query', 
+    	    		method:'GET',
+    	    		queryParams:{'status':-1},
+    	    		fitCloumns: true , 
+    	    		nowrap: true , 
+    	    		singleSelect: true,
+    	    		pagination:true,//分页控件 
+    	    		columns:[[ 
+    	    		{field:'id',title:'ID',width:50,formatter:function(value,row,index){
+    	    		    return "<input name='os_id_redio' type='radio' value='"+value+"'>";
+    	    		}}, 
+    	    		{field:'name',title:'加油站',width:150}, 
+    	    		{field:'address',title:'地址',width:200,align:'right'},
+    	    		{field:'cityName',title:'城市',width:70,align:'right'}
+    	    		]] 
+    	    	});
+    		}else{
+    			$("#os_row").hide();
+    		}
+    	});
+    	
+		$('#os_dg').datagrid({ 
+    		url:'${ctx}/m/os/query', 
+    		method:'GET',
+    		queryParams:{'status':-1},
+    		fitCloumns: true , 
+    		nowrap: true , 
+    		singleSelect: true,
+    		pagination:true,//分页控件 
+    		columns:[[ 
+    		{field:'id',title:'ID',width:50,formatter:function(value,row,index){
+    		    return "<input name='os_id_redio' type='radio' value='"+value+"'>";
+    		}}, 
+    		{field:'name',title:'加油站',width:150}, 
+    		{field:'address',title:'地址',width:200,align:'right'},
+    		{field:'cityName',title:'城市',width:70,align:'right'}
+    		]] 
+    	});
+    	
     	$("#restartDialog").dialog('close');
     	$("#showOsDialog").dialog('close');
     	$('#dg').datagrid({ 
@@ -212,6 +319,7 @@
     		{field:'createTime',title:'创建时间',width:fixWidth(0.2),align:'right'},
     		{field:'op',title:'操作',width:155,formatter:function(value,rowData,rowIndex){
     			var id = rowData.id;
+    			var username = rowData.userName;
     			var status = rowData.status;
     			var str = "";
     			if(status == 1){
@@ -219,6 +327,9 @@
     			}else{
     				str += ' <a href="#" onclick="updateStatus(\''+id+'\',1)">生效</a>';
     			}
+    			
+    			str += ("|"+' <a href="#" onclick="deleteuser(\''+id+'\')">删除</a>');
+    			str += ("|"+' <a href="#" onclick="modify(\''+id+'\',\''+username+'\')">修改</a>');
     			return str;
     		}} 
     		]] 
@@ -250,8 +361,8 @@
 		    <table id="dg"></table>
 		</div>
 	</div>
-	<div id="restartDialog" class="easyui-dialog" title="添加优惠券" style="width: 800px; height: 600px;" >
-		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
+	<div id="restartDialog" class="easyui-dialog" title="添加用户" style="width: 800px; height: 400px;" >
+		<div style="margin-left: 5px;margin-right: 5px;margin-top: 15px;">			
 			<div class="data-tips-info">
 				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
 					<tr style="height: 30px">
@@ -280,7 +391,7 @@
 								   <c:when test="${userRole=='admin'}"> 
 								        <option value="admin">系统管理员</option> 
 								        <option value="cwgly">财务管理员</option>
-										<option value="cwgly">客服权限</option>
+										<option value="user">客服权限</option>
 										<option value="jygly">进油管理员</option>
 										<option value="jyzAdmin">加油站系统管理员</option>      
 								   </c:when>
@@ -293,7 +404,7 @@
 							</select>
 						</td>
 					</tr>
-					<tr style="height: 30px">
+					<tr style="height: 30px" id="os_row">
 						<td style="width:30%;">
 							所属加油站：
 						</td>
@@ -310,15 +421,25 @@
 		</div>
 	</div>
 	
-	<div id="showOsDialog" class="easyui-dialog" title="分配加油站" style="width: 800px; height: 580px;" >
+	<div id="showOsDialog" class="easyui-dialog" title="更改信息" style="width: 800px; height: 400px;" >
 		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
 			<div class="data-tips-info">
 				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
-					<tr>
+					<tr style="height: 30px">
+						<td style="width:30%;">
+							用户名：
+						</td>
 						<td  style="text-align:left;">
-							<table id="os_dg"></table>
-							<input type="hidden" id="os_orderId" name="os_orderId"/>
-							<input type="hidden" id="os_name" name="os_name"/>
+							<input id="mod_name" name="user_name"/>
+							<input id="mod_id" name="mod_id" style="display:none"/>
+						</td>
+					</tr>
+					<tr style="height: 30px">
+						<td style="width:30%;">
+							密码：
+						</td>
+						<td  style="text-align:left;">
+							<input id="mod_pwd" name="user_pwd"/>
 						</td>
 					</tr>
 				</table>

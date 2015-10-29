@@ -103,13 +103,19 @@ public class MosController extends BaseController implements HybConstants{
 		try {
 			int res = mosService.updatePicUrl(file, param, request);
 			if(res > 0){
-				return CommonUtils.printObjStr(res);
+				//return CommonUtils.printObjStr(res);
+				return simpleResultPage("成功");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error("uStatus error.", e);
 		}
-		return CommonUtils.printStr(ErrorConstants.BANK_GET_INFO_ERROR);
+		return simpleResultPage("失败");
+	}
+	
+	private String simpleResultPage(String msg){
+		String ret = "<html><body>"+msg+"</br><a href='javascript:history.go(-1);'>返回</a></body></html>";
+		return ret;
 	}
 	
 	@RequestMapping(value="addnima", method=RequestMethod.POST)

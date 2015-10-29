@@ -60,6 +60,13 @@
 		var amountEnd = $("#c_charge_end").val();
 		var cname = $("#c_name").val();		
 		
+		if(startTime.trim().length>0){
+			startTime += ' 00:00:00';
+		}
+		if(endTime.trim().length>0){
+			endTime += ' 23:59:59';
+		}
+		
 		if(!isMoney(amountStart) || !isMoney(amountEnd)){
 			alert('请输入正确的金额');
 			return;
@@ -210,7 +217,7 @@
     		{field:'phone',title:'手机号',width:fixWidth(0.20)}, 
     		{field:'username',title:'用户名',width:fixWidth(0.20)}, 
     		{field:'shipname',title:'船舶名',width:fixWidth(0.20)}, 
-    		{field:'amount',title:'金额',width:fixWidth(0.20),align:'right'}
+    		{field:'amount',title:'充值总额',width:fixWidth(0.20),align:'right'}
 //     		{field:'createTime',title:'充值时间',width:fixWidth(0.12),align:'right'}
     		]] 
     	});

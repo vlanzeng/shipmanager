@@ -360,7 +360,7 @@ a:active {
 			<shiro:hasAnyRoles name="jyzAdmin,jyzcwqx,admin,cwgly">
 				<div title="财务明细">
 				    <shiro:hasAnyRoles name="jyzAdmin,jyzcwqx">
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">加油收入</a></p>
+						<p><a href="javascript:void(0);" src="${ctx}/m/finance/index" class="cs-navi-tab">加油收入</a></p>
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">进油支出</a></p>
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请</a></p>
 					</shiro:hasAnyRoles>
@@ -419,6 +419,7 @@ a:active {
 			<shiro:hasAnyRoles name="admin,jyzAdmin">
 				<div title="系统管理">
 				    <p><a href="javascript:void(0);" src="${ctx}/m/muser/index" class="cs-navi-tab">后台用户管理</a></p>
+				    <p><a href="javascript:void(0);" src="${ctx}/m/muser/nindex" class="cs-navi-tab">普通用户管理</a></p>
 				</div>
 			</shiro:hasAnyRoles>
 		</div>

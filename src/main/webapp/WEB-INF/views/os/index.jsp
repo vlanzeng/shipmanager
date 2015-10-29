@@ -16,6 +16,9 @@
 <script type="text/javascript" src="${ctx}/static/jquery/swfobject.js"></script>
 <script type="text/javascript" src="${ctx}/static/jquery/jquery.uploadify.js"></script>
 <script type="text/javascript">  
+	function submitfile(){
+		$("#testform").submit();
+	}
 	function fixWidth(percent)  
 	{  
 	    return (document.body.clientWidth-200) * percent ;
@@ -24,7 +27,7 @@
 	function showRestartDialog(id, status){       
         $("#update_orderId").val(id);  
         $("#os_old_status").val(status);  
-        $("#restartDialog").dialog('open');  
+        //$("#restartDialog").dialog('open');  
     }  
 	
 	function showOsDialog(id, productName){       
@@ -51,7 +54,9 @@
     } 
 	
 	function cancel(){       
-		$("#restartDialog").dialog('close');
+		//$("#restartDialog").dialog('close');
+		$("#restartDialog").hide();
+		$("#pageColumn").show();
 	}
 	
 	function cancelOs(){       
@@ -66,6 +71,13 @@
 		//var status = $("#status").val();
 		var startTime = $("#c_startTime").datebox('getValue');
 		var endTime = $("#c_endTime").datebox('getValue');
+		
+		if(startTime.trim().length>0){
+			startTime += ' 00:00:00';
+		}
+		if(endTime.trim().length>0){
+			endTime += ' 23:59:59';
+		}
 		name=encodeURI(name);
 		cityName=encodeURI(cityName);
 // 		$('#dg').datagrid({ url:"${ctx}/m/os/query",
@@ -106,68 +118,24 @@
 	}
 	
 	function showCreatePage(){
-		$("#restartDialog").dialog('open');  
+		//$("#restartDialog").dialog('open');  
+		$("#pageColumn").hide();
+		$("#restartDialog").show();
 	}
 	
 	function create(){
 		//$('#file_upload').uploadify("upload");
-        	var name = $("#add_os_name").val();
-      	var addr = $("#add_os_addr").val();
-      	var phone = $("#add_os_phone").val();
-      	var latitude = $("#add_os_latitude").val();
-      	var langitude = $("#add_os_longitude").val();
-      	var cityId = $("#add_os_city").val();
+//         	var name = $("#add_os_name").val();
+//       	var addr = $("#add_os_addr").val();
+//       	var phone = $("#add_os_phone").val();
+//       	var latitude = $("#add_os_latitude").val();
+//       	var langitude = $("#add_os_longitude").val();
+//       	var cityId = $("#add_os_city").val();
 //       	name=encodeURI(name);
 //       	addr=encodeURI(addr);
-		$("#addform")[0].action = "${ctx}/m/os/addnima?add_os_name="+name+"&add_os_addr="+addr+"&add_os_phone="+phone+"&add_os_latitude="+latitude+"&add_os_longitude="+langitude+"&add_os_city="+cityId;
+		//$("#addform")[0].action = "${ctx}/m/os/addnima?add_os_name="+name+"&add_os_addr="+addr+"&add_os_phone="+phone+"&add_os_latitude="+latitude+"&add_os_longitude="+langitude+"&add_os_city="+cityId;
 		//$("#addform")[0].action = "${ctx}/m/os/add";
 		$("#addform").submit();
-//         $("#file_upload").uploadify({  
-//         	'buttonText' : '选择图片',  
-//             'height' : 30,  
-//             'swf':'${ctx}/static/audio/uploadify.swf',
-//             'uploader' : '${ctx}/m/os/add/add',  
-//             'width' : 120,  
-//             'fileSizeLimit': '1MB',  
-//             'auto':false,  
-//             'fileObjName'   : 'file',  
-//             'method': 'post',
-//             'fileDesc'       : '支持格式:jpg/gif/jpeg/png/bmp.', //如果配置了以下的'fileExt'属性，那么这个属性是必须的  
-//             'fileExt'        : '*.jpg;*.gif;*.jpeg;*.png;*.bmp',//允许的格式    
-//             'queueID'  : 'some_file_queue',
-//             'onUploadStart' : function(file) {  
-//             	var name = $("#add_os_name").val();
-//             	var addr = $("#add_os_addr").val();
-//             	var phone = $("#add_os_phone").val();
-//             	var latitude = $("#add_os_latitude").val();
-//             	var langitude = $("#add_os_longitude").val();
-//             	var cityId = $("#add_os_city").val();
-//                 //$("#file_upload").uploadify("settings", "formData", {'method':'post','name':name,'addr':addr,'phone':phone,'latitude':latitude,'langitude':langitude,'cityId':cityId});  
-//             },  
-//             'onUploadSuccess' : function(file, data, response) {  
-//             	var o =  eval("("+data+")");
-//             	if(o.code == 200){
-// 	            	alert("创建成功。");
-// 	            	$("#restartDialog").dialog('close');
-//             	}else{
-//             		alert(o.msg);  
-//             	}
-//             },
-//             'onFallback' : function() {//检测FLASH失败调用  
-//                 alert("您未安装FLASH控件，无法上传图片！请安装FLASH控件后再试。");  
-//             },
-//             onComplete: function (event, queueID, fileObj, response, data) {     
-//                 //$('<li></li>').appendTo('.files').text(response);  
-//                 //var picIndexPlus = picIndex++;  
-//                 var uploadPath =response;  
-// //                 $('#picBefore').before(picTpl(picIndexPlus));  
-// //                 var uploadImgPathId = "uploadImgPath" + (picIndexPlus);  
-// //                 document.getElementById(uploadImgPathId).value=uploadPath;  
-//             },
-// 			'onSelect':function(file){
-// 				$("#file_name_").html(file.name);
-//             }
-//         });
 	}
 	
 	function updateStatus(id, status){
@@ -181,6 +149,7 @@
 		    	if(data.code == 200){
 		    		$("#showOsDialog").dialog('close');
 		    		alert("更新成功");
+		    		query();
 		    	}else{
 		    		alert(data.msg);  
 		    	}
@@ -215,14 +184,15 @@
 	
 
     $(document).ready(function(){
-    	$("#restartDialog").dialog('close');
+    	//$("#restartDialog").dialog('close');
+    	$("#restartDialog").hide();
     	$("#showOsDialog").dialog('close');
     	
 //         $("#file_upload").uploadify({  
 //         	'buttonText' : '选择图片',  
 //             'height' : 30,  
 //             'swf':'${ctx}/static/audio/uploadify.swf',
-//             'uploader' : '${ctx}/m/os/add/add',  
+//             'uploader' : '${ctx}/m/os/add',  
 //             'width' : 120,  
 //             'fileSizeLimit': '1MB',  
 //             'auto':false,  
@@ -238,7 +208,8 @@
 //             	var latitude = $("#add_os_latitude").val();
 //             	var langitude = $("#add_os_longitude").val();
 //             	var cityId = $("#add_os_city").val();
-//                 //$("#file_upload").uploadify("settings", "formData", {'method':'post','name':name,'addr':addr,'phone':phone,'latitude':latitude,'langitude':langitude,'cityId':cityId});  
+            	
+//                 $("#file_upload").uploadify("settings", "formData", {'method':'post','name':name,'addr':addr,'phone':phone,'latitude':latitude,'langitude':langitude,'cityId':cityId});  
 //             },  
 //             'onUploadSuccess' : function(file, data, response) {  
 //             	var o =  eval("("+data+")");
@@ -288,7 +259,7 @@
     			var id = rowData.id;
     			var status = rowData.status;
     			var str = "";
-    			str += ' <a href="#" onclick="deleteOS(\''+id+'\',0)">删除</a>';
+    			str += ' <a href="#" onclick="deleteStatus(\''+id+'\',0)">删除</a>';
     			if(status == 1){
     				str += ' <a href="#" onclick="updateStatus(\''+id+'\',0)">失效</a>';
     			}else{
@@ -327,15 +298,35 @@
 				</table>
 			</div>
 		</div>
-		<div class="pageColumn" style="margin-top: 50px">
+		<div class="pageColumn" id="pageColumn" style="margin-top: 50px">
 		    <table id="dg"></table>
 		</div>
 	</div>
-	
-	<form id="addform"　action="${ctx}/m/os/add" enctype="multipart/form-data" method="post">
-	<div id="restartDialog" class="easyui-dialog" title="添加加油站" style="width: 650px; height: 380px;" >
+
+	<div id="showOsDialog" class="easyui-dialog" title="分配加油站" style="width: 800px; height: 580px;" >
 		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
 			<div class="data-tips-info">
+				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
+					<tr>
+						<td  style="text-align:left;">
+							<table id="os_dg"></table>
+							<input type="hidden" id="os_orderId" name="os_orderId"/>
+							<input type="hidden" id="os_name" name="os_name"/>
+						</td>
+					</tr>
+				</table>
+				<div style="text-align:right;margin-right:30px;margin-top: 50px">
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-finish'" onclick="disOs()">确定</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-cancel'" onclick="cancelOs()">取消</a>
+				</div>				
+			</div> 		
+		</div>
+	</div>
+	
+	
+	<div id="restartDialog"  title="添加加油站" style="width: 650px; height: 380px;" >
+	<form id="testform" action="${ctx}/m/os/add" enctype="multipart/form-data" method="post">
+			
 				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
 					<tr style="height: 30px">
 						<td style="width:30%;">
@@ -402,38 +393,14 @@
 							加油站图片：
 						</td>
 						<td  style="text-align:left;">
-							<input id="file_upload" name="file" type="file" multiple="true"/>
+							<input id="file_upload" name="file" type="file" />
 							<div id="some_file_queue" style="display: none;"></div>
 						</td>
 					</tr>
 				</table>
-				<div style="text-align:right;margin-right:30px;margin-top: 50px">
-					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-finish'" onclick="create()">确定</a>
-					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-cancel'" onclick="cancel()">取消</a>
-				</div>				
-			</div> 		
-		</div>
-	</div>
+<!-- 		<input type="file" name="file" id="testfile">上传我的文件</input> -->
+		<input type="button" onclick="submitfile();">上传</input>
 	</form>
-	
-	<div id="showOsDialog" class="easyui-dialog" title="分配加油站" style="width: 800px; height: 580px;" >
-		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
-			<div class="data-tips-info">
-				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
-					<tr>
-						<td  style="text-align:left;">
-							<table id="os_dg"></table>
-							<input type="hidden" id="os_orderId" name="os_orderId"/>
-							<input type="hidden" id="os_name" name="os_name"/>
-						</td>
-					</tr>
-				</table>
-				<div style="text-align:right;margin-right:30px;margin-top: 50px">
-					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-finish'" onclick="disOs()">确定</a>
-					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-cancel'" onclick="cancelOs()">取消</a>
-				</div>				
-			</div> 		
-		</div>
 	</div>
 </body>
 </html>
