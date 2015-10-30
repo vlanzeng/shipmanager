@@ -4,6 +4,7 @@
 <%@ page import="org.apache.shiro.authc.IncorrectCredentialsException"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="ctx" value="${pageContext.request.contextPath}"/>
+<script type="text/javascript" src="${ctx}/static/jquery/jquery-1.8.0.min.js"></script>
 <link href="${ctx}/static/bootstrap/2.3.2/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
 <link href="${ctx}/static/styles/default.css" type="text/css" rel="stylesheet" />
 <style>
@@ -38,13 +39,13 @@
 		<div class="control-group">
 			<label for="username" class="control-label">名称:</label>
 			<div class="controls">
-				<input type="text" id="username" name="username"  value="${username}" class="input-medium required"/>
+				<input type="text" style="height:30px;" id="username" name="username"  value="${username}" class="input-medium required"/>
 			</div>
 		</div>
 		<div class="control-group">
 			<label for="password" class="control-label">密码:</label>
-			<div class="controls">
-				<input type="password" id="password" name="password" class="input-medium required"/>
+			<div class="controls" >
+				<input style="height:30px;" type="password" id="password" name="password" class="input-medium required"/>
 			</div>
 		</div>
 				
