@@ -98,6 +98,80 @@ public class McouponService {
 		return dg;
 	}
 
+	
+	
+	/**
+	 * 获取优惠券列表
+	 * @param param
+	 * @return
+	 */
+	public DataGrid<CouponBean> getMUseList(CouponParam param){
+		DataGrid<CouponBean> dg = new DataGrid<CouponBean>();
+		StringBuffer whereParam = new StringBuffer();
+		int start = (param.getPage() - 1) * param.getRows();
+		
+		if(!StringUtils.isEmpty(param.getName())){
+			whereParam.append(" and c.coupon_name='"+param.getName()+"'");
+		}
+		
+		if(!StringUtils.isEmpty(param.getType()) && param.getType() > 0){
+			whereParam.append(" and c.type="+param.getType());
+		}
+		
+		if(!StringUtils.isEmpty(param.getFaceLimit())){
+			whereParam.append(" and c.face_value="+param.getFaceLimit());
+		}
+		
+		if(!StringUtils.isEmpty(param.getStatus()) && param.getStatus() >=0){
+			whereParam.append(" and c.status="+param.getStatus());
+		}
+		
+		if(!StringUtils.isEmpty(param.startTime)){
+			whereParam.append(" and  DATE_FORMAT(c.create_time,'%Y-%m-%d')   >='"+param.startTime+"'");
+		}
+		
+		if(!StringUtils.isEmpty(param.getEndTime())){
+			whereParam.append(" and  DATE_FORMAT(c.create_time,'%Y-%m-%d')  <='"+param.getEndTime()+"'");
+		}
+		
+		String sql = "select c.id,c.coupon_name,c.face_value,c.limit_value,tc.os_id,type,c.status,c.start_time,c.end_time,c.create_time,u.user_name"
+				+ " from t_coupon_list  c left join t_user u on c.user_id = u.id  left join t_coupon tc on  c.coupon_id = tc.id     where 1=1 " + whereParam.toString()
+				+ " order by c.create_time desc limit "+start+","+param.getRows()+"";
+		Query q = em.createNativeQuery(sql);
+		List<Object[]> infoList = q.getResultList();
+		List<CouponBean> result = new ArrayList<CouponBean>();
+		SimpleDateFormat fromat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		for(int i = 0 ; (infoList != null && i < infoList.size()); i++){
+			Object[] o = infoList.get(i);
+			CouponBean bean = new CouponBean();
+			bean.setId(Long.valueOf(o[0] + ""));
+			bean.setName(o[1] + "");
+			bean.setFaceValue(Integer.valueOf(o[2] + ""));
+			bean.setLimitValue(Integer.valueOf(o[3] + ""));
+			bean.setOsId(Long.valueOf(o[4] + ""));
+			bean.setType(Integer.valueOf(o[5] + ""));
+			bean.setStatus(Integer.valueOf(o[6] + ""));
+			try {
+			bean.setStartTime(fromat.parse(o[7].toString()).toLocaleString());
+			bean.setEndTime(fromat.parse(o[8].toString()).toLocaleString());
+			bean.setUserName( null== o[10]?"":o[10].toString());
+				bean.setCreateTime(fromat.parse(o[9].toString()).toLocaleString());
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			result.add(bean);
+		}
+		dg.setRows(result);
+		
+		String totalSql = "select count(*) "
+				+ " from t_coupon_list  c left join t_user u on c.user_id = u.id  left join t_coupon tc on  c.coupon_id = tc.id     where 1=1 " + whereParam.toString();
+		Query q1 = em.createNativeQuery(totalSql);
+		int total = Integer.valueOf(q1.getSingleResult()+"");
+		dg.setTotal(total);
+		return dg;
+	}
+	
+	
 	public int add(CouponParam param) {
 		String faceLimit = param.getFaceLimit();
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
@@ -115,5 +189,9 @@ public class McouponService {
 
 	public int uStatus(String couponId, String status) {
 		return mcouponDao.updateStatus(Integer.valueOf(status), Long.valueOf(couponId));
+	}
+	
+	public List<Object[]> findAllValidCoupons(){
+		return mcouponDao.selectAllValidCoupons();
 	}
 }

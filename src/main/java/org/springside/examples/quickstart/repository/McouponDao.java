@@ -39,4 +39,7 @@ public interface McouponDao extends CrudRepository<Coupon, Long> {
 	@Modifying
 	@Query(value="update t_coupon set status=?1 where id=?2", nativeQuery=true)
 	public int updateStatus(Integer status, Long id);
+
+	@Query(value="SELECT * FROM  t_coupon  c WHERE  STATUS = 1",nativeQuery=true)
+	public  List<Object[]>  selectAllValidCoupons();
 }

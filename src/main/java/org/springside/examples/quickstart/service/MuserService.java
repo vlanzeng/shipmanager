@@ -15,7 +15,9 @@ import org.springside.examples.quickstart.contants.HybConstants;
 import org.springside.examples.quickstart.domain.DataGrid;
 import org.springside.examples.quickstart.domain.MuserBean;
 import org.springside.examples.quickstart.domain.MuserParam;
+import org.springside.examples.quickstart.entity.Muser;
 import org.springside.examples.quickstart.entity.User;
+import org.springside.examples.quickstart.repository.AppUserDao;
 import org.springside.examples.quickstart.repository.MUserDao;
 import org.springside.examples.quickstart.repository.UserDao;
 import org.springside.modules.security.utils.Digests;
@@ -34,8 +36,20 @@ public class MuserService {
 	@Autowired
 	private UserDao userDao;
 	
+	@Autowired
+	private AppUserDao auserDao; 
+	
 	 @PersistenceContext  
 	 private EntityManager em; 
+	 
+	 
+	 public  Muser  findOne(Long id){
+		 return muserDao.findOne(id);
+	 }
+	 
+	 public  List<Muser> findByPhone(String phone){
+		 return muserDao.findByPhone(phone);
+	 }
 
 	public DataGrid<MuserBean> getMuserList(String loginName, MuserParam param) {
 		DataGrid<MuserBean> dg = new DataGrid<MuserBean>();
@@ -118,6 +132,15 @@ public class MuserService {
 	public int uStatus(String userId, String status) {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+	
+	public  List<Object[]>  selectAppUserByPhone(String phone) {
+		return  this.auserDao.selectAppUserByPhone(phone);
+	}
+	
+	public  Iterable<Muser> selectByIds(List<Long> ids){
+		return	muserDao.findAll(ids);
+		
 	}
 
 }

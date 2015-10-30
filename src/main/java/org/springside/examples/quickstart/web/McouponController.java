@@ -106,7 +106,7 @@ public class McouponController extends BaseController implements HybConstants{
 		}
 		param.setStartTime(request.getParameter("startTime"));
 		param.setEndTime(request.getParameter("endTime"));
-		DataGrid<CouponBean> gb = mcouponService.getCouponList(param);
+		DataGrid<CouponBean> gb = mcouponService.getMUseList(param);
 		return CommonUtils.printObjStr2(gb);
 	}
 	

@@ -46,4 +46,11 @@ public interface MosDao extends CrudRepository<Coupon, Long> {
 	@Query(value="insert into t_os_buy(user_name,os_id,order_no,oil_id,price,num,amount,status,create_time) "
 			+ "values(?1,?2,?3,?4,?5,?6,?7,1,now())", nativeQuery=true)
 	int addOsOilOrder(String userNmae,Long osId, String orderNo,Long oilId, String price, Integer num,String amount);
+	
+	@Query(value= " SELECT * FROM   t_oil_station", nativeQuery=true)
+	List<Object[]> findAllOStation();
+	
+	@Query(value= " SELECT * FROM   t_oil_station   WHERE id = ?1  ", nativeQuery=true)
+	List<Object[]> findOStationById(Long id);
+	
 }

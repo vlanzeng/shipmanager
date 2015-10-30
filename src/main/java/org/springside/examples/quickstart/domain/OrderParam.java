@@ -13,6 +13,13 @@ public class OrderParam extends BaseParam {
 	public String regionId;
 	private Integer[] region;
 	private String[] otherStatus;
+	private boolean hasCash = false ;
+	public boolean isHasCash() {
+		return hasCash;
+	}
+	public void setHasCash(boolean hasCash) {
+		this.hasCash = hasCash;
+	}
 	public String[] getOtherStatus() {
 		return otherStatus;
 	}

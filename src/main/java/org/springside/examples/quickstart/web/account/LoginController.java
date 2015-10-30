@@ -5,6 +5,8 @@
  *******************************************************************************/
 package org.springside.examples.quickstart.web.account;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.UsernamePasswordToken;

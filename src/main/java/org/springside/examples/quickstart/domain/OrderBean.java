@@ -30,7 +30,14 @@ public class OrderBean {
 	private Long couponId;
 	private String amount;
 	
+	private String code;
 	
+	public String getCode() {
+		return code;
+	}
+	public void setCode(String code) {
+		this.code = code;
+	}
 	public String getStatusId() {
 		return statusId;
 	}

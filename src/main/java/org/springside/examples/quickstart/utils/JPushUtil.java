@@ -30,7 +30,7 @@ public class JPushUtil {
 	   	 bean.setPrice("12.4");
 	     bean.setProductId(1L);
 	   	 bean.setProductName("机油");
-	   	 System.out.println(pushOrderOs("15829045164", bean));
+	   	 System.out.println(pushOrderOs("18215658695", bean));
 	}
 	
 	public static boolean pushOrderOs(String phone, PushOsBean bean){
@@ -38,8 +38,9 @@ public class JPushUtil {
 			JPushClient jpushClient = new JPushClient(HybConstants.JPUSH_MASTERSECRET, HybConstants.JPUSH_APPKEY, 3);
 			PushPayload payload = buildPushObject_all_alias_alert("HYB_"+phone, HybConstants.JPUSH_ALERT, bean);
 	        PushResult result = jpushClient.sendPush(payload);
-	        JSONObject obj = new JSONObject();
-	        System.out.println(obj.get("dddddddddd"));
+	      /*  JSONObject obj = new JSONObject();
+	        System.out.println(obj.get("dddddddddd"));*/
+	        System.out.println(result.toString());
 	        return result.isResultOK();
 	     } catch (Exception e) {
 	    	 System.out.println("Should review the error, and fix the request"+e);

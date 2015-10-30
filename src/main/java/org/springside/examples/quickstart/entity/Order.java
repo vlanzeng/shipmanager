@@ -1,38 +1,116 @@
 package org.springside.examples.quickstart.entity;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "t_order")
 public class Order extends IdEntity {
-	private Integer userId;
+	
+	
+	private Long userId;
+	
+	
+	@Column(name="user_id")
+	public Long getUserId() {
+		return userId;
+	}
+	
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+
 	private Long osId;
+	
+
 	private Long productId;
+	
+
 	private String productName;
-	private Integer type;
+	
+	private Integer type;//订单类型 1-普通订单 2-充值订单 3-预约订单 4-后台添加订单
+	
+	
+	private   String phone;
+	
+	private  String userName;
+	
+	@Transient
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	@Transient
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+
 	private Double money;
 	private BigDecimal price;
 	private Integer num;
 	private Integer status;
+	
+
 	private String orderNo;
+	
+
+	private String consumeCode;
+	
+
 	private String sftOrderNo;
+	
+
 	private String sessionToken;
+	
+
 	private Date bookTime;
+	
+
 	private Date createTime;
-	//private OilStation oilStation;
-	private List<CouponList> couponList = new ArrayList<CouponList>();
+	
+	
+	private Long  couponId;
+	
+	
+/*	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "order_id")
+	private List<CouponList> couponList = new ArrayList<CouponList>();*/
+
+	@Column(name="consume_code")
+	public String getConsumeCode() {
+		return consumeCode;
+	}
+
+	public void setConsumeCode(String consumeCode) {
+		this.consumeCode = consumeCode;
+	}
+
+	@Column(name="get_coupon_id")
+	public Long getCouponId() {
+		return couponId;
+	}
+
+	public void setCouponId(Long couponId) {
+		this.couponId = couponId;
+	}
 
 	public Order() {
 
@@ -40,15 +118,6 @@ public class Order extends IdEntity {
 
 	public Order(Long id) {
 		this.id = id;
-	}
-
-	@Column(name = "user_id")
-	public Integer getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Integer userId) {
-		this.userId = userId;
 	}
 
 	public Integer getType() {
@@ -83,6 +152,7 @@ public class Order extends IdEntity {
 		this.status = status;
 	}
 
+	@Column(name="book_time")
 	public Date getBookTime() {
 		return bookTime;
 	}
@@ -91,7 +161,7 @@ public class Order extends IdEntity {
 		this.bookTime = bookTime;
 	}
 
-	@Column(name = "create_time")
+	@Column(name="create_time")
 	public Date getCreateTime() {
 		return createTime;
 	}
@@ -110,15 +180,14 @@ public class Order extends IdEntity {
 //		this.oilStation = oilStation;
 //	}
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "order_id")
-	public List<CouponList> getCouponList() {
+/*	public List<CouponList> getCouponList() {
 		return couponList;
 	}
 
 	public void setCouponList(List<CouponList> couponList) {
 		this.couponList = couponList;
-	}
+	}*/
+	@Column(name="os_id")
 	public Long getOsId() {
 		return osId;
 	}
@@ -127,6 +196,7 @@ public class Order extends IdEntity {
 		this.osId = osId;
 	}
 
+	@Column(name="product_id")
 	public Long getProductId() {
 		return productId;
 	}
@@ -135,6 +205,7 @@ public class Order extends IdEntity {
 		this.productId = productId;
 	}
 
+	@Column(name="product_name")
 	public String getProductName() {
 		return productName;
 	}
@@ -151,6 +222,7 @@ public class Order extends IdEntity {
 		this.price = price;
 	}
 
+	@Column(name="order_no")
 	public String getOrderNo() {
 		return orderNo;
 	}
@@ -159,6 +231,7 @@ public class Order extends IdEntity {
 		this.orderNo = orderNo;
 	}
 
+	@Column(name="sft_order_no")
 	public String getSftOrderNo() {
 		return sftOrderNo;
 	}
@@ -167,6 +240,7 @@ public class Order extends IdEntity {
 		this.sftOrderNo = sftOrderNo;
 	}
 
+	@Column(name="session_token")
 	public String getSessionToken() {
 		return sessionToken;
 	}

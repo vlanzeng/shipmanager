@@ -22,7 +22,7 @@ public class OrderStatus {
 		status.put("6", "退款成功");
 		status.put("7", "退款失败");
 		status.put("8", "部分退款成功");
-		status.put("11", "退款成功");
+		status.put("11", "新建预约订单");
 		status.put("12", "后台加油站以确定");
 		status.put("88", "订单完成");
 		status.put("99", "删除");

@@ -143,7 +143,7 @@ public class MosService {
 		}
 		
 		if(!StringUtils.isEmpty(param.getOsName())){
-			whereParam.append(" and s.name like '%"+param.getOsName()+"%'");
+			whereParam.append(" and s.name like '%"+param.getOsName().trim()+"%'");
 		}
 		
 		if(!StringUtils.isEmpty(param.startTime)){
@@ -189,5 +189,13 @@ public class MosService {
 		User user = userDao.findByLoginName(param.userName, 1);
 		param.osId = user.getOsId();
 		return mosDao.addOsOilOrder(param.userName,param.osId, param.orderNo,param.oilId,param.price, param.num,param.amount);
+	}
+	
+	public  List<Object[]> findAllOsation(){
+		return mosDao.findAllOStation();
+	}
+	
+	public  List<Object[]> findById(Long id){
+		return mosDao.findOStationById(id);
 	}
 }

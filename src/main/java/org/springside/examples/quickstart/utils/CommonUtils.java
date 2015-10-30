@@ -295,6 +295,7 @@ public class CommonUtils {
 		return "H"+format.format(new Date())+ userId +System.currentTimeMillis() + String.format("%05d", new Random().nextInt(10000));
 	}
 	
+	
 	/**
 	 * 获取充值订单号
 	 * @param userId

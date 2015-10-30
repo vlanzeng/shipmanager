@@ -15,6 +15,13 @@ public class CouponBean {
 	private String endTime;
 	private String createTime;
 	private Integer status;
+	private String userName;
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 	public String getCreateTime() {
 		return createTime;
 	}

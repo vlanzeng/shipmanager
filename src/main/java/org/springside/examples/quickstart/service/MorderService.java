@@ -1,12 +1,17 @@
 package org.springside.examples.quickstart.service;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
+import org.apache.commons.lang3.time.DateUtils;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,8 +23,18 @@ import org.springside.examples.quickstart.domain.OrderBean;
 import org.springside.examples.quickstart.domain.OrderParam;
 import org.springside.examples.quickstart.domain.PushOsBean;
 import org.springside.examples.quickstart.domain.ResultList;
+import org.springside.examples.quickstart.domain.UserOrderBean;
+import org.springside.examples.quickstart.entity.AjaxResult;
+import org.springside.examples.quickstart.entity.Muser;
+import org.springside.examples.quickstart.entity.Order;
+import org.springside.examples.quickstart.entity.OrderCash;
+import org.springside.examples.quickstart.entity.OrderCashDetail;
 import org.springside.examples.quickstart.entity.OrderStatus;
 import org.springside.examples.quickstart.repository.MorderDao;
+import org.springside.examples.quickstart.repository.MosDao;
+import org.springside.examples.quickstart.service.account.AccountService;
+import org.springside.examples.quickstart.service.account.ShiroDbRealm.ShiroUser;
+import org.springside.examples.quickstart.utils.CommonUtils;
 import org.springside.examples.quickstart.utils.JPushUtil;
 
 @Component
@@ -27,6 +42,18 @@ import org.springside.examples.quickstart.utils.JPushUtil;
 public class MorderService {
 	@Autowired
 	private MorderDao morderDao;
+	
+	@Autowired
+	private MuserService muserService;
+	
+	@Autowired
+	private AccountService accountService;
+	
+	@Autowired
+	private OrderCashService orderCashService;
+	
+	@Autowired
+	private MosDao mosDao;
 	
 	 @PersistenceContext  
 	 private EntityManager em; 
@@ -109,11 +136,25 @@ public class MorderService {
 		if(!StringUtils.isEmpty(param.getOjStatus()) && param.getOjStatus() >=0){
 			//订单状态  等待付款中-0 付款成功-1 付款失败-2 过期-3 撤销成功-4 退款中-5 
 			//退款成功-6 退款失败-7 部分退款成功-8  11-新建预约订单 12-后台加油站以确定 99-删除
-			String s = "1";
+			String s = "1,88,9";
 			if(param.getOjStatus() == 1){
 				whereParam.append(" and o.status in ("+s+")");
 			}else{
 				whereParam.append(" and o.status not in ("+s+")");
+			}
+		}
+		
+		if(param.isHasCash()){
+			StringBuilder notIds =  new StringBuilder();
+			List<OrderCash> oss =  orderCashService.findByOsId(Long.valueOf(param.getOsId()));
+			if(null!=oss && !oss.isEmpty()  ){
+				
+				for (OrderCash orderCash : oss) {
+					for (OrderCashDetail ocd : orderCash.getOrderCashDetails()) {
+						notIds.append(ocd.getHistoryOrder().getId()+",");
+					}
+				}
+				whereParam.append("  and o.id  not in ("+notIds.substring(0, notIds.lastIndexOf(","))+" )"); //  排除上次提现的订单
 			}
 		}
 		
@@ -131,6 +172,9 @@ public class MorderService {
 			}
 		}
 		
+		
+		
+		
 		if(!StringUtils.isEmpty(param.startTime)){
 			whereParam.append(" and  DATE_FORMAT(o.create_time,'%Y-%m-%d')  >='"+param.startTime+"'");
 		}
@@ -140,7 +184,7 @@ public class MorderService {
 		}
 		
 		if(!StringUtils.isEmpty(param.getOsId())){
-			whereParam.append(" and o.os_id<'"+param.getOsId()+"'");
+			whereParam.append(" and o.os_id =  '"+param.getOsId()+"'");
 		}
 		
 		
@@ -161,7 +205,7 @@ public class MorderService {
 		}
 		
 		String sql = "select o.id,o.order_no,o.product_name,o.price,o.num,o.status,o.money,"
-				+ "u.user_name,s.name,o.update_time,o.create_time,o.book_time, o.book_addr "
+				+ "u.user_name,s.name,o.update_time,o.create_time,o.book_time, o.book_addr,o.consume_code "
 				+ "from t_order o left join t_user u on o.user_id=u.id left join t_oil_station s on o.os_id=s.id left join t_city c on s.city_id=c.id where o.type in (1,3,4) "+whereParam.toString()+" "
 				+ "order by o.create_time desc limit "+start+","+param.getRows()+"";
 		Query q = em.createNativeQuery(sql);
@@ -189,6 +233,7 @@ public class MorderService {
 			
 			ob.setBookTime(o[11]==null ? "" :o[11] + "");
 			ob.setBookAddr(o[12]==null ? "" :o[12] + "");
+			ob.setCode(o[13]==null ? "" :o[13] + "");
 			result.add(ob);
 		}
 		dg.setTotal(total);
@@ -211,7 +256,7 @@ public class MorderService {
 		
 		//加油站
 		if(!StringUtils.isEmpty(param.getOsName())){
-			whereParam.append(" and s.name like '%" + param.getOsName().trim() + "%'");
+			whereParam.append(" and os.name like '%" + param.getOsName().trim() + "%'");
 		}
 		
 		
@@ -375,6 +420,128 @@ public class MorderService {
 	
 	public void  delOrder(Long id) throws Exception{
 		morderDao.deleteOrder(id);
+	}
+	
+	public  Order  saveOrder(Order order){
+		return  morderDao.save(order);
+	}
+	
+	
+	public AjaxResult  addUserOrder(UserOrderBean order) throws Exception{
+		
+		AjaxResult ar = new AjaxResult();
+		if(StringUtils.isEmpty(order.getPhone())){
+			ar.setStatus(300);
+			ar.setResult("电话号码为空");
+			return ar;
+		}
+		List<Muser> user = muserService.findByPhone(order.getPhone());
+		if(null==user || user.isEmpty()){
+			ar.setStatus(300);
+			ar.setResult("系统无为此手机号用户");
+			return ar;
+		}
+		ShiroUser u = (ShiroUser) SecurityUtils.getSubject().getPrincipal();
+		Order o = new Order();
+		o.setBookTime(null);
+		o.setCreateTime(new java.util.Date());
+		o.setPrice(new BigDecimal(order.getPrice()));
+		o.setNum(order.getNum());
+		Double money =  new BigDecimal(order.getPrice()).multiply(new BigDecimal(order.getNum())).doubleValue();
+		o.setMoney( money);
+		o.setOrderNo(CommonUtils.getMerchantOrderNo("22"));
+		o.setOsId(accountService.getUser(u.getId()).getOsId());
+		o.setProductId(order.getProId());
+		o.setProductName(order.getProName());
+		o.setStatus(0);
+		o.setType(4); //  后台用户订单
+		o.setUserId(user.get(0).getId());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		o.setBookTime(StringUtils.isEmpty(order.getBookTime())?null:sdf.parse(order.getBookTime()));
+		Order newOrder =  this.saveOrder(o);
+		List<Object[]>  stations  = mosDao.findOStationById(newOrder.getOsId());
+		if(null==stations  || stations.isEmpty()){
+			ar.setStatus(300);
+			ar.setResult("加油站ID错误");
+			return ar;
+		}
+		 Object[] station = stations.get(0);
+		  PushOsBean bean = new PushOsBean();
+		   	 bean.setOsId(newOrder.getOsId());
+		   	 bean.setOrderId(newOrder.getId());
+		   	 bean.setOrderNo(newOrder.getOrderNo());
+		   	 bean.setAddr((null!=station && null!= station[3])?station[3].toString():"");
+		   	 bean.setBookTime(order.getBookTime());
+		   	 bean.setNum(newOrder.getNum());
+		   	 bean.setPrice(newOrder.getPrice().toString());
+		     bean.setProductId(newOrder.getProductId());
+		   	 bean.setProductName(newOrder.getProductName());
+		  if(!JPushUtil.pushOrderOs(order.getPhone(), bean)){
+			 throw new Exception("推送失败");
+		  }
+		ar.setStatus(200);
+		return ar;
+	}
+	
+	
+	public AjaxResult  addBookOrder(UserOrderBean order) throws Exception{
+		
+		AjaxResult ar = new AjaxResult();
+		if(StringUtils.isEmpty(order.getPhone())){
+			ar.setStatus(300);
+			ar.setResult("电话号码为空");
+			return ar;
+		}
+		List<Muser> user = muserService.findByPhone(order.getPhone());
+		if(null==user || user.isEmpty()){
+			ar.setStatus(300);
+			ar.setResult("系统无为此手机号用户");
+			return ar;
+		}
+		Order o = new Order();
+		o.setBookTime(null);
+		o.setCreateTime(new java.util.Date());
+		o.setPrice(new BigDecimal(order.getPrice()));
+		o.setNum(order.getNum());
+		Double money =  new BigDecimal(order.getPrice()).multiply(new BigDecimal(order.getNum())).doubleValue();
+		o.setMoney( money);
+		o.setConsumeCode(((new  Random().nextInt(800000)+100000))+"");
+		o.setOrderNo("H"+System.currentTimeMillis());
+		o.setOsId(order.getStationId());
+		o.setProductId(order.getProId());
+		o.setProductName(order.getProName());
+		o.setStatus(11);
+		o.setType(3); //  预约单
+		o.setUserId(user.get(0).getId());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		o.setBookTime(StringUtils.isEmpty(order.getBookTime())?null:sdf.parse(order.getBookTime()));
+		Order newOrder =  this.saveOrder(o);
+		List<Object[]>  stations  = mosDao.findOStationById(newOrder.getOsId());
+		if(null==stations  || stations.isEmpty()){
+			ar.setStatus(300);
+			ar.setResult("加油站ID错误");
+			return ar;
+		}
+		 Object[] station = stations.get(0);
+		  PushOsBean bean = new PushOsBean();
+		   	 bean.setOsId(newOrder.getOsId());
+		   	 bean.setOrderId(newOrder.getId());
+		   	 bean.setOrderNo(newOrder.getOrderNo());
+		   	 bean.setAddr((null!=station && null!= station[3])?station[3].toString():"");
+		   	 bean.setBookTime(order.getBookTime());
+		   	 bean.setNum(newOrder.getNum());
+		   	 bean.setPrice(newOrder.getPrice().toString());
+		     bean.setProductId(newOrder.getProductId());
+		   	 bean.setProductName(newOrder.getProductName());
+		  if(!JPushUtil.pushOrderOs(order.getPhone(), bean)){
+			 throw new Exception("推送失败");
+		  }
+		ar.setStatus(200);
+		return ar;
+	}
+	
+	public  Order findOne(Long id){
+		return morderDao.findOne(id);
 	}
 	
 }

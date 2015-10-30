@@ -49,7 +49,8 @@ public class MosController extends BaseController implements HybConstants{
 	 * @return
 	 */
 	@RequestMapping(value="/history", method=RequestMethod.GET)
-	public String history(){
+	public String history(HttpServletRequest request){
+		request.setAttribute("oss", mosService.findAllOsation());
 		return "/os/history";
 	}
 	
