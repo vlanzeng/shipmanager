@@ -59,10 +59,23 @@ public class MosService {
 		return mosDao.deleteOSStatus(id);
 	}
 
-	public DataGrid<OilStationBean> getOsList(OsParam param) {
+	public DataGrid<OilStationBean> getOsList(String login_name, OsParam param) {
 		DataGrid<OilStationBean> dg = new DataGrid<OilStationBean>();
 		StringBuffer whereParam = new StringBuffer();
+		
+		//获取登录用户角色
+		User user = userDao.findByLoginName(login_name, 1);
+		if(user==null || StringUtils.isEmpty(user.getRoles()) || (!HybConstants.ADMIN.equalsIgnoreCase(user.getRoles()) 
+				&& !HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles()))){
+			return dg;
+		}
+		
 		int start = (param.getPage() - 1) * param.getRows();
+		
+		//jyzadmin只操作自己加油站的用户
+		if(HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles())){
+			whereParam.append(" and o.id="+user.getOsId());
+		}
 		
 		if(!StringUtils.isEmpty(param.getOsName())){
 			whereParam.append(" and o.name like '%" + param.getOsName() + "%'");

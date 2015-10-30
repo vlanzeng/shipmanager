@@ -1,6 +1,7 @@
 package org.springside.examples.quickstart.web;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,6 +27,7 @@ import org.springside.examples.quickstart.repository.MUserDao;
 import org.springside.examples.quickstart.service.MuserService;
 import org.springside.examples.quickstart.service.account.ShiroDbRealm.ShiroUser;
 import org.springside.examples.quickstart.utils.CommonUtils;
+import org.springside.examples.quickstart.utils.ExportExcel;
 
 @Controller
 @RequestMapping(value="/m/muser")
@@ -117,6 +119,31 @@ public class ManagerUserController extends BaseController implements HybConstant
 		return CommonUtils.printObjStr2(gb);
 	}
 	
+	
+	@RequestMapping(value="exportNuser", method=RequestMethod.GET)
+	public String exportNuser(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException{
+		ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();	
+		Integer[] pageInfo = getPageInfo(request);
+		UserParam param = new UserParam();
+		param.setPage(pageInfo[0]);
+		param.setRows(pageInfo[1]);
+		param.setUserName(CommonUtils.decode(request.getParameter("name")));
+		param.setPhone(CommonUtils.decode(request.getParameter("phone")));
+		DataGrid<UserBean> gb = muserService.getNuserAllList( param);
+		
+
+		response.setContentType("application/x-excel");
+		response.setCharacterEncoding("UTF-8");
+		response.setHeader("Content-Disposition", new String("attachment; filename=清单.xls".getBytes(),"ISO8859-1"));
+		
+		ExportExcel<UserBean> excel = new ExportExcel<UserBean>();
+		excel.exportExcel(new String[]{"用户ID","用户名","手机号","船舶名","船舶编号","帐户余额","支出","创建时间"}, gb.getRows(), response.getOutputStream());
+		response.getOutputStream().flush();
+		response.getOutputStream().close();
+		
+		return null;
+	}
 	/**
 	 * @param request
 	 * @param response
@@ -180,7 +207,7 @@ public class ManagerUserController extends BaseController implements HybConstant
 			e.printStackTrace();
 			logger.error("uStatus error.", e);
 		}
-		return CommonUtils.printStr(ErrorConstants.MUSER_ALREADY_EXISTS_ERROR);
+		return CommonUtils.printStr(ErrorConstants.MUSER_PHONEALREADY_EXISTS_ERROR);
 	}
 	
 	@RequestMapping(value="status", method=RequestMethod.POST)

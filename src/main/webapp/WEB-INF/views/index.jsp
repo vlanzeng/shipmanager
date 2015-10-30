@@ -406,7 +406,7 @@ a:active {
 				</div>
 			</div>
 			</shiro:hasAnyRoles>
-			<shiro:hasAnyRoles name="admin,cwgly">
+			<shiro:hasAnyRoles name="admin">
 				<div title="充值管理">
 					<p><a href="javascript:void(0);" src="${ctx}/m/order/rIndex" class="cs-navi-tab">充值管理</a></p>
 				</div>
@@ -419,7 +419,9 @@ a:active {
 			<shiro:hasAnyRoles name="admin,jyzAdmin">
 				<div title="系统管理">
 				    <p><a href="javascript:void(0);" src="${ctx}/m/muser/index" class="cs-navi-tab">后台用户管理</a></p>
+				    <shiro:hasAnyRoles name="admin">
 				    <p><a href="javascript:void(0);" src="${ctx}/m/muser/nindex" class="cs-navi-tab">普通用户管理</a></p>
+				    </shiro:hasAnyRoles>
 				</div>
 			</shiro:hasAnyRoles>
 		</div>

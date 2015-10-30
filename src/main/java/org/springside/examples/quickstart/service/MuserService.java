@@ -131,13 +131,61 @@ public class MuserService {
 //		if(HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles())){
 //			whereParam.append(" and u.roles in ('jyzAdmin','jyzcwqx','jyzjygqx') and u.os_id="+user.getOsId());
 //		}
-		
-//		String sql = "SELECT u.id,u.login_name,u.os_id,u.roles,u.register_date,u.status, s.name as osName "
-//				+ "from ss_user u LEFT JOIN t_oil_station s on u.os_id=s.id where 1=1 "+whereParam.toString()+" "
-//				+ "order by u.register_date desc limit "+start+","+param.getRows()+"";
 		String sql = "SELECT u.user_name, u.phone,u.ship_name, u.ship_no, u.create_time, SUM(o.money) money,b.fund recharge "
 			+" from t_user u left join t_order o on u.id=o.user_id left join t_user_bank b on u.id=b.user_id where 1=1 "
-			+whereParam.toString()+" group by 1,2,3,4,5,7 order by 1 desc limit "+start+","+param.getRows()+" ";
+			+whereParam.toString()+" group by 1,2,3,4,5,7 order by create_time desc limit "+start+","+param.getRows()+" ";
+		Query q = em.createNativeQuery(sql);
+		List<Object[]> infoList = q.getResultList();
+		List<UserBean> result = new ArrayList<UserBean>();
+		
+		String totalSql = "select count(*) from ( select  u.user_name, u.phone,u.ship_name, u.ship_no, u.create_time from t_user u left join t_order o on u.id=o.user_id left join t_user_bank b on u.id=b.user_id where 1=1 "
+		+ whereParam.toString() +" group by 1,2,3,4,5 ) a";
+		Query q1 = em.createNativeQuery(totalSql);
+		int total = Integer.valueOf(q1.getSingleResult()+"");
+		for(Object[] o : infoList){
+			UserBean ob = new UserBean();
+			ob.setUserName(o[0]+"");
+			ob.setPhone(o[1]+"");
+			ob.setShipname(o[2]+"");
+			ob.setShipno(o[3]+"");
+			ob.setCreatetime(o[4]+"");
+			ob.setFee(o[5]==null?null:Double.valueOf(o[5]+""));
+			ob.setRechargeamount(o[6]==null?null:Double.valueOf(o[6]+""));
+			result.add(ob);
+		}
+		dg.setTotal(total);
+		dg.setRows(result);
+		return dg;
+	}
+	
+	//普通用户与加油站没有关联，也就只有admin能管理，不作权限判断
+	public DataGrid<UserBean> getNuserAllList(UserParam param){
+		DataGrid<UserBean> dg = new DataGrid<UserBean>();
+		StringBuffer whereParam = new StringBuffer();
+		//jyzadmin只操作自己加油站的用户
+		int start = (param.getPage() - 1) * param.getRows();
+		//用户名或手机号
+		if(!StringUtils.isEmpty(param.getPhone())){
+			whereParam.append(" and u.phone='"+param.getPhone().trim() + "'");
+		}
+		//用户名或手机号
+		if(!StringUtils.isEmpty(param.getUserName())){
+			whereParam.append(" and u.user_name='"+param.getUserName().trim() + "'");
+		}
+		if(!StringUtils.isEmpty(param.startTime)){
+			whereParam.append(" and u.create_time >='"+param.startTime+"'");
+		}
+		
+		if(!StringUtils.isEmpty(param.getEndTime())){
+			whereParam.append(" and u.create_time<'"+param.getEndTime()+"'");
+		}
+		
+//		if(HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles())){
+//			whereParam.append(" and u.roles in ('jyzAdmin','jyzcwqx','jyzjygqx') and u.os_id="+user.getOsId());
+//		}
+		String sql = "SELECT u.user_name, u.phone,u.ship_name, u.ship_no, u.create_time, SUM(o.money) money,b.fund recharge "
+			+" from t_user u left join t_order o on u.id=o.user_id left join t_user_bank b on u.id=b.user_id where 1=1 "
+			+whereParam.toString()+" group by 1,2,3,4,5,7 order by create_time desc  ";
 		Query q = em.createNativeQuery(sql);
 		List<Object[]> infoList = q.getResultList();
 		List<UserBean> result = new ArrayList<UserBean>();

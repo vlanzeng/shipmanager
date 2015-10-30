@@ -22,6 +22,7 @@ public class ErrorConstants {
 	public static final String RECHARGE_GENERAL_ERROR = "10040002";
 	/**添加用户类错误**/
 	public static final String MUSER_ALREADY_EXISTS_ERROR = "10050001";
+	public static final String MUSER_PHONEALREADY_EXISTS_ERROR = "10050002";
 	
 	public static String getErrorMsg(String code){
 		if(SUCCESS.equalsIgnoreCase(code)){
@@ -40,6 +41,8 @@ public class ErrorConstants {
 			return "充值失败";
 		}else if(MUSER_ALREADY_EXISTS_ERROR.equalsIgnoreCase(code)){
 			return "用户已存在";
+		}else if(MUSER_PHONEALREADY_EXISTS_ERROR.equalsIgnoreCase(code)){
+			return "该手机已注册";
 		}
 		return "";
 	}

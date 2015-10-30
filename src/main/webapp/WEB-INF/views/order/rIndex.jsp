@@ -67,7 +67,8 @@
 			endTime += ' 23:59:59';
 		}
 		
-		if(!isMoney(amountStart) || !isMoney(amountEnd)){
+		if( (amountStart.trim().length>0 && !isMoney(amountStart)) || 
+				(amountEnd.trim().length>0 && !isMoney(amountEnd))){
 			alert('请输入正确的金额');
 			return;
 		}
@@ -90,7 +91,8 @@
 		var amountEnd = $("#c_charge_end").val();
 		var cname = $("#c_name").val();		
 		
-		if(!isMoney(amountStart) || !isMoney(amountEnd)){
+		if( (amountStart.trim().length>0 && !isMoney(amountStart)) || 
+				(amountEnd.trim().length>0 && !isMoney(amountEnd))){
 			alert('请输入正确的金额');
 			return;
 		}
@@ -109,12 +111,9 @@
 	
 	function isMoney(num){
 		if(num.trim().length == 0){
-			return true;
+			return false;
 		}
 		if(/^[0-9]+(\.[0-9])?[0-9]*$/.test(num)){
-			if(num == 0){
-				return false;
-			}
 			return true;
 		}
 		return false;
@@ -124,7 +123,7 @@
 		var phone = $("#user_phone").val();
 		var amount = $("#user_amount").val();
 		
-		if( !isMoney(amount)){
+		if( !isMoney(amount) || amount==0){
 			alert("请输入正确的金额");
 			return false;
 		}

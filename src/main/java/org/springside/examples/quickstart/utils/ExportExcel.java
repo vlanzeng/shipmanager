@@ -45,6 +45,7 @@ import org.apache.poi.hssf.util.HSSFColor;
  */
 public class ExportExcel<T>
 {
+	
 	public void exportExcel(Collection<T> dataset, OutputStream out)
 	{
 		exportExcel("测试POI导出EXCEL文档", null, dataset, out, "yyyy-MM-dd");
@@ -84,7 +85,7 @@ public class ExportExcel<T>
 		// 声明一个工作薄
 		HSSFWorkbook workbook = new HSSFWorkbook();
 		// 生成一个表格
-		HSSFSheet sheet = workbook.createSheet(title);
+		HSSFSheet sheet = workbook.createSheet();
 		// 设置表格默认列宽度为15个字节
 		sheet.setDefaultColumnWidth((short) 15);
 		// 生成一个样式
@@ -186,7 +187,10 @@ public class ExportExcel<T>
 					// long longValue = (Long) value;
 					// cell.setCellValue(longValue);
 					// }
-					if (value instanceof Boolean)
+					if(value == null){
+						textValue = "";
+					}
+					else if (value instanceof Boolean)
 					{
 						boolean bValue = (Boolean) value;
 						textValue = "男";

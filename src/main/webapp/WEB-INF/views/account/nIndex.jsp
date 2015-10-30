@@ -142,11 +142,11 @@
 		param['phone'] = phone;
 		param['pwd'] = pwd;
 		
-		if(!isEmpty(c_name)){
+		if(!isEmptyStr(c_name)){
 			param['c_name'] = c_name;
 		}
 		
-		if(!isEmpty(c_no)){
+		if(!isEmptyStr(c_no)){
 			param['c_no'] = c_no;
 		}
 		
@@ -205,15 +205,15 @@
     		pagination:true,//分页控件 
     		columns:[[ 
     		{field:'userName',title:'用户名',width:fixWidth(0.2),align:'right'},
-    		{field:'phone',title:'手机号',width:fixWidth(0.2),align:'right'},
+    		{field:'phone',title:'手机号',width:fixWidth(0.15),align:'right'},
     		{field:'shipname',title:'船舶名',width:fixWidth(0.2),align:'right'},
-    		{field:'shipno',title:'船舶编号',width:fixWidth(0.2),align:'right'},
-    		{field:'createtime',title:'用户创建时间',width:fixWidth(0.2),align:'right'},
-    		{field:'rechargeamount',title:'充值总额',width:fixWidth(0.2),align:'right',formatter:function(value,rowData,rowIndex){
+    		{field:'shipno',title:'船舶编号',width:fixWidth(0.15),align:'right'},
+    		{field:'createtime',title:'用户创建时间',width:fixWidth(0.15),align:'right'},
+    		{field:'rechargeamount',title:'充值总额',width:fixWidth(0.15),align:'right',formatter:function(value,rowData,rowIndex){
     			if(typeof(value)=='undefined' || value==null) return;
     			return "<a href='javascript:detail_recharge("+rowData.phone+");'>"+value.toFixed(2)+"</a>";
     		}},
-    		{field:'fee',title:'支出总额',width:fixWidth(0.2),align:'right',formatter:function(value,rowData,rowIndex){
+    		{field:'fee',title:'支出总额',width:fixWidth(0.15),align:'right',formatter:function(value,rowData,rowIndex){
     			if(typeof(value)=='undefined' || value==null) return;
     			return "<a href='javascript:detail_order("+rowData.phone+");'>"+value.toFixed(2)+"</a>";
     		}}
@@ -260,7 +260,7 @@
     		    		{field:'productName',title:'油品',width:fixWidth(0.04),align:'right'},
     		    		{field:'num',title:'数量',width:fixWidth(0.03),align:'right'},
     		    		{field:'status',title:'状态',width:fixWidth(0.06),align:'right'},
-    		    		{field:'amount',title:'总价',width:fixWidth(0.05),align:'right'},
+    		    		{field:'amount',title:'总价',width:fixWidth(0.10),align:'right'},
     		    		{field:'userName',title:'用户名',width:fixWidth(0.15),align:'right'},
     		    		{field:'osName',title:'加油站',width:fixWidth(0.15),align:'right'},
     		    		{field:'bookTime',title:'预约时间',width:fixWidth(0.1),align:'right'},
@@ -301,7 +301,8 @@
 			</div>
 		</div>
 		<div class="pageColumn" style="margin-top: 50px">
-		    <div id="div_dg"><table id="dg"></table></div>
+			<div id="div_dg"><a href="${ctx}/m/muser/exportNuser">导出</a>
+		    <table id="dg"></table></div>
 		    <div style="display:none"  id="div_order"><a href="javascript:back_order();">返回</a><table id="dg_order"></table><div>
 		    <div  style="display:none" id="div_recharge"><a href="javascript:back_recharge();">返回</a><table id="dg_recharge"></table></div>
 		</div>
