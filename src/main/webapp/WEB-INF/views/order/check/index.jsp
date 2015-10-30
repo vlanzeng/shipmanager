@@ -195,11 +195,12 @@
     		{field:'num',title:'数量',width:fixWidth(0.03),align:'right'},
     		{field:'status',title:'状态',width:fixWidth(0.2),align:'right'},
     		{field:'amount',title:'总价',width:fixWidth(0.05),align:'right'},
-    		{field:'userName',title:'用户名',width:fixWidth(0.15),align:'right'},
+    		{field:'userName',title:'用户名',width:fixWidth(0.11),align:'right'},
     		{field:'osName',title:'加油站',width:fixWidth(0.15),align:'right'},
     		{field:'bookTime',title:'预约时间',width:fixWidth(0.15),align:'right'},
     		/* {field:'bookAddr',title:'预约地址',width:fixWidth(0.15),align:'right'}, */
     		{field:'createTime',title:'创建时间',width:fixWidth(0.15),align:'right'},
+    		{field:'code',title:'预约码',width:fixWidth(0.07),align:'right'},
     		{field:'op',title:'操作',width:80,formatter:function(value,rowData,rowIndex){
     			if(rowData.statusId && rowData.statusId==11){
     			var id = rowData.id;

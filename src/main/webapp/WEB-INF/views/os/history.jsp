@@ -66,6 +66,12 @@
 		var startTime = $("#oo_startTime").val();
 		var endTime = $("#oo_endTime").val();
 		//name=encodeURI(name);
+		
+		if(osName!="-1"){
+			osName = $("#oo_osName").find("option:selected").text();
+		}else{
+			osName = "";
+		}
 		osName=encodeURI(osName);
 		$('#dg').datagrid({ url:"${ctx}/m/os/jyzOQuery",
 			queryParams:{'page':1,'rows':15,'orderNo':orderNo,'status':status,'osName':osName,
@@ -197,7 +203,16 @@
 							</select></td>
 							
 							<td width="100px"><span>加油站:</span></td>
-						<td width="150px"><input id="oo_osName" type="text" style="width: 120px"/></td>
+						<td width="150px"><!-- <input id="oo_osName" type="text" style="width: 120px"/> -->
+						
+								<select id="oo_osName" style="width: 150px">
+									<option value="-1">请选择</option>
+								<c:forEach items="${oss}" var="item" >
+									<option value="${item[0] }">${item[1] } </option>
+								</c:forEach>
+								</select>
+						
+						</td>
 							
 							</shiro:hasAnyRoles>
 						<td colspan="4" style="text-align: right;"><button type="button" onclick="query()">查询</button></td>

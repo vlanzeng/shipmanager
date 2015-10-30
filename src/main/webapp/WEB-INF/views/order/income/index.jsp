@@ -67,6 +67,12 @@
 		var startTime = $('#o_startTime').datebox('getValue');   
 		var endTime = $('#o_endTime').datebox('getValue');  
 		
+		if(osName!="-1"){
+			osName = $("#o_s_name").find("option:selected").text();
+		}else{
+			osName = "";
+		}
+		
 		userName=encodeURI(userName);
 		osName=encodeURI(osName);
 		area=encodeURI(area);
@@ -78,6 +84,7 @@
 			method:"GET"});
 	}
 	
+
 	function disOs(){
 		var orderId = $("#os_orderId").val();
 	    var productName = $("#os_name").val();  
@@ -170,7 +177,35 @@
     		}}  */
     		]] 
     	});
-    });   
+    });  
+    
+    
+	function excelData(){
+		var orderNo = $("#order_no").val();
+		var userName = $("#user_name").val();
+		var osName = $("#o_s_name").val();
+		var ojStatus = $("#o_j_status").val();
+		var owStatus = $("#o_w_status").val();
+		var priceRegion = $("#o_price_region").val();
+		var type = $("#o_type").val();
+		var area = $("#o_area").val();
+		var startTime = $('#o_startTime').datebox('getValue');   
+		var endTime = $('#o_endTime').datebox('getValue');  
+		
+		if(osName!="-1"){
+			osName = $("#o_s_name").find("option:selected").text();
+		}else{
+			osName = "";
+		}
+		
+	 	userName=encodeURI(userName);
+		osName=encodeURI(osName); 
+		var url = "${ctx}/m/order/excel/income?orderNo="+orderNo+"&userName="+userName+"&osName="+osName+"&ojStatus="+ojStatus+"&owStatus="+owStatus+"&type="+type+"&area="+area+"&status="+status+"&startTime="+startTime+"&endTime="+endTime+"&priceRegion="+priceRegion;
+		
+		window.location.href = url;
+	}
+	
+    
 </script>
 </head>
 
@@ -233,13 +268,23 @@
 							</td>
 							   <shiro:hasAnyRoles name="jyzAdmin,jyzcwqx">
 							<td width="100px"><span>加油站:</span></td>
-						<td width="150px"><input id="o_s_name" type="text" style="width: 120px"/></td> 
+						<td width="150px"><!-- <input id="o_s_name" type="text" style="width: 120px"/> -->
+							
+								<select id="o_s_name" style="width: 150px">
+									<option value="-1">请选择</option>
+								<c:forEach items="${oss}" var="item" >
+									<option value="${item[0] }">${item[1] } </option>
+								</c:forEach>
+							</select>
+						
+						</td> 
 							</shiro:hasAnyRoles>
 						</tr>
 						
 				</table>
-					<div style="width: 80px;height: 25px;position: absolute;right: 50px;top: 50px;">
+					<div style="width: 180px;height: 25px;position: absolute;right: 50px;top: 50px;">
 					<button type="button" onclick="query()">查询</button>
+					<button type="button" onclick="excelData()">导出报表</button>
 					</div>
 			</div>
 		</div>

@@ -27,7 +27,7 @@
         $("#os_name").val(productName);  
         $("#showOsDialog").dialog('open');  
     	$('#os_dg').datagrid({ 
-    		url:'${ctx}/m/coupon/query', 
+    		url:'${ctx}/m/coupon/use/query', 
     		method:'GET',
     		queryParams:{'status':-1},
     		fitCloumns: true , 
@@ -61,7 +61,7 @@
 		var startTime = $("#c_startTime").val();
 		var endTime = $("#c_endTime").val();
 		
-		$('#dg').datagrid({ url:"${ctx}/m/coupon/query",
+		$('#dg').datagrid({ url:"${ctx}/m/coupon/use/query",
 			queryParams:{'page':1,'rows':15,'name':name,'faceLimit':faceLimit,'type':type,
 				'startTime':startTime,'endTime':endTime},
 			method:"GET"});
@@ -156,7 +156,7 @@
     	$("#restartDialog").dialog('close');
     	$("#showOsDialog").dialog('close');
     	$('#dg').datagrid({ 
-    		url:'${ctx}/m/coupon/uQuery', 
+    		url:'${ctx}/m/coupon/use/query', 
     		method:'GET',
     		queryParams:{'status':-1},
     		fitCloumns: true , 
@@ -166,14 +166,33 @@
     		columns:[[ 
     		{field:'id',title:'ID',width:50}, 
     		{field:'userName',title:'用户',width:fixWidth(0.15),align:'right'},
-    		{field:'name',title:'名称',width:fixWidth(0.15),align:'right'},
-    		{field:'type',title:'类型',width:fixWidth(0.1),align:'right'},
-    		{field:'status',title:'状态',width:fixWidth(0.08),align:'right'},
+    		{field:'name',title:'优惠券名称',width:fixWidth(0.15),align:'right'},
+    		{field:'type',title:'类型',width:fixWidth(0.1),align:'right',formatter:function(value){
+				if(value==1){
+					return "柴油";
+				}else if(value==2){
+					return "机油";
+				}else{
+					return "180";
+				}
+				
+    		}},
+    		{field:'status',title:'状态',width:fixWidth(0.08),align:'right',formatter:function(value){
+    			if(value==0){
+    				return "未使用";
+    			}else if(value==1){
+    				return "已使用";
+    			}else if(value==8){
+    				return  "已删除";
+    			}else{
+    				return  "已过期";
+    			}
+    		}},
     		{field:'faceValue',title:'面额',width:fixWidth(0.1),align:'right'},
     		{field:'startTime',title:'有效开始时间',width:fixWidth(0.15),align:'right'},
     		{field:'endTime',title:'有效结束时间',width:fixWidth(0.15),align:'right'},
-    		{field:'createTime',title:'创建时间',width:fixWidth(0.15),align:'right'},
-    		{field:'op',title:'操作',width:155,formatter:function(value,rowData,rowIndex){
+    		{field:'createTime',title:'创建时间',width:fixWidth(0.15),align:'right'}
+    /* 		{field:'op',title:'操作',width:155,formatter:function(value,rowData,rowIndex){
     			var id = rowData.id;
     			var status = rowData.status;
     			var str = "";
@@ -183,7 +202,7 @@
     				str += ' <a href="#" onclick="updateStatus(\''+id+'\',1)">生效</a>';
     			}
     			return str;
-    		}} 
+    		}}  */
     		]] 
     	});
     });   
@@ -196,7 +215,7 @@
 			<div id="coupon_query_id">
 				<table>
 					<tr style="height: 40px;">
-						<td width="100px"><span>名称:</span></td>
+						<td width="100px"><span>优惠券名称:</span></td>
 						<td width="150px"><input id="c_name" type="text" style="width: 120px"/></td>
 						<td width="100px"><span>面额:</span></td>
 						<td width="150px"><input id="c_face" type="text" style="width: 120px"/></td>
@@ -216,11 +235,11 @@
 						<td width="100px"><span>结束时间:</span></td>
 						<td width="150px"><input id="c_endTime" class="easyui-datebox"></input></td>
 						<td colspan="4" width="100px">&nbsp;</td>
+						<td colspan="2" style="text-align: right;"><button type="button" onclick="query()">查询</button></td>
 					</tr>
 					<tr style="height: 40px;">
-					    <td colspan="8" style="text-align: right;"><button type="button" onclick="showCreatePage()">添加</button></td>
+				<!-- 	    <td colspan="8" style="text-align: right;"><button type="button" onclick="showCreatePage()">添加</button></td> -->
 					    &nbsp;&nbsp;
-						<td colspan="8" style="text-align: right;"><button type="button" onclick="query()">查询</button></td>
 					</tr>
 				</table>
 			</div>

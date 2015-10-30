@@ -10,6 +10,7 @@
 <script type="text/javascript" src="${ctx}/static/jquery/jquery-1.8.0.min.js"></script>
 <script type="text/javascript" src="${ctx}/static/jquery/jquery.easyui.min.js"></script>
 <script type="text/javascript" src="${ctx}/static/jquery/easyui-lang-zh_CN.js"></script>
+<script type="text/javascript" src="${ctx}/My97DatePicker/WdatePicker.js"></script> 
 <link rel="stylesheet" type="text/css" href="${ctx}/static/styles/main.css" id="swicth-style"/>
 <script type="text/javascript">  
 	function fixWidth(percent)  
@@ -55,6 +56,46 @@
 		$("#showOsDialog").dialog('close');
 	}
 	
+	function addUserOrderDialog(){
+		$("#addUserOrderDialog").dialog('open');
+	}
+	
+	function canceladdUserOrderDialog(){
+		$("#addUserOrderDialog").dialog('close');
+	}
+	
+	function addUserOrder(){
+		var phone = $("#order_user_phone").val();
+		var proId = $("#order_product_name").val();
+	/* 	var couponId = $("#order_coupon").val(); */
+	    var bookTime =     $("#order_book_time").val()  ;
+		var price = $("#order_price").val();
+		var num = $("#order_num").val();
+		var proName = $("#order_product_name").find("option:selected").text();
+		$.ajax({
+		    type:'POST',
+		    url: "${ctx}/m/order/addUserOrder",
+		    cache:false,  
+		    data: {'phone':phone,'proId':proId,"price":price,"num":num,"proName":proName,"bookTime":bookTime} ,
+		    dataType: 'json',
+		    success: function(data){
+		    	if(data.status == 200){
+		    		canceladdUserOrderDialog();
+		    		alert("添加成功");
+		    		query();
+		    	}else{
+		    		alert(data.result);  
+		    	}
+		    },  
+		    error : function() {  
+		    	alert("操作异常，请稍后再试。");  
+		    }  
+		});
+		
+	}
+	
+	
+	
 	function query(){
 		var orderNo = $("#order_no").val();
 		var userName = $("#user_name").val();
@@ -65,7 +106,11 @@
 		var area = $("#o_area").val();
 		var startTime = $('#o_startTime').datebox('getValue');   
 		var endTime = $('#o_endTime').datebox('getValue');  
-		
+		if(osName!="-1"){
+			osName = $("#o_s_name").find("option:selected").text();
+		}else{
+			osName = "";
+		}
 		userName=encodeURI(userName);
 		osName=encodeURI(osName);
 		area=encodeURI(area);
@@ -138,6 +183,7 @@
     $(document).ready(function(){
     	$("#restartDialog").dialog('close');
     	$("#showOsDialog").dialog('close');
+    	$("#addUserOrderDialog").dialog('close');
     	$('#dg').datagrid({ 
     		url:'${ctx}/m/order/query', 
     		method:'GET',
@@ -201,7 +247,16 @@
 						<td width="100px"><span>用户名/手机号:</span></td>
 						<td width="150px"><input id="user_name" type="text" style="width: 120px"/></td>
 						<td width="100px"><span>加油站:</span></td>
-						<td width="150px"><input id="o_s_name" type="text" style="width: 120px"/></td>
+						<td width="150px"><!-- <input id="o_s_name" type="text" style="width: 120px"/> -->
+							
+							<select id="o_s_name" style="width: 150px">
+									<option value="-1">请选择</option>
+								<c:forEach items="${oss}" var="item" >
+									<option value="${item[0] }">${item[1] } </option>
+								</c:forEach>
+							</select>
+						
+						</td>
 						<td width="100px"><span>地区:</span></td>
 						<td width="150px"><input id="o_area" type="text" style="width: 120px"/></td>
 						<td width="100px"><span>完成状态:</span></td>
@@ -239,6 +294,7 @@
 					</tr>
 					<tr style="height: 40px;">
 						<td colspan="8" style="text-align: right;"><button type="button" onclick="query()">查询</button></td>
+						<td colspan="8" style="text-align: center;"><button type="button" onclick="addUserOrderDialog()">添加用户订单</button></td>
 					</tr>
 				</table>
 			</div>
@@ -303,5 +359,75 @@
 			</div> 		
 		</div>
 	</div>
+	
+	
+	
+		<div id="addUserOrderDialog" class="easyui-dialog" title="添加用户订单" style="width: 400px; height: 320px;" >
+		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
+			<div class="data-tips-info">
+				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
+					<tr>
+						<td style="text-align: center ;">用户电话:</td>
+						<td> <input id="order_user_phone"  name="order_user_phone" /></td>	
+					</tr>
+					<tr style="line-height: 40px;">
+					<td style="text-align: center;">产品:</td>	
+						<td><select id="order_product_name" style="width: 150px">
+								<option value="1">机油 </option>
+								<option value="2">柴油</option>
+								<option value="3">180</option>
+							</select>
+						</td>
+					</tr>
+			<%-- 		<tr style="line-height: 40px;">
+					<td style="text-align: center;">加油站:</td>	
+						<td><select id="order_station" style="width: 150px">
+								<c:forEach items="${oss}" var="item" >
+									<option value="${item[0] }">${item[1] } </option>
+								</c:forEach>
+							</select>
+						</td>
+					</tr> --%>
+		<%-- 				<tr style="line-height: 40px;">
+					<td style="text-align: center;">优惠券:</td>	
+						<td><select id="order_coupon" style="width: 150px">
+								<option value="-1">无</option>
+								<c:forEach items="${conpons}" var="item" >
+									<option value="${item[0] }">${item[1] } </option>
+								</c:forEach>
+							</select>
+						</td>
+					</tr> --%>
+							<tr style="line-height: 40px;">
+					<td style="text-align: center;">预约时间:</td>	
+						<td>
+							<input  id="order_book_time"  type="text"  onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"  name="order_book_time" />
+						</td>
+					</tr>
+					<tr style="line-height: 40px;">
+					<td style="text-align: center;">单价:</td>	
+						<td>
+							<input  id="order_price" type="text"   name="order_price" />
+						</td>
+					</tr>
+						<tr style="line-height: 40px;">
+					<td style="text-align: center;">数量:</td>	
+						<td>
+							<input id="order_num" type="text" name="order_num" />
+						</td>
+					</tr>
+					<tr style="line-height: 40px;">
+					<td style="text-align: right;">
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-finish'" onclick="addUserOrder()">确定</a>
+					</td>
+					<td style="text-align: center;">
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-cancel'" onclick="canceladdUserOrderDialog()">取消</a>
+					</td>
+				</tr>	
+				</table>		
+			</div> 		
+		</div>
+	</div>
+	
 </body>
 </html>

@@ -352,9 +352,6 @@ a:active {
 				    <shiro:hasAnyRoles name="jyzAdmin,jyzjygqx,admin,kfqx">
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">订单查询</a></p>
 					</shiro:hasAnyRoles>
-					<shiro:hasAnyRoles name="jyzAdmin,jyzjygqx">
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">生成客户订单(没有做)</a></p>
-					</shiro:hasAnyRoles> 
 				</div>
 			</shiro:hasAnyRoles> 
 			<shiro:hasAnyRoles name="jyzAdmin,jyzcwqx,admin,cwgly">
@@ -366,21 +363,20 @@ a:active {
 					</shiro:hasAnyRoles>
 					<shiro:hasAnyRoles name="jyzAdmin,jyzcwqx">
 					<%-- 	<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">明细查询</a></p> --%>
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请列表(没有做)</a></p>
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/cash/index" class="cs-navi-tab">提现申请列表</a></p>
 					</shiro:hasAnyRoles>
 				</div>
 			</shiro:hasAnyRoles>
 			<shiro:hasAnyRoles name="admin">
 				<div title="预约销码">
-					<p><a href="javascript:void(0);" src="${ctx}/m/order/subscribe/logout" class="cs-navi-tab">预约销码（没有做）</a></p>
-					<p><a href="javascript:void(0);" src="${ctx}/m/order/subscribe/index" class="cs-navi-tab">预约订单查询</a></p>
+					<p><a href="javascript:void(0);" src="${ctx}/m/order/check/index" class="cs-navi-tab">订单管理</a></p>
 				</div>
 			</shiro:hasAnyRoles>
 			<shiro:hasAnyRoles name="jyzAdmin,jyzjygqx">
 				<div title="油库进油">
 				<%-- 	<p><a href="javascript:void(0);" src="${ctx}/m/os/jyzOIndex" class="cs-navi-tab">加油站订单查询</a></p>
 					<p><a href="javascript:void(0);" src="${ctx}/m/os/adminOIndex" class="cs-navi-tab">admin订单查询</a></p> --%>
-						<p><a href="javascript:void(0);" src="${ctx}/m/os/history" class="cs-navi-tab">订单管理</a>
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/purchase/index" class="cs-navi-tab">订单管理</a>
 				</div>
 			</shiro:hasAnyRoles>
 			<shiro:hasAnyRoles name="jyzAdmin">
@@ -401,11 +397,11 @@ a:active {
 					</p>
 				</div>
 				<div title="广告管理">
-				<p><a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">广告管理</a></p>
+				<p><a href="javascript:void(0);" src="${ctx}/advert/index" class="cs-navi-tab">广告管理</a></p>
+				</div>
 				<div title="用户管理">
 					<p><a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">用户列表</a></p>
 				</div>
-			</div>
 			</shiro:hasAnyRoles>
 			<shiro:hasAnyRoles name="admin,cwgly">
 				<div title="充值管理">

@@ -28,7 +28,7 @@
         $("#os_name").val(productName);  
         $("#showOsDialog").dialog('open');  
     	$('#os_dg').datagrid({ 
-    		url:'${ctx}/m/coupon/query', 
+    		url:'${ctx}/advert/query', 
     		method:'GET',
     		queryParams:{'status':-1},
     		fitCloumns: true , 
@@ -55,16 +55,8 @@
 	}
 	
 	function query(){
-		var name = $("#c_name").val();
-		var faceLimit = $("#c_face").val();
-		var type = $("#c_type").val();
-		//var status = $("#status").val();
-		var startTime = $("#c_startTime").val();
-		var endTime = $("#c_endTime").val();
-		name=encodeURI(name);
-		$('#dg').datagrid({ url:"${ctx}/m/coupon/query",
-			queryParams:{'page':1,'rows':15,'name':name,'faceLimit':faceLimit,'type':type,
-				'startTime':startTime,'endTime':endTime},
+		$('#dg').datagrid({ url:"${ctx}/advert/query",
+			queryParams:{'page':1,'rows':15},
 			method:"GET"});
 	}
 	
@@ -157,7 +149,7 @@
     	$("#restartDialog").dialog('close');
     	$("#showOsDialog").dialog('close');
     	$('#dg').datagrid({ 
-    		url:'${ctx}/m/coupon/query', 
+    		url:'${ctx}/advert/query', 
     		method:'GET',
     		queryParams:{'status':-1},
     		fitCloumns: true , 
@@ -166,42 +158,18 @@
     		pagination:true,//分页控件 
     		columns:[[ 
     		{field:'id',title:'ID',width:50}, 
-    		{field:'name',title:'名称',width:fixWidth(0.15),align:'right'},
-    		{field:'type',title:'类型',width:fixWidth(0.1),align:'right',formatter:function(value){
-				if(value==1){
-					return "柴油";
-				}else if(value==2){
-					return "机油";
-				}else{
-					return "180";
-				}
-				
+    		{field:'url',title:'链接',width:fixWidth(0.3),align:'right'},
+    		{field:'purl',title:'图片',width:fixWidth(0.1),align:'right',formatter:function(value){
+					return "  <img  src="+value+"  width=80px height=80px />  ";				
     		}},
-    		{field:'status',title:'状态',width:fixWidth(0.08),align:'right',formatter:function(value){
-    			if(value==0){
-    				return "已失效";
-    			}else if(value==1){
-    				return "生效中";
-    			}else{
-    				return  "不可用";
-    			}
+    		{field:'title',title:'描述',width:fixWidth(0.25),align:'right'},
+    		{field:'type',title:'类型',width:fixWidth(0.15),align:'right',formatter:function(value){
+					return "  <img  src="+value+"  width=80px height=80px />  ";				
     		}},
-    		{field:'faceValue',title:'面额',width:fixWidth(0.1),align:'right'},
-    		{field:'limitValue',title:'限额',width:fixWidth(0.1),align:'right'},
-    		{field:'startTime',title:'有效开始时间',width:fixWidth(0.15),align:'right'},
-    		{field:'endTime',title:'有效结束时间',width:fixWidth(0.15),align:'right'},
-    		{field:'createTime',title:'创建时间',width:fixWidth(0.15),align:'right'},
-    		{field:'op',title:'操作',width:155,formatter:function(value,rowData,rowIndex){
-    			var id = rowData.id;
-    			var status = rowData.status;
-    			var str = "";
-    			if(status == 1){
-    				str += ' <a href="#" onclick="updateStatus(\''+id+'\',0)">失效</a>';
-    			}else{
-    				str += ' <a href="#" onclick="updateStatus(\''+id+'\',1)">生效</a>';
-    			}
-    			return str;
-    		}} 
+    		{field:'type',title:'类型',width:fixWidth(0.15),align:'right',formatter:function(value){
+				return "  <img  src="+value+"  width=80px height=80px />  ";				
+		}}
+   
     		]] 
     	});
     });   
@@ -212,7 +180,7 @@
 	<div id="contentWrap">
 		<div class="" style="">
 			<div id="coupon_query_id">
-				<table>
+			<!-- 	<table>
 					<tr style="height: 40px;">
 						<td width="100px"><span>名称:</span></td>
 						<td width="150px"><input id="c_name" type="text" style="width: 120px"/></td>
@@ -237,10 +205,10 @@
 					    <td colspan="2" style="text-align: right;"><button type="button" onclick="showCreatePage()">添加</button></td>
 						<td colspan="2" style="text-align: center;"><button type="button" onclick="query()">查询</button></td>
 					</tr>
-				</table>
+				</table> -->
 			</div>
 		</div>
-		<div class="pageColumn" style="margin-top: 50px">
+		<div class="pageColumn" style="margin-top: 20px">
 		    <table id="dg"></table>
 		</div>
 	</div>
