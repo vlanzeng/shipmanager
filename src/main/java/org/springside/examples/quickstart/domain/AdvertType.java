@@ -11,7 +11,7 @@ public class AdvertType {
 	static{
 		 TYPES.put("1", "加油站");
 		 TYPES.put("2", "网站");
-		 TYPES.put("3", "是否发放优惠券");
+		 TYPES.put("3", "加油站发放优惠券");
 	}
 
 }

@@ -17,6 +17,8 @@ import org.springside.examples.quickstart.domain.BaseParam;
 import org.springside.examples.quickstart.domain.DataGrid;
 import org.springside.examples.quickstart.domain.OilStationBean;
 import org.springside.examples.quickstart.domain.OsParam;
+import org.springside.examples.quickstart.entity.Advert;
+import org.springside.examples.quickstart.repository.AdvertDao;
 import org.springside.examples.quickstart.repository.MUserDao;
 import org.springside.examples.quickstart.repository.MosDao;
 import org.springside.examples.quickstart.repository.UserDao;
@@ -33,14 +35,42 @@ public class MAdvertService {
 	@Autowired
 	private UserDao userDao;
 	
+	@Autowired
+	private AdvertDao advertDao;
+	
 	 @PersistenceContext  
 	 private EntityManager em; 
 	
 
+	 public int insertAdvert( String url, String purl, String type, String title, String os){
+		 Advert advert = new Advert();
+		 
+		 advert.setUrl(url);
+		 advert.setPurl(purl);
+		 advert.setTitle(title);
+		 advert.setType(type+":"+os);
+		 try{
+			 Advert ret = advertDao.save(advert);
+			 if(ret == null){
+				 return -1;
+			 }
+		 }catch(Exception e){
+			 e.printStackTrace();
+			 return -2;
+		 }
+		 
+		 return 0;
+	 }
+	 
 	public DataGrid<AdvertBean> getAdvertsList(BaseParam bp) {
 		DataGrid<AdvertBean> dg = new DataGrid<AdvertBean>();
 		int start = (bp.getPage() - 1) * bp.getRows();
-		String sql = "  SELECT * FROM  t_advert  limit "+start+","+bp.getRows()+"";
+		StringBuilder str = new StringBuilder();
+		str.append(" where 1=1 ");
+		if(bp.getType() != null){
+			str.append(" and type like '"+bp.getType()+"%'");
+		}
+		String sql = "  SELECT * FROM  t_advert  " +str.toString()+" limit "+start+","+bp.getRows()+"";
 		Query q = em.createNativeQuery(sql);
 		List<Object[]> infoList = q.getResultList();
 		List<AdvertBean> result = new ArrayList<AdvertBean>();

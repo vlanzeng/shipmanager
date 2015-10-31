@@ -209,14 +209,15 @@
     		{field:'shipname',title:'船舶名',width:fixWidth(0.2),align:'right'},
     		{field:'shipno',title:'船舶编号',width:fixWidth(0.15),align:'right'},
     		{field:'createtime',title:'用户创建时间',width:fixWidth(0.15),align:'right'},
-    		{field:'rechargeamount',title:'充值总额',width:fixWidth(0.15),align:'right',formatter:function(value,rowData,rowIndex){
+    		{field:'rechargeamount',title:'充值总额',width:fixWidth(0.10),align:'right',formatter:function(value,rowData,rowIndex){
     			if(typeof(value)=='undefined' || value==null) return;
     			return "<a href='javascript:detail_recharge("+rowData.phone+");'>"+value.toFixed(2)+"</a>";
     		}},
-    		{field:'fee',title:'支出总额',width:fixWidth(0.15),align:'right',formatter:function(value,rowData,rowIndex){
+    		{field:'fee',title:'支出总额',width:fixWidth(0.10),align:'right',formatter:function(value,rowData,rowIndex){
     			if(typeof(value)=='undefined' || value==null) return;
     			return "<a href='javascript:detail_order("+rowData.phone+");'>"+value.toFixed(2)+"</a>";
-    		}}
+    		}},
+    		{field:'left',title:'余额',width:fixWidth(0.10),align:'right' }
     		]] 
     	});
     });   
@@ -225,8 +226,6 @@
     	$("#div_dg").hide();
     	$("#div_recharge").show();
     	
-		$("#dgsumdiv").hide();
-		$("#dgdiv").show();
 		$('#dg_recharge').datagrid({ 
 			url:"${ctx}/m/order/rQuery",
 			queryParams:{'page':1,'rows':15,'phone':phone},
@@ -303,7 +302,7 @@
 		<div class="pageColumn" style="margin-top: 50px">
 			<div id="div_dg"><a href="${ctx}/m/muser/exportNuser">导出</a>
 		    <table id="dg"></table></div>
-		    <div style="display:none"  id="div_order"><a href="javascript:back_order();">返回</a><table id="dg_order"></table><div>
+		    <div style="display:none"  id="div_order"><a href="javascript:back_order();">返回</a><table id="dg_order"></table></div>
 		    <div  style="display:none" id="div_recharge"><a href="javascript:back_recharge();">返回</a><table id="dg_recharge"></table></div>
 		</div>
 	</div>

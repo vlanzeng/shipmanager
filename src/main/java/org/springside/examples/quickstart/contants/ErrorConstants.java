@@ -25,6 +25,9 @@ public class ErrorConstants {
 	public static final String MUSER_ALREADY_EXISTS_ERROR = "10050001";
 	public static final String MUSER_PHONEALREADY_EXISTS_ERROR = "10050002";
 	
+	/**广告类错误**/
+	public static final String ADVERT_ERROR = "10060001";
+	
 	public static String getErrorMsg(String code){
 		if(SUCCESS.equalsIgnoreCase(code)){
 			return "请求完成";
@@ -52,6 +55,8 @@ public class ErrorConstants {
 			return "该手机已注册";
 		}else if(MUSER_PHONEALREADY_EXISTS_ERROR.equalsIgnoreCase(code)){
 			return "该手机已注册";
+		}else if(ADVERT_ERROR.equalsIgnoreCase(code)){
+			return "添加广告错误";
 		}
 		return "";
 	}

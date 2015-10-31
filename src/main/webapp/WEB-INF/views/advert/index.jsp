@@ -55,9 +55,10 @@
 	}
 	
 	function query(){
-		$('#dg').datagrid({ url:"${ctx}/advert/query",
-			queryParams:{'page':1,'rows':15},
-			method:"GET"});
+// 		$('#dg').datagrid({ url:"${ctx}/advert/query",
+// 			queryParams:{'page':1,'rows':15},
+// 			method:"GET"});
+		doQuery( $("#type").val() );
 	}
 	
 	function disOs(){
@@ -93,21 +94,27 @@
 		$("#restartDialog").dialog('open');  
 	}
 	
+	function isEmptyStr( str ){
+		if(str == null)
+			return true;
+		return /^\s*$/.test(str);
+	}
 	function create(){
-		var name = $("#coupon_name").val();
-		var faceLimit = $("#face_limit").val();
-		var type = $("#coupon_type").val();
-		var startTime = $('#coupon_startTime').datebox('getValue');   
-		var endTime = $('#coupon_endTime').datebox('getValue');   
-		if(status < 0){
-			alert("请选择状态。");
+		var url = $("#a_url").val();
+		var purl = $("#a_purl").val();
+		var type = $("#a_type").val();
+		var title = $('#a_title').val();
+		var os = $("#a_os").combobox('getValue');
+		
+		if(  isEmptyStr( url ) || isEmptyStr(purl) || isEmptyStr(type) || isEmptyStr(title)){
+			alert("请录入链接地址、图片地址、标题和广告类型");
 			return;
 		}
 		$.ajax({
 		    type:'POST',
-		    url: "${ctx}/m/coupon/add",
+		    url: "${ctx}/advert/add",
 		    cache:false,  
-		    data: {'name':name,'faceLimit':faceLimit,'type':type,'startTime':startTime,'endTime':endTime} ,
+		    data: {'url':url,'purl':purl,'type':type,'title':title,'os':os} ,
 		    dataType: 'json',
 		    success: function(data){
 		    	if(data.code == 200){
@@ -145,13 +152,17 @@
 		});
 	}
 
-    $(document).ready(function(){
-    	$("#restartDialog").dialog('close');
-    	$("#showOsDialog").dialog('close');
-    	$('#dg').datagrid({ 
+	function doQuery( type ){
+		var param = {'page':1,'rows':15};
+		
+		if( typeof type!='undefined' && type != null && type.trim().length>0){
+			param['type'] = type;
+		}
+		
+	   	$('#dg').datagrid({ 
     		url:'${ctx}/advert/query', 
     		method:'GET',
-    		queryParams:{'status':-1},
+    		queryParams:param,
     		fitCloumns: true , 
     		nowrap: true , 
     		singleSelect: true,
@@ -163,15 +174,33 @@
 					return "  <img  src="+value+"  width=80px height=80px />  ";				
     		}},
     		{field:'title',title:'描述',width:fixWidth(0.25),align:'right'},
-    		{field:'type',title:'类型',width:fixWidth(0.15),align:'right',formatter:function(value){
-					return "  <img  src="+value+"  width=80px height=80px />  ";				
-    		}},
-    		{field:'type',title:'类型',width:fixWidth(0.15),align:'right',formatter:function(value){
-				return "  <img  src="+value+"  width=80px height=80px />  ";				
-		}}
+    		{field:'type',title:'类型',width:fixWidth(0.15),align:'right'}
    
     		]] 
     	});
+	}
+	
+    $(document).ready(function(){
+		$.ajax({
+		    type:'GET',
+		    url:'${ctx}/m/os/query?status=-1&page=1&rows=10000000',
+		    cache:false,  
+		    dataType: 'json',
+		    success: function(vdata){
+		    	$("#a_os").combobox({
+		    		data:vdata.rows,
+		    		valueField:'id',
+		    		textField:'name'
+		    	});
+
+		    	$("#restartDialog").dialog('close');
+		    	$("#showOsDialog").dialog('close');
+		    },  
+		    error : function() {  
+		    	alert("操作异常，请稍后再试。");  
+		    }  
+		});
+ 		doQuery();
     });   
 </script>
 </head>
@@ -180,76 +209,75 @@
 	<div id="contentWrap">
 		<div class="" style="">
 			<div id="coupon_query_id">
-			<!-- 	<table>
+			<table>
 					<tr style="height: 40px;">
-						<td width="100px"><span>名称:</span></td>
-						<td width="150px"><input id="c_name" type="text" style="width: 120px"/></td>
-						<td width="100px"><span>面额:</span></td>
-						<td width="150px"><input id="c_face" type="text" style="width: 120px"/></td>
 						<td width="100px"><span>类型:</span></td>
 						<td width="150px">
-							<select name="type" id="c_type" style="width: 200px">
-							    <option value="-1" selected="selected">全部</option>
-								<option value="1">柴油  </option>
-								<option value="2">机油</option>
-								<option value="3">180</option>
+							<select id="type">
+								<option value="" selected="selected">--</option>
+								<option value="1" >加油站</option>
+								<option value="2">新闻网页</option>
+								<option value="3">加油站发放优惠券</option>
 							</select>
 						</td>
-					</tr>
-					<tr style="height: 40px;">
-						<td width="100px"><span>开始时间:</span></td>
-						<td width="150px"><input id="c_startTime" class="easyui-datebox"></input></td>
-						<td width="100px"><span>结束时间:</span></td>
-						<td width="150px"><input id="c_endTime" class="easyui-datebox"></input></td>
 						<td colspan="4" width="100px">&nbsp;</td>
 					    <td colspan="2" style="text-align: right;"><button type="button" onclick="showCreatePage()">添加</button></td>
 						<td colspan="2" style="text-align: center;"><button type="button" onclick="query()">查询</button></td>
 					</tr>
-				</table> -->
+				</table>
 			</div>
 		</div>
 		<div class="pageColumn" style="margin-top: 20px">
 		    <table id="dg"></table>
 		</div>
 	</div>
-	<div id="restartDialog" class="easyui-dialog" title="添加优惠券" style="width: 650px; height: 380px;" >
+	<div id="restartDialog" class="easyui-dialog" title="添加广告" style="width: 650px; height: 380px;" >
 		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
 			<div class="data-tips-info">
 				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
 					<tr style="height: 30px">
 						<td style="width:30%;">
-							优惠券名称：
+						 	链接地址：
 						</td>
 						<td  style="text-align:left;">
-							<input id="coupon_name" name="coupon_name"/>
+							<input id="a_url"   type="text"/>
 						</td>
 					</tr>
 					<tr style="height: 30px">
 						<td style="width:30%;">
-							限额-面额：
+							图片地址：
 						</td>
 						<td  style="text-align:left;">
-							<input id="face_limit" name="face_limit"/>(格式：100-30)
+							<input id="a_purl"   type="text"/>
 						</td>
 					</tr>
 					<tr style="height: 30px">
 						<td style="width:30%;">
-							类型：
+							标题：
 						</td>
 						<td  style="text-align:left;">
-							<select id="coupon_type">
-								<option value="1">柴油  </option>
-								<option value="2">机油</option>
-								<option value="3">180</option>
+							<input id="a_title"  type="text" />
+						</td>
+					</tr>
+					<tr style="height: 30px">
+						<td style="width:30%;">
+							广告类型：
+						</td>
+						<td  style="text-align:left;">
+							<select id="a_type">
+								<option value="" selected="selected">--</option>
+								<option value="1" >加油站</option>
+								<option value="2">新闻网页</option>
+								<option value="3">加油站发放优惠券</option>
 							</select>
 						</td>
 					</tr>
 					<tr style="height: 30px">
 						<td style="width:30%;">
-							有效期：
+							加油站：
 						</td>
 						<td  style="text-align:left;">
-							<input id="coupon_startTime" class="easyui-datebox"></input>--<input id="coupon_endTime" class="easyui-datebox"></input>
+							<input id="a_os" type="text" ></input>
 						</td>
 					</tr>
 				</table>

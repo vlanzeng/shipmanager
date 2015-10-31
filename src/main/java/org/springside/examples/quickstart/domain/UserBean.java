@@ -8,6 +8,7 @@ public class UserBean {
 	public String shipno;
 	public Double rechargeamount;
 	public Double fee;	//支出
+	public Double left; //余额
 	public String createtime;
 	
 	
@@ -58,5 +59,11 @@ public class UserBean {
 	}
 	public void setCreatetime(String createtime) {
 		this.createtime = createtime;
+	}
+	public Double getLeft() {
+		return left;
+	}
+	public void setLeft(Double left) {
+		this.left = left;
 	}
 }

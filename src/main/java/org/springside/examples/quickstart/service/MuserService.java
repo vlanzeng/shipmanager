@@ -125,10 +125,14 @@ public class MuserService {
 	public DataGrid<UserBean> getNuserList(UserParam param){
 		DataGrid<UserBean> dg = new DataGrid<UserBean>();
 		StringBuffer whereParam = new StringBuffer();
+		StringBuffer where1 = new StringBuffer();
+		StringBuffer where2 = new StringBuffer();
 		//jyzadmin只操作自己加油站的用户
 		int start = (param.getPage() - 1) * param.getRows();
 		//用户名或手机号
 		if(!StringUtils.isEmpty(param.getPhone())){
+			where2.append(" and exists (select * from t_user tu where tu.id=trinima.user_id and tu.phone='"+param.getPhone().trim()+"')");
+			where1.append(" and phone = '"+param.getPhone().trim() + "'");
 			whereParam.append(" and u.phone='"+param.getPhone().trim() + "'");
 		}
 		//用户名或手机号
@@ -146,15 +150,19 @@ public class MuserService {
 //		if(HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles())){
 //			whereParam.append(" and u.roles in ('jyzAdmin','jyzcwqx','jyzjygqx') and u.os_id="+user.getOsId());
 //		}
-		String sql = "SELECT u.user_name, u.phone,u.ship_name, u.ship_no, u.create_time, SUM(o.money) money,b.fund recharge "
-			+" from t_user u left join t_order o on u.id=o.user_id left join t_user_bank b on u.id=b.user_id where 1=1 "
-			+whereParam.toString()+" group by 1,2,3,4,5,7 order by create_time desc limit "+start+","+param.getRows()+" ";
+		String sql = "SELECT u.user_name, u.phone,u.ship_name, u.ship_no, u.create_time, o.money money, r.amount recharge, b.fund  "
+			+" from t_user u left join ( select user_id, sum(money) money from t_order trinima where 1=1 "
+			+where2.toString()	
+			+" group by 1 ) o on u.id=o.user_id left join  t_user_bank  b on u.id=b.user_id left join ( select phone, sum(amount) amount from t_recharge_log where 1=1 "
+			+where1.toString()
+			+" group by 1 ) r on u.phone=r.phone where 1=1 "
+			+whereParam.toString()+" order by create_time desc limit "+start+","+param.getRows()+" ";
 		Query q = em.createNativeQuery(sql);
 		List<Object[]> infoList = q.getResultList();
 		List<UserBean> result = new ArrayList<UserBean>();
 		
-		String totalSql = "select count(*) from ( select  u.user_name, u.phone,u.ship_name, u.ship_no, u.create_time from t_user u left join t_order o on u.id=o.user_id left join t_user_bank b on u.id=b.user_id where 1=1 "
-		+ whereParam.toString() +" group by 1,2,3,4,5 ) a";
+		String totalSql = "select count(*) from t_user u where 1=1 "
+		+ whereParam.toString() +" ";
 		Query q1 = em.createNativeQuery(totalSql);
 		int total = Integer.valueOf(q1.getSingleResult()+"");
 		for(Object[] o : infoList){
@@ -166,6 +174,7 @@ public class MuserService {
 			ob.setCreatetime(o[4]+"");
 			ob.setFee(o[5]==null?null:Double.valueOf(o[5]+""));
 			ob.setRechargeamount(o[6]==null?null:Double.valueOf(o[6]+""));
+			ob.setLeft(o[7]==null?null:Double.valueOf(o[7]+""));
 			result.add(ob);
 		}
 		dg.setTotal(total);
