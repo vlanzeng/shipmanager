@@ -1,5 +1,6 @@
 package org.springside.examples.quickstart.domain;
 
-public class InfoBean {
+public class UserParam extends BaseParam {
 
+	
 }

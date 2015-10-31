@@ -6,6 +6,8 @@ public class ChargeLogBean {
 	private String amount;
 	private Integer status;
 	private String createTime;
+	private String username;
+	private String shipname;
 	public Long getId() {
 		return id;
 	}
@@ -35,5 +37,17 @@ public class ChargeLogBean {
 	}
 	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getShipname() {
+		return shipname;
+	}
+	public void setShipname(String shipname) {
+		this.shipname = shipname;
 	}
 }

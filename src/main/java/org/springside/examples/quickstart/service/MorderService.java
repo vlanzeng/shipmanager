@@ -1,6 +1,7 @@
 package org.springside.examples.quickstart.service;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.apache.commons.lang3.time.DateUtils;
 import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springside.examples.quickstart.domain.BaseParam;
@@ -22,6 +24,7 @@ import org.springside.examples.quickstart.domain.DataGrid;
 import org.springside.examples.quickstart.domain.OrderBean;
 import org.springside.examples.quickstart.domain.OrderParam;
 import org.springside.examples.quickstart.domain.PushOsBean;
+import org.springside.examples.quickstart.domain.RechargeParam;
 import org.springside.examples.quickstart.domain.ResultList;
 import org.springside.examples.quickstart.domain.UserOrderBean;
 import org.springside.examples.quickstart.entity.AjaxResult;
@@ -38,7 +41,7 @@ import org.springside.examples.quickstart.utils.CommonUtils;
 import org.springside.examples.quickstart.utils.JPushUtil;
 
 @Component
-@Transactional
+@EnableTransactionManagement
 public class MorderService {
 	@Autowired
 	private MorderDao morderDao;
@@ -205,7 +208,7 @@ public class MorderService {
 		}
 		
 		String sql = "select o.id,o.order_no,o.product_name,o.price,o.num,o.status,o.money,"
-				+ "u.user_name,s.name,o.update_time,o.create_time,o.book_time, o.book_addr,o.consume_code "
+				+ "u.user_name,s.name,o.update_time,o.create_time,o.book_time, o.book_addr,o.consume_code ,s.id osid ,o.product_id ,u.phone "
 				+ "from t_order o left join t_user u on o.user_id=u.id left join t_oil_station s on o.os_id=s.id left join t_city c on s.city_id=c.id where o.type in (1,3,4) "+whereParam.toString()+" "
 				+ "order by o.create_time desc limit "+start+","+param.getRows()+"";
 		Query q = em.createNativeQuery(sql);
@@ -229,11 +232,17 @@ public class MorderService {
 			ob.setUserName(o[7]==null ? "" :o[7] + "");
 			ob.setOsName(o[8]==null ? "" :o[8] + "");
 			ob.setUpdateTime(o[9]== null ?  "" : o[9]+"");
-			ob.setCreateTime(o[10]==null ? "" :o[10] + "");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String s10 = o[10]+"";
+			String s11 = o[11]+"";
+				ob.setCreateTime(o[10]==null ? "" : s10.substring(0,s10.lastIndexOf(".")) );
+				ob.setBookTime(o[11]==null ? "" :  s11.substring(0,s11.lastIndexOf(".")));
 			
-			ob.setBookTime(o[11]==null ? "" :o[11] + "");
 			ob.setBookAddr(o[12]==null ? "" :o[12] + "");
 			ob.setCode(o[13]==null ? "" :o[13] + "");
+			ob.setOsId(o[14]==null ? -1L : Long.valueOf( o[14].toString()  ));
+			ob.setProductId(o[15]==null ? "" :o[15] + "");
+			ob.setPhone(o[16]==null ? "" :o[16] + "");
 			result.add(ob);
 		}
 		dg.setTotal(total);
@@ -360,25 +369,38 @@ public class MorderService {
 		return 1;
 	}
 
+	@Transactional
 	public int recharge(String phone, String amount) {
+		//根据手机号查询ID
+		Long userId =-1L;
+		try{
+		userId= morderDao.queryUserIdForPhone(phone);
+		}catch(Exception e){
+			return -1;
+		}
+		if(userId <= 0){
+			//throw new RuntimeException("充值失败:手机号不存在");
+			return -1;
+		}
+		int rr= -1;
+		try{
+			rr = morderDao.queryUserBankCount(userId);
+			if(rr <=0){
+				rr = morderDao.insertUserBank(userId, 0);
+				if(rr <= 0){
+					return -2;
+				}
+			}
+		}catch(Exception e){
+			return -2;
+		}
 		//更新用户月
 		//插入充值记录表
 		int r = morderDao.insertLog(phone,amount);
-		if(r > 0){
-			//根据手机号查询ID
-				Long userId = morderDao.queryUserIdForPhone(phone);
-				if(userId <= 0){
-					throw new RuntimeException("充值失败");
-				}
-				int rr = morderDao.updateRecharge(userId, amount);
-				if(rr <= 0){
-					throw new RuntimeException("充值失败");
-				}
-		}
 		return r;
 	}
 	
-	public DataGrid<ChargeLogBean> getRechargeList(BaseParam param){
+	public DataGrid<ChargeLogBean> getRechargeList(RechargeParam param){
 		DataGrid<ChargeLogBean> dg = new DataGrid<ChargeLogBean>();
 		StringBuffer whereParam = new StringBuffer();
 		int start = (param.getPage() - 1) * param.getRows();
@@ -388,13 +410,26 @@ public class MorderService {
 		}
 		
 		if(!StringUtils.isEmpty(param.startTime)){
-			whereParam.append(" and o.create_time >='"+param.startTime+"'");
+			whereParam.append(" and r.create_time >='"+param.startTime+"'");
 		}
 		
 		if(!StringUtils.isEmpty(param.getEndTime())){
-			whereParam.append(" and o.create_time<'"+param.getEndTime()+"'");
+			whereParam.append(" and r.create_time<'"+param.getEndTime()+"'");
 		}
-		String sql = "SELECT r.id,r.phone,r.`status`,r.amount,r.create_time from t_recharge_log r where 1=1 " + 
+		
+		if(!StringUtils.isEmpty(param.getCname())){
+			whereParam.append(" and exists (select * from t_user c where r.phone=c.phone and c.ship_name like '%"+param.getCname()+"%')");
+		}
+		
+		if(param.getAmountStart() != null){
+			whereParam.append(" and r.amount>="+param.getAmountStart());
+		}
+		
+		if(param.getAmountEnd() != null){
+			whereParam.append(" and r.amount <= "+param.getAmountEnd());
+		}
+		
+		String sql = "SELECT r.id,r.phone,r.status,r.amount,r.create_time, b.user_name,b.ship_name from t_recharge_log r, t_user b where 1=1 and r.phone=b.phone " + 
 		              whereParam.toString() + " " + "order by r.create_time desc limit "+start+","+param.getRows()+"";
 		Query q = em.createNativeQuery(sql);
 		List<Object[]> infoList = q.getResultList();
@@ -411,6 +446,8 @@ public class MorderService {
 			ob.setStatus(Integer.valueOf(o[2]+""));
 			ob.setAmount(o[3]==null ? "" :o[3] + "");
 			ob.setCreateTime(o[4]==null ? "" :o[4] + "");
+			ob.setUsername(o[5]==null?"":o[5]+"");
+			ob.setShipname(o[6]==null?"":o[6]+"");
 			result.add(ob);
 		}
 		dg.setTotal(total);
@@ -449,7 +486,7 @@ public class MorderService {
 		o.setNum(order.getNum());
 		Double money =  new BigDecimal(order.getPrice()).multiply(new BigDecimal(order.getNum())).doubleValue();
 		o.setMoney( money);
-		o.setOrderNo(CommonUtils.getMerchantOrderNo("22"));
+		o.setOrderNo("H"+System.currentTimeMillis());
 		o.setOsId(accountService.getUser(u.getId()).getOsId());
 		o.setProductId(order.getProId());
 		o.setProductName(order.getProName());
@@ -510,6 +547,7 @@ public class MorderService {
 		o.setOsId(order.getStationId());
 		o.setProductId(order.getProId());
 		o.setProductName(order.getProName());
+		o.setId(order.getId());
 		o.setStatus(11);
 		o.setType(3); //  预约单
 		o.setUserId(user.get(0).getId());
@@ -543,5 +581,60 @@ public class MorderService {
 	public  Order findOne(Long id){
 		return morderDao.findOne(id);
 	}
+	public DataGrid<ChargeLogBean> getRechargeSumList(RechargeParam param){
+		DataGrid<ChargeLogBean> dg = new DataGrid<ChargeLogBean>();
+		StringBuffer whereParam = new StringBuffer();
+		int start = (param.getPage() - 1) * param.getRows();
+		
+		if(!StringUtils.isEmpty(param.phone)){
+			whereParam.append(" and r.phone ='"+param.phone+"'");
+		}
+		
+		if(!StringUtils.isEmpty(param.startTime)){
+			whereParam.append(" and r.create_time >='"+param.startTime+"'");
+		}
+		
+		if(!StringUtils.isEmpty(param.getEndTime())){
+			whereParam.append(" and r.create_time<'"+param.getEndTime()+"'");
+		}
+		
+		if(!StringUtils.isEmpty(param.getCname())){
+			whereParam.append(" and exists (select * from t_user c where r.phone=c.phone and c.ship_name like '%"+param.getCname()+"%')");
+		}
+		
+		if(param.getAmountStart() != null){
+			whereParam.append(" and r.amount>="+param.getAmountStart());
+		}
+		
+		if(param.getAmountEnd() != null){
+			whereParam.append(" and r.amount <= "+param.getAmountEnd());
+		}
+		
+		String sql = "SELECT r.phone,sum(r.amount), b.user_name,b.ship_name from t_recharge_log r, t_user b where 1=1 and r.phone=b.phone " + 
+		              whereParam.toString() + " " + "group by 1,3,4 order by r.create_time desc limit "+start+","+param.getRows()+"";
+		Query q = em.createNativeQuery(sql);
+		List<Object[]> infoList = q.getResultList();
+		List<ChargeLogBean> result = new ArrayList<ChargeLogBean>();
+		
+		String totalSql = "select count(1) from t_recharge_log r where 1=1 " + whereParam.toString();
+		Query q1 = em.createNativeQuery(totalSql);
+		
+		int total = Integer.valueOf(q1.getSingleResult()+"");
+		for(Object[] o : infoList){
+			ChargeLogBean ob = new ChargeLogBean();
+			//ob.setId(Long.valueOf(o[0]+""));
+			ob.setPhone(o[0]+"");
+			//ob.setStatus(Integer.valueOf(o[2]+""));
+			ob.setAmount(o[1]==null ? "" :o[1] + "");
+			//ob.setCreateTime(o[4]==null ? "" :o[4] + "");
+			ob.setUsername(o[2]==null?"":o[2]+"");
+			ob.setShipname(o[3]==null?"":o[3]+"");
+			result.add(ob);
+		}
+		dg.setTotal(total);
+		dg.setRows(result);
+		return dg;
+	}
 	
 }
+

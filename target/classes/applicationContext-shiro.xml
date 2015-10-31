@@ -27,9 +27,10 @@
 				/logout = logout
 				/static/** = anon
 				/api/** = anon
+				 /favicon.ico = anon
 				/register/** = anon
 				/admin/** = roles[admin]
-				/** = user
+				/** = authc 
 			</value>
 		</property>
 	</bean>

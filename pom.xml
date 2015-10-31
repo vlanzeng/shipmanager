@@ -60,12 +60,33 @@
 
 	<!-- 依赖项定义 -->
 	<dependencies>
+	
+	
+		<dependency>
+    <groupId>cn.jpush.api</groupId>
+    <artifactId>jpush-client</artifactId>
+    <version>3.2.7</version>
+</dependency>
+
+ <dependency>
+             <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.11</version>
+         </dependency>
+	
 		<!-- SPRINGSIDE -->
 		<dependency>
 			<groupId>io.springside</groupId>
 			<artifactId>springside-core</artifactId>
 			<version>${springside.version}</version>
 		</dependency>
+		
+			<dependency>
+			<groupId>io.springside</groupId>
+			<artifactId>springside-utils</artifactId>
+			<version>${springside.version}</version>
+		</dependency>
+		
 
 		<!-- PERSISTENCE begin -->
 		<!-- hibernate -->

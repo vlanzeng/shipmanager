@@ -153,11 +153,12 @@
 		var price = $("#order_price").val();
 		var num = $("#order_num").val();
 		var proName = $("#order_product_name").find("option:selected").text();
+		var id = $("#order_user_id").val();
 		$.ajax({
 		    type:'POST',
 		    url: "${ctx}/m/order/addBookOrder",
 		    cache:false,  
-		    data: {'phone':phone,'proId':proId,"price":price,"num":num,"proName":proName,"bookTime":bookTime,"stationId":station} ,
+		    data: {'phone':phone,'proId':proId,"price":price,"num":num,"proName":proName,"bookTime":bookTime,"stationId":station,"id":id} ,
 		    dataType: 'json',
 		    success: function(data){
 		    	if(data.status == 200){
@@ -207,7 +208,8 @@
     			var status = rowData.status;
     			var productName = rowData.productName;
     			var str = "";
-    			str += '<a href="#" onclick="showRestartDialog(\''+id+'\','+rowData.statusId+')">销码</a>';
+    			str += '<a href="#" onclick="showRestartDialog(\''+id+'\','+rowData.statusId+')">销码</a>|';
+    			str += '<a href="#" onclick="setBookOrderDataDialog(\''+rowData+'\')">设置</a>';
     			return str;
     			}
     		}} 
@@ -215,20 +217,39 @@
     	});
     });   
     
-    function delOrder(id){
-    	$.ajax({
-    	     type: 'POST',
-    	     url: '${ctx}/m/order/delOrder', 
-    	    data: {"id":id} ,
-    	    success: function(result){
-				   if(result.status==200){
-					   query();
-				   }else{
-					   alert("系统错误");
-				   }
-    	    }
-    	});
-    }
+    function setBookOrderDataDialog(){
+    	var row = $('#dg').datagrid('getSelected');
+    	if (row){
+    	    $("#order_user_phone").val(row.phone);
+    		$("#order_product_name").val(row.productId);
+    		$("#order_book_time").val(row.bookTime);
+    		 $("#order_station").val(row.osId);
+    		 $("#order_price").val(row.price);
+    		$("#order_num").val(row.num);
+    		$("#order_user_id").val(row.id);
+    			addUserOrderDialog();
+    	}
+    	
+
+
+	}
+
+	function delOrder(id) {
+		$.ajax({
+			type : 'POST',
+			url : '${ctx}/m/order/delOrder',
+			data : {
+				"id" : id
+			},
+			success : function(result) {
+				if (result.status == 200) {
+					query();
+				} else {
+					alert("系统错误");
+				}
+			}
+		});
+	}
 </script>
 </head>
 
@@ -336,6 +357,7 @@
 		<div id="addUserOrderDialog" class="easyui-dialog" title="添加用户订单" style="width: 400px; height: 320px;" >
 		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
 			<div class="data-tips-info">
+				<input type="hidden" value=""  id="order_user_id" />
 				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
 					<tr>
 						<td style="text-align: center ;">用户电话:</td>

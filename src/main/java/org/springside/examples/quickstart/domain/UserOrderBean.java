@@ -2,6 +2,7 @@ package org.springside.examples.quickstart.domain;
 
 public class UserOrderBean {
 	private String  phone ;
+	private Long id;
 	private Long proId;
 	private Long couponId ;
 	private String price ;
@@ -12,6 +13,12 @@ public class UserOrderBean {
 	
 	private String proName;
 	
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
 	public String getBookTime() {
 		return bookTime;
 	}
