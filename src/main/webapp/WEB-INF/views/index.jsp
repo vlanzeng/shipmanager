@@ -352,25 +352,19 @@ a:active {
 				    <shiro:hasAnyRoles name="jyzAdmin,jyzjygqx,admin,user,jygly">
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">订单查询</a></p>
 					</shiro:hasAnyRoles>
-<<<<<<< HEAD
-=======
 					<shiro:hasAnyRoles name="admin,jyzAdmin,jyzjygqx">
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">生成客户订单</a></p>
 					</shiro:hasAnyRoles> 
->>>>>>> branch 'master' of https://github.com/zhaohfup/shipmanager.git
 				</div>
 			</shiro:hasAnyRoles> 
 				<div title="财务明细">
-<<<<<<< HEAD
 				    <shiro:hasAnyRoles name="jyzAdmin,jyzcwqx,admin">
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/income/index" class="cs-navi-tab">加油收入</a></p>
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/purchase/index" class="cs-navi-tab">进油支出</a></p>
-						<%-- <p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请</a></p> --%>
-				
-					<shiro:hasAnyRoles name="jyzAdmin,jyzcwqx">
-					<%-- 	<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">明细查询</a></p> --%>
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/cash/index" class="cs-navi-tab">提现申请列表</a></p>
-=======
+						<%-- <p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请</a></p> --%>
+					</shiro:hasAnyRoles>
+					<%-- 	<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">明细查询</a></p> --%>
 				    <shiro:hasAnyRoles name="admin,jyzAdmin,jyzcwqx">
 						<p><a href="javascript:void(0);" src="${ctx}/m/finance/index" class="cs-navi-tab">加油收入</a></p>
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">进油支出</a></p>
@@ -379,15 +373,9 @@ a:active {
 					<shiro:hasAnyRoles name="admin,cwgly">
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">明细查询</a></p>
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请列表</a></p>
->>>>>>> branch 'master' of https://github.com/zhaohfup/shipmanager.git
 					</shiro:hasAnyRoles>
 				</div>
-			</shiro:hasAnyRoles>
-<<<<<<< HEAD
-			<shiro:hasAnyRoles name="admin">
-=======
 			<shiro:hasAnyRoles name="admin,jyzAdmin,jyzjygqx,jygly">
->>>>>>> branch 'master' of https://github.com/zhaohfup/shipmanager.git
 				<div title="预约销码">
 					<p><a href="javascript:void(0);" src="${ctx}/m/order/check/index" class="cs-navi-tab">订单管理</a></p>
 				</div>
@@ -399,11 +387,7 @@ a:active {
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/purchase/index" class="cs-navi-tab">订单管理</a>
 				</div>
 			</shiro:hasAnyRoles>
-<<<<<<< HEAD
-			<shiro:hasAnyRoles name="jyzAdmin">
-=======
 			<shiro:hasAnyRoles name="admin,user">
->>>>>>> branch 'master' of https://github.com/zhaohfup/shipmanager.git
 				<div title="优惠券管理">
 					<p><a href="javascript:void(0);" src="${ctx}/m/coupon/index" class="cs-navi-tab">优惠券管理</a></p>
 					<p><a href="javascript:void(0);" src="${ctx}/m/coupon/uIndex" class="cs-navi-tab">优惠券发放记录</a></p>
