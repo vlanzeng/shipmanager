@@ -364,16 +364,6 @@ a:active {
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/cash/index" class="cs-navi-tab">提现申请列表</a></p>
 						<%-- <p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请</a></p> --%>
 					</shiro:hasAnyRoles>
-					<%-- 	<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">明细查询</a></p> --%>
-				    <shiro:hasAnyRoles name="admin,jyzAdmin,jyzcwqx">
-						<p><a href="javascript:void(0);" src="${ctx}/m/finance/index" class="cs-navi-tab">加油收入</a></p>
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">进油支出</a></p>
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请</a></p>
-					</shiro:hasAnyRoles>
-					<shiro:hasAnyRoles name="admin,cwgly">
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">明细查询</a></p>
-						<p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请列表</a></p>
-					</shiro:hasAnyRoles>
 				</div>
 			<shiro:hasAnyRoles name="admin,jyzAdmin,jyzjygqx,jygly">
 				<div title="预约销码">
