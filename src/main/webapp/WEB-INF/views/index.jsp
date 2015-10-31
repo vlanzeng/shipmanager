@@ -352,9 +352,9 @@ a:active {
 				    <shiro:hasAnyRoles name="jyzAdmin,jyzjygqx,admin,user,jygly">
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">订单查询</a></p>
 					</shiro:hasAnyRoles>
-					<shiro:hasAnyRoles name="admin,jyzAdmin,jyzjygqx">
+			<%-- 		<shiro:hasAnyRoles name="admin,jyzAdmin,jyzjygqx">
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">生成客户订单</a></p>
-					</shiro:hasAnyRoles> 
+					</shiro:hasAnyRoles>  --%>
 				</div>
 			</shiro:hasAnyRoles> 
 				<div title="财务明细">
