@@ -355,20 +355,19 @@ a:active {
 					<shiro:hasAnyRoles name="admin,jyzAdmin,jyzjygqx">
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">生成客户订单</a></p>
 					</shiro:hasAnyRoles> 
+			<%-- 		<shiro:hasAnyRoles name="admin,jyzAdmin,jyzjygqx">
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">生成客户订单</a></p>
+					</shiro:hasAnyRoles>  --%>
 				</div>
 			</shiro:hasAnyRoles> 
 			
 			<shiro:hasAnyRoles name="jyzAdmin,jyzcwqx,admin">
 				<div title="财务明细">
-
 				    <shiro:hasAnyRoles name="jyzAdmin,jyzcwqx,admin">
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/income/index" class="cs-navi-tab">加油收入</a></p>
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/purchase/index" class="cs-navi-tab">进油支出</a></p>
-						<%-- <p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请</a></p> --%>
-					</shiro:hasAnyRoles>
-					<shiro:hasAnyRoles name="admin,jyzAdmin,jyzcwqx">
-					<%-- 	<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">明细查询</a></p> --%>
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/cash/index" class="cs-navi-tab">提现申请列表</a></p>
+						<%-- <p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请</a></p> --%>
 					</shiro:hasAnyRoles>
 <%-- 				    <shiro:hasAnyRoles name="admin,jyzAdmin,jyzcwqx"> --%>
 <%-- 						<p><a href="javascript:void(0);" src="${ctx}/m/finance/index" class="cs-navi-tab">加油收入</a></p> --%>
@@ -395,8 +394,6 @@ a:active {
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/purchase/index" class="cs-navi-tab">订单管理</a>
 				</div>
 			</shiro:hasAnyRoles>
-			
-<%-- 			<shiro:hasAnyRoles name="jyzAdmin"> --%>
 			<shiro:hasAnyRoles name="admin,user">
 				<div title="优惠券管理">
 					<p><a href="javascript:void(0);" src="${ctx}/m/coupon/index" class="cs-navi-tab">优惠券管理</a></p>
