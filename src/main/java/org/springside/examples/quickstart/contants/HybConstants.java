@@ -44,8 +44,8 @@ public interface HybConstants {
 	static final String JYZCWQX = "jyzcwqx";
 	static final String JYZJYGQX = "jyzjygqx";
 	
-	//static final String FW_ADDRESS = "43.254.55.158";
-	static final String FW_ADDRESS = "127.0.0.1:8080";
+	static final String FW_ADDRESS = "43.254.55.158:8080";
+	//static final String FW_ADDRESS = "127.0.0.1:8080";
 	
 	static final String JPUSH_MASTERSECRET = "94b0506b0bcfcd06d33b6198";
 	static final String JPUSH_APPKEY = "748df3f198144ba82d948e01";

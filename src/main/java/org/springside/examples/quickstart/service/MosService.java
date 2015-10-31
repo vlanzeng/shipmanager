@@ -27,6 +27,7 @@ import org.springside.examples.quickstart.entity.User;
 import org.springside.examples.quickstart.repository.MUserDao;
 import org.springside.examples.quickstart.repository.MosDao;
 import org.springside.examples.quickstart.repository.UserDao;
+import org.springside.examples.quickstart.utils.RoleUtil;
 
 @Component
 @Transactional
@@ -65,15 +66,22 @@ public class MosService {
 		
 		//获取登录用户角色
 		User user = userDao.findByLoginName(login_name, 1);
-		if(user==null || StringUtils.isEmpty(user.getRoles()) || (!HybConstants.ADMIN.equalsIgnoreCase(user.getRoles()) 
-				&& !HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles()))){
+//		if(user==null || StringUtils.isEmpty(user.getRoles()) || (!HybConstants.ADMIN.equalsIgnoreCase(user.getRoles()) 
+//				&& !HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles()))){
+//			return dg;
+//		}
+		if( user==null || StringUtils.isEmpty(user.getRoles()) || ( !RoleUtil.isRole(user.getRoles(), HybConstants.ADMIN)
+				&&  !RoleUtil.isRole(user.getRoles(), HybConstants.JYZADMIN) )  ){
 			return dg;
+			
 		}
 		
 		int start = (param.getPage() - 1) * param.getRows();
 		
 		//jyzadmin只操作自己加油站的用户
-		if(HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles())){
+		boolean rb = !RoleUtil.isRole(user.getRoles(), HybConstants.ADMIN);
+		rb = rb && RoleUtil.isRole(user.getRoles(), HybConstants.JYZADMIN);
+		if(rb){
 			whereParam.append(" and o.id="+user.getOsId());
 		}
 		

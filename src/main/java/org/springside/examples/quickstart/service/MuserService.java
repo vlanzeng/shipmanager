@@ -22,6 +22,7 @@ import org.springside.examples.quickstart.entity.Muser;
 import org.springside.examples.quickstart.repository.AppUserDao;
 import org.springside.examples.quickstart.repository.MUserDao;
 import org.springside.examples.quickstart.repository.UserDao;
+import org.springside.examples.quickstart.utils.RoleUtil;
 import org.springside.modules.security.utils.Digests;
 import org.springside.modules.utils.Encodes;
 //github.com/zhaohfup/shipmanager.git
@@ -60,13 +61,14 @@ public class MuserService {
 		StringBuffer whereParam = new StringBuffer();
 		//获取登录用户角色
 		User user = userDao.findByLoginName(loginName, 1);
-		if(StringUtils.isEmpty(user.getRoles()) || (!HybConstants.ADMIN.equalsIgnoreCase(user.getRoles()) 
-				&& !HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles()))){
+		if(StringUtils.isEmpty(user.getRoles()) || ( !RoleUtil.isRole(user.getRoles(), HybConstants.ADMIN)
+				&&  !RoleUtil.isRole(user.getRoles(), HybConstants.JYZADMIN) )  ){
 			return dg;
+			
 		}
 		
 		//jyzadmin只操作自己加油站的用户
-		if(HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles())){
+		if( !RoleUtil.isRole(user.getRoles(), HybConstants.ADMIN) && RoleUtil.isRole(user.getRoles(), HybConstants.JYZADMIN)){
 			whereParam.append(" and u.os_id="+user.getOsId());
 		}
 		
@@ -91,7 +93,7 @@ public class MuserService {
 			whereParam.append(" and u.register_date<'"+param.getEndTime()+"'");
 		}
 		
-		if(HybConstants.JYZADMIN.equalsIgnoreCase(user.getRoles())){
+		if( !RoleUtil.isRole(user.getRoles(), HybConstants.ADMIN) && RoleUtil.isRole(user.getRoles(), HybConstants.JYZADMIN)){
 			whereParam.append(" and u.roles in ('jyzAdmin','jyzcwqx','jyzjygqx') and u.os_id="+user.getOsId());
 		}
 		
