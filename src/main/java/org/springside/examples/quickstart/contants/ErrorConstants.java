@@ -50,6 +50,8 @@ public class ErrorConstants {
 			return "用户已存在";
 		}else if(MUSER_PHONEALREADY_EXISTS_ERROR.equalsIgnoreCase(code)){
 			return "该手机已注册";
+		}else if(MUSER_PHONEALREADY_EXISTS_ERROR.equalsIgnoreCase(code)){
+			return "该手机已注册";
 		}
 		return "";
 	}

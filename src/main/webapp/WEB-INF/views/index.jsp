@@ -343,18 +343,25 @@ a:active {
 		</div>
 		</div>
 	</div>
-	//admin-系统管理员      cwgly-财务管理员     kfqx客服权限  jygly进油管理员
+	//admin-系统管理员      cwgly-财务管理员     user客服权限  jygly进油管理员
 	//jyzAdmin-系统管理员     jyzcwqx-加油站财务权限     jyzjygqx加油工权限
 	<div region="west" border="true" split="true" title="" class="cs-west">
 	    <div class="easyui-accordion" fit="true" border="false">
-			<shiro:hasAnyRoles name="jyzAdmin,jyzjygqx,admin,kfqx">	    
+			<shiro:hasAnyRoles name="jyzAdmin,jyzjygqx,admin,user,jygly">	    
 				<div title="订单管理">
-				    <shiro:hasAnyRoles name="jyzAdmin,jyzjygqx,admin,kfqx">
+				    <shiro:hasAnyRoles name="jyzAdmin,jyzjygqx,admin,user,jygly">
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">订单查询</a></p>
 					</shiro:hasAnyRoles>
+<<<<<<< HEAD
+=======
+					<shiro:hasAnyRoles name="admin,jyzAdmin,jyzjygqx">
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">生成客户订单</a></p>
+					</shiro:hasAnyRoles> 
+>>>>>>> branch 'master' of https://github.com/zhaohfup/shipmanager.git
 				</div>
 			</shiro:hasAnyRoles> 
 				<div title="财务明细">
+<<<<<<< HEAD
 				    <shiro:hasAnyRoles name="jyzAdmin,jyzcwqx,admin">
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/income/index" class="cs-navi-tab">加油收入</a></p>
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/purchase/index" class="cs-navi-tab">进油支出</a></p>
@@ -363,28 +370,46 @@ a:active {
 					<shiro:hasAnyRoles name="jyzAdmin,jyzcwqx">
 					<%-- 	<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">明细查询</a></p> --%>
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/cash/index" class="cs-navi-tab">提现申请列表</a></p>
+=======
+				    <shiro:hasAnyRoles name="admin,jyzAdmin,jyzcwqx">
+						<p><a href="javascript:void(0);" src="${ctx}/m/finance/index" class="cs-navi-tab">加油收入</a></p>
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">进油支出</a></p>
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请</a></p>
+					</shiro:hasAnyRoles>
+					<shiro:hasAnyRoles name="admin,cwgly">
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/index" class="cs-navi-tab">明细查询</a></p>
+						<p><a href="javascript:void(0);" src="${ctx}/m/order/mIndex" class="cs-navi-tab">提现申请列表</a></p>
+>>>>>>> branch 'master' of https://github.com/zhaohfup/shipmanager.git
 					</shiro:hasAnyRoles>
 				</div>
 			</shiro:hasAnyRoles>
+<<<<<<< HEAD
 			<shiro:hasAnyRoles name="admin">
+=======
+			<shiro:hasAnyRoles name="admin,jyzAdmin,jyzjygqx,jygly">
+>>>>>>> branch 'master' of https://github.com/zhaohfup/shipmanager.git
 				<div title="预约销码">
 					<p><a href="javascript:void(0);" src="${ctx}/m/order/check/index" class="cs-navi-tab">订单管理</a></p>
 				</div>
 			</shiro:hasAnyRoles>
-			<shiro:hasAnyRoles name="jyzAdmin,jyzjygqx">
+			<shiro:hasAnyRoles name="admin,jyzAdmin,jyzjygqx">
 				<div title="油库进油">
 				<%-- 	<p><a href="javascript:void(0);" src="${ctx}/m/os/jyzOIndex" class="cs-navi-tab">加油站订单查询</a></p>
 					<p><a href="javascript:void(0);" src="${ctx}/m/os/adminOIndex" class="cs-navi-tab">admin订单查询</a></p> --%>
 						<p><a href="javascript:void(0);" src="${ctx}/m/order/purchase/index" class="cs-navi-tab">订单管理</a>
 				</div>
 			</shiro:hasAnyRoles>
+<<<<<<< HEAD
 			<shiro:hasAnyRoles name="jyzAdmin">
+=======
+			<shiro:hasAnyRoles name="admin,user">
+>>>>>>> branch 'master' of https://github.com/zhaohfup/shipmanager.git
 				<div title="优惠券管理">
 					<p><a href="javascript:void(0);" src="${ctx}/m/coupon/index" class="cs-navi-tab">优惠券管理</a></p>
 					<p><a href="javascript:void(0);" src="${ctx}/m/coupon/uIndex" class="cs-navi-tab">优惠券发放记录</a></p>
 				</div>
 			</shiro:hasAnyRoles>
-			<shiro:hasAnyRoles name="admin,kfqx">
+			<shiro:hasAnyRoles name="admin,user">
 				<div title="资讯管理">
 					<p><a href="javascript:void(0);" src="${ctx}/m/info/goods" class="cs-navi-tab">大宗商品</a>
 					</p>
@@ -402,7 +427,7 @@ a:active {
 					<p><a href="javascript:void(0);" src="${ctx}/admin/user/list" class="cs-navi-tab">用户列表</a></p>
 				</div>
 			</shiro:hasAnyRoles>
-			<shiro:hasAnyRoles name="admin,cwgly">
+			<shiro:hasAnyRoles name="admin">
 				<div title="充值管理">
 					<p><a href="javascript:void(0);" src="${ctx}/m/order/rIndex" class="cs-navi-tab">充值管理</a></p>
 				</div>
@@ -412,10 +437,14 @@ a:active {
 					<p><a href="javascript:void(0);" src="${ctx}/m/os/index" class="cs-navi-tab">加油站列表</a></p>
 				</div>
 			</shiro:hasAnyRoles>
-			<shiro:hasAnyRoles name="admin,jyzAdmin">
+			<shiro:hasAnyRoles name="admin,jyzAdmin,user">
 				<div title="系统管理">
+					<shiro:hasAnyRoles name="admin,jyzAdmin">
 				    <p><a href="javascript:void(0);" src="${ctx}/m/muser/index" class="cs-navi-tab">后台用户管理</a></p>
+				    </shiro:hasAnyRoles>
+				    <shiro:hasAnyRoles name="admin,user">
 				    <p><a href="javascript:void(0);" src="${ctx}/m/muser/nindex" class="cs-navi-tab">普通用户管理</a></p>
+				    </shiro:hasAnyRoles>
 				</div>
 			</shiro:hasAnyRoles>
 		</div>

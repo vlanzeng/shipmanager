@@ -76,6 +76,7 @@ public class MosController extends BaseController implements HybConstants{
 	@ResponseBody
 	public String query(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException{
+		ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();	
 		Integer[] pageInfo = getPageInfo(request);
 		OsParam param = new OsParam();
 		param.setPage(pageInfo[0]);
@@ -85,7 +86,7 @@ public class MosController extends BaseController implements HybConstants{
 		param.setStatus(Integer.valueOf(request.getParameter("status")));
 		param.setStartTime(request.getParameter("startTime"));
 		param.setEndTime(request.getParameter("endTime"));
-		DataGrid<OilStationBean> gb = mosService.getOsList(param);
+		DataGrid<OilStationBean> gb = mosService.getOsList(user.loginName, param);
 		return CommonUtils.printObjStr2(gb);
 	}
 	
@@ -96,7 +97,7 @@ public class MosController extends BaseController implements HybConstants{
 	 * @throws ServletException
 	 */
 	@RequestMapping(value="add", method=RequestMethod.POST)
-	@ResponseBody
+	//@ResponseBody
 	public String rAdd(@RequestParam(required=false) MultipartFile file,HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException{
 		OsParam param = new OsParam();
@@ -116,7 +117,7 @@ public class MosController extends BaseController implements HybConstants{
 			int res = mosService.updatePicUrl(file, param, request);
 			if(res > 0){
 				//return CommonUtils.printObjStr(res);
-				return simpleResultPage("成功");
+				return "redirect:/m/os/index";
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

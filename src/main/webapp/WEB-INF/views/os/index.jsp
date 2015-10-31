@@ -17,6 +17,15 @@
 <script type="text/javascript" src="${ctx}/static/jquery/jquery.uploadify.js"></script>
 <script type="text/javascript">  
 	function submitfile(){
+		var name=$("#add_os_name").val();
+		var addr=$("#add_os_addr").val();
+		var phone=$("#add_os_phone").val();
+		
+		if(name.trim().length==0 || addr.trim().length==0 || phone.trim().length==0){
+			alert('请填写名称、地址和电话');
+			return;
+		}
+		
 		$("#testform").submit();
 	}
 	function fixWidth(percent)  
@@ -171,6 +180,7 @@
 		    	if(data.code == 200){
 		    		$("#showOsDialog").dialog('close');
 		    		alert("删除成功");
+		    		query();
 		    	}else{
 		    		alert(data.msg);  
 		    	}
@@ -324,7 +334,7 @@
 	</div>
 	
 	
-	<div id="restartDialog"  title="添加加油站" style="width: 650px; height: 380px;" >
+	<div id="restartDialog"  title="添加加油站" style="width: 650px; height: 380px; border: 1px; text-align: center; margin:auto;" >
 	<form id="testform" action="${ctx}/m/os/add" enctype="multipart/form-data" method="post">
 			
 				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
@@ -399,7 +409,8 @@
 					</tr>
 				</table>
 <!-- 		<input type="file" name="file" id="testfile">上传我的文件</input> -->
-		<input type="button" onclick="submitfile();">上传</input>
+		<input type="button" onclick="submitfile();" value="确定"></input>
+		<input type="button" onclick="cancel();" value="退出"></input>
 	</form>
 	</div>
 </body>
