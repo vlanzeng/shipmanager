@@ -6,13 +6,15 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springside.examples.quickstart.entity.Coupon;
+import org.springside.examples.quickstart.entity.OilStation;
+import org.springside.examples.quickstart.entity.OilStation_1;
 
 /**
  * 
  * @author lyhc
  * 
  */
-public interface MosDao extends CrudRepository<Coupon, Long> {
+public interface MosDao extends CrudRepository<OilStation_1, Long> {
 	@Modifying
 	@Query(value="select o.id,o.product_name,o.num,o.status,o.order_no,o.book_time,o.book_addr,o.create_time,u.phone,u.user_name,u.ship_name "
 			+ "from t_order o, t_user u where o.user_id=u.id and o.status=11 "
@@ -40,6 +42,10 @@ public interface MosDao extends CrudRepository<Coupon, Long> {
 	@Modifying
 	@Query(value="update t_oil_station set status=?1 where id=?2", nativeQuery=true)
 	int updateOSStatus(Integer status, Long id);
+	
+	@Modifying
+	@Query(value="update t_oil_station set `desc`=?1 where id=?2", nativeQuery=true)
+	int updateOSDesc( String desc, Long id);
 	
 	@Modifying
 	@Query(value="delete from t_oil_station  where id=?1", nativeQuery=true)

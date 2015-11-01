@@ -91,7 +91,9 @@
 	}
 	
 	function showCreatePage(){
-		$("#restartDialog").dialog('open');  
+		//$("#restartDialog").dialog('open');  
+    	$("#pageColumn").hide();
+		$("#restartDialog").show();
 	}
 	
 	function isEmptyStr( str ){
@@ -101,34 +103,39 @@
 	}
 	function create(){
 		var url = $("#a_url").val();
-		var purl = $("#a_purl").val();
+		//var purl = $("#a_purl").val();
 		var type = $("#a_type").val();
 		var title = $('#a_title').val();
 		var os = $("#a_os").combobox('getValue');
 		
-		if(  isEmptyStr( url ) || isEmptyStr(purl) || isEmptyStr(type) || isEmptyStr(title)){
-			alert("请录入链接地址、图片地址、标题和广告类型");
+		if(  isEmptyStr( url ) ||  isEmptyStr(type) || isEmptyStr(title)){
+			alert("请录入链接地址、标题和广告类型");
 			return;
 		}
-		$.ajax({
-		    type:'POST',
-		    url: "${ctx}/advert/add",
-		    cache:false,  
-		    data: {'url':url,'purl':purl,'type':type,'title':title,'os':os} ,
-		    dataType: 'json',
-		    success: function(data){
-		    	if(data.code == 200){
-		    		$("#restartDialog").dialog('close');
-		    		alert("添加成功");
-		    		query();
-		    	}else{
-		    		alert(data.msg);  
-		    	}
-		    },  
-		    error : function() {  
-		    	alert("操作异常，请稍后再试。");  
-		    }  
-		});
+
+    	$("#pageColumn").hide();
+		$("#restartDialog").show();
+		
+		$("#testform").submit();
+// 		$.ajax({
+// 		    type:'POST',
+// 		    url: "${ctx}/advert/add",
+// 		    cache:false,  
+// 		    data: {'url':url,'purl':purl,'type':type,'title':title,'os':os} ,
+// 		    dataType: 'json',
+// 		    success: function(data){
+// 		    	if(data.code == 200){
+// 		    		$("#restartDialog").dialog('close');
+// 		    		alert("添加成功");
+// 		    		query();
+// 		    	}else{
+// 		    		alert(data.msg);  
+// 		    	}
+// 		    },  
+// 		    error : function() {  
+// 		    	alert("操作异常，请稍后再试。");  
+// 		    }  
+// 		});
 	}
 	
 	function updateStatus(id, status){
@@ -151,6 +158,28 @@
 		    }  
 		});
 	}
+	
+	function deleteAdvert(id){
+		$.ajax({
+		    type:'POST',
+		    url: "${ctx}/advert/delete",
+		    cache:false,  
+		    data: { 'id' : id} ,
+		    dataType: 'json',
+		    success: function(data){
+		    	if(data.code == 200){
+		    		//$("#restartDialog").dialog('close');
+		    		alert("删除成功");
+		    		query();
+		    	}else{
+		    		alert(data.msg);  
+		    	}
+		    },  
+		    error : function() {  
+		    	alert("操作异常，请稍后再试。");  
+		    }  
+		});
+	}
 
 	function doQuery( type ){
 		var param = {'page':1,'rows':15};
@@ -158,6 +187,9 @@
 		if( typeof type!='undefined' && type != null && type.trim().length>0){
 			param['type'] = type;
 		}
+    	
+		$("#restartDialog").hide();
+    	$("#pageColumn").show();
 		
 	   	$('#dg').datagrid({ 
     		url:'${ctx}/advert/query', 
@@ -174,8 +206,11 @@
 					return "  <img  src="+value+"  width=80px height=80px />  ";				
     		}},
     		{field:'title',title:'描述',width:fixWidth(0.25),align:'right'},
-    		{field:'type',title:'类型',width:fixWidth(0.15),align:'right'}
-   
+    		{field:'type',title:'类型',width:fixWidth(0.15),align:'right'},
+    		{field:'op',title:'操作',width:fixWidth(0.15),align:'right', formatter:function(value,rowData,rowIndex){
+    			var _id = rowData.id;
+    			return "<a href=\"javascript:deleteAdvert(\'"+_id+"\');\">删除</a>";
+    		}}
     		]] 
     	});
 	}
@@ -193,8 +228,8 @@
 		    		textField:'name'
 		    	});
 
-		    	$("#restartDialog").dialog('close');
-		    	$("#showOsDialog").dialog('close');
+		    	$("#restartDialog").hide();
+		    	$("#pageColumn").show();
 		    },  
 		    error : function() {  
 		    	alert("操作异常，请稍后再试。");  
@@ -227,11 +262,12 @@
 				</table>
 			</div>
 		</div>
-		<div class="pageColumn" style="margin-top: 20px">
+		<div class="pageColumn" id="pageColumn" style="margin-top: 20px">
 		    <table id="dg"></table>
 		</div>
 	</div>
-	<div id="restartDialog" class="easyui-dialog" title="添加广告" style="width: 650px; height: 380px;" >
+	<div id="restartDialog"   title="添加广告" style="width: 650px; height: 380px; text-align:center; margin: auto;" >
+	<form id="testform" action="${ctx}/advert/add" enctype="multipart/form-data" method="post">
 		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
 			<div class="data-tips-info">
 				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
@@ -240,7 +276,7 @@
 						 	链接地址：
 						</td>
 						<td  style="text-align:left;">
-							<input id="a_url"   type="text"/>
+							<input id="a_url" name="url"   type="text"/>
 						</td>
 					</tr>
 					<tr style="height: 30px">
@@ -248,7 +284,7 @@
 							图片地址：
 						</td>
 						<td  style="text-align:left;">
-							<input id="a_purl"   type="text"/>
+							<input id="a_purl"   type="file" name="file"/>
 						</td>
 					</tr>
 					<tr style="height: 30px">
@@ -256,7 +292,7 @@
 							标题：
 						</td>
 						<td  style="text-align:left;">
-							<input id="a_title"  type="text" />
+							<input id="a_title"  name="title" type="text" />
 						</td>
 					</tr>
 					<tr style="height: 30px">
@@ -264,7 +300,7 @@
 							广告类型：
 						</td>
 						<td  style="text-align:left;">
-							<select id="a_type">
+							<select id="a_type" name="type">
 								<option value="" selected="selected">--</option>
 								<option value="1" >加油站</option>
 								<option value="2">新闻网页</option>
@@ -277,7 +313,7 @@
 							加油站：
 						</td>
 						<td  style="text-align:left;">
-							<input id="a_os" type="text" ></input>
+							<input id="a_os" name="os" type="text" ></input>
 						</td>
 					</tr>
 				</table>
@@ -287,9 +323,10 @@
 				</div>				
 			</div> 		
 		</div>
+		</form>
 	</div>
 	
-	<div id="showOsDialog" class="easyui-dialog" title="分配加油站" style="width: 800px; height: 580px;" >
+	<div id="showOsDialog"   title="分配加油站" style="width: 800px; height: 580px;" >
 		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
 			<div class="data-tips-info">
 				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">

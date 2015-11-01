@@ -75,6 +75,9 @@ public interface MorderDao extends CrudRepository<Order, Long> {
 	@Query(value="select count(*) from t_user_bank where user_id=?1", nativeQuery=true)
 	int queryUserBankCount(Long userId);
 	
+	@Query(value="select fund from t_user_bank where user_id=?1", nativeQuery=true)
+	Double queryUserBankYe(Long userId);
+	
 	@Modifying
 	@Query(value="insert into t_user_bank(user_id, fund, update_time) values(?1,?2,now())", nativeQuery=true)
 	int insertUserBank(Long userId, float amount);

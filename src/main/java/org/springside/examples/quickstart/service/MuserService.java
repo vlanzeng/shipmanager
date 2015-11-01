@@ -1,5 +1,6 @@
 package org.springside.examples.quickstart.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -174,9 +175,9 @@ public class MuserService {
 			ob.setShipname(o[2]+"");
 			ob.setShipno(o[3]+"");
 			ob.setCreatetime(o[4]+"");
-			ob.setFee(o[5]==null?null:Double.valueOf(o[5]+""));
-			ob.setRechargeamount(o[6]==null?null:Double.valueOf(o[6]+""));
-			ob.setLeft(o[7]==null?null:Double.valueOf(o[7]+""));
+			ob.setFee(o[5]==null?null: new BigDecimal(Double.valueOf(o[5]+"")).setScale(2	, BigDecimal.ROUND_HALF_UP).doubleValue() );
+			ob.setRechargeamount(o[6]==null?null:new BigDecimal(Double.valueOf(o[6]+"")).setScale(2	, BigDecimal.ROUND_HALF_UP).doubleValue() );
+			ob.setLeft(o[7]==null?null:new BigDecimal(Double.valueOf(o[7]+"")).setScale(2	, BigDecimal.ROUND_HALF_UP).doubleValue() );
 			result.add(ob);
 		}
 		dg.setTotal(total);

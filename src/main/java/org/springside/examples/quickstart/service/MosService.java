@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -19,11 +20,17 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springside.examples.quickstart.contants.HybConstants;
 import org.springside.examples.quickstart.domain.DataGrid;
+import org.springside.examples.quickstart.domain.DerateParam;
 import org.springside.examples.quickstart.domain.OilStationBean;
+import org.springside.examples.quickstart.domain.OsComment;
 import org.springside.examples.quickstart.domain.OsOilBean;
 import org.springside.examples.quickstart.domain.OsOilParam;
 import org.springside.examples.quickstart.domain.OsParam;
+import org.springside.examples.quickstart.entity.Derate;
+import org.springside.examples.quickstart.entity.OilStation;
+import org.springside.examples.quickstart.entity.OilStation_1;
 import org.springside.examples.quickstart.entity.User;
+import org.springside.examples.quickstart.repository.DerateDao;
 import org.springside.examples.quickstart.repository.MUserDao;
 import org.springside.examples.quickstart.repository.MosDao;
 import org.springside.examples.quickstart.repository.UserDao;
@@ -40,6 +47,9 @@ public class MosService {
 	
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private DerateDao derateDao;
 	
 	 @PersistenceContext  
 	 private EntityManager em; 
@@ -58,6 +68,31 @@ public class MosService {
 	public int deleteOS(String osid){
 		Long id = Long.valueOf(osid);
 		return mosDao.deleteOSStatus(id);
+	}
+	
+	public DataGrid<OsComment> getOsCommentList( OsParam param ){
+		DataGrid<OsComment> dg = new DataGrid<OsComment>();
+		int start = (param.getPage() - 1) * param.getRows();
+		
+		String sql = "select o.name, u.user_name, a.content  from t_appraise a left join t_oil_station o on a.os_id=o.id left join t_user u on a.user_id=u.id where a.os_id= " + param.getOsId()
+				+ " limit "+start+","+param.getRows()+"";
+		Query q = em.createNativeQuery(sql);
+		List<Object[]> infoList = q.getResultList();
+		List<OsComment> result = new ArrayList<OsComment>();
+		String totalSql = "select count(1) from t_appraise  where os_id= " + param.getOsId();
+		Query q1 = em.createNativeQuery(totalSql);
+		int total = Integer.valueOf(q1.getSingleResult()+"");
+		
+		for(Object[] o : infoList){
+			OsComment ob = new OsComment();
+			ob.setComment(o[2]+"");
+			ob.setOsName(o[0]+"");
+			ob.setUserName(o[1]+"");
+			result.add(ob);
+		}
+		dg.setTotal(total);
+		dg.setRows(result);
+		return dg;
 	}
 
 	public DataGrid<OilStationBean> getOsList(String login_name, OsParam param) {
@@ -107,7 +142,7 @@ public class MosService {
 		if(!StringUtils.isEmpty(param.getEndTime())){
 			whereParam.append(" and o.create_time<'"+param.getEndTime()+"'");
 		}
-		String sql = "select o.id, o.name,o.address,o.phone,o.`status`,o.pic_url,o.create_time,c.name cname from t_oil_station o, t_city c where o.city_id=c.id " + whereParam.toString()+" "
+		String sql = "select o.id, o.name,o.address,o.phone,o.`status`,o.pic_url,o.create_time,c.name cname, o.latitude, o.longitude, d.info from t_oil_station o left join t_city c on o.city_id=c.id left join t_derate d on o.id=d.os_id where 1=1 " + whereParam.toString()+" "
 				+ "order by o.create_time desc limit "+start+","+param.getRows()+"";
 		Query q = em.createNativeQuery(sql);
 		List<Object[]> infoList = q.getResultList();
@@ -127,6 +162,9 @@ public class MosService {
 			ob.setPicUrl(o[5] + "");
 			ob.setCreateTime(o[6] + "");
 			ob.setCityName(o[7] + "");
+			ob.setLatitude(o[8]+"");
+			ob.setLongitude(o[9]+"");
+			ob.setDerate(o[10]+"");
 			result.add(ob);
 		}
 		dg.setTotal(total);
@@ -134,7 +172,42 @@ public class MosService {
 		return dg;
 	}
 
-	public int updatePicUrl(MultipartFile file,OsParam param, HttpServletRequest request) {
+	private  int insertDeprate( DerateParam dParam ){
+		
+		Long osId = dParam.getOsId();
+		Integer man = dParam.getMan();
+		Integer jian = dParam.getJian();
+		String status = dParam.getStatus();
+		
+		Derate en = new Derate();
+		String info = man+"-"+jian;
+		//SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		//String time = df.format(new Date());
+		Date now = new Date();
+		
+		en.setOsId(osId);
+		en.setCreateTime( now );
+		en.setUpdateTime( now );
+		en.setInfo(info);
+		if(StringUtils.isEmpty(status)){
+			en.setStatus("1");
+		}else{
+			en.setStatus(status);
+		}
+		
+		try{
+			derateDao.save(en);
+		}catch(Exception e){
+			e.printStackTrace();
+			return -1;
+		}
+		
+		return 0;
+	}
+	
+	public int updatePicUrl(MultipartFile file,OsParam param, 
+			DerateParam dParam,
+			HttpServletRequest request) {
 	    String fileName = file.getOriginalFilename();
 	    String extensionName = fileName.substring(fileName.lastIndexOf(".") + 1);
 	    String newFileName = "JYZ_" + String.valueOf(System.currentTimeMillis()) + "." + extensionName;
@@ -145,6 +218,8 @@ public class MosService {
  		if (!fileDir.exists()) {
  			fileDir.mkdirs();
  		}
+ 		
+ 		OilStation_1 osret = null;
  		try {
  			
  			FileOutputStream out = new FileOutputStream(new File(saveFilePath,newFileName));
@@ -154,11 +229,100 @@ public class MosService {
  			out.close();
  			String PICUrl = "http://" + HybConstants.FW_ADDRESS + request.getContextPath() + "/osImage/" + newFileName;
  			//保存信息
- 			int r = mosDao.insertOs(param.osName, param.addr, param.latitude, param.longitude,PICUrl,param.phone,Long.valueOf(param.cityId));
- 			return r;
+ 			int r = 0;
+ 			//mosDao.insertOs(param.osName, param.addr, param.latitude, param.longitude,PICUrl,param.phone,Long.valueOf(param.cityId));
+ 			
+ 			OilStation_1 os = new OilStation_1();
+ 			os.setAddress(param.getAddr());
+ 			os.setCityId(param.getCityId()==null?null:Integer.valueOf(param.getCityId()));
+ 			os.setName(param.getOsName());
+ 			//os.setDesc(param.getOsName());
+ 			os.setLatitude(param.getLatitude());
+ 			os.setLongitude(param.getLongitude());
+ 			os.setPicUrl(PICUrl);
+ 			os.setPhone(param.getPhone());
+ 			os.setCredit(5f);
+ 			os.setQuality(5f);
+ 			os.setService(5f);
+ 			os.setCouponFlag(1);
+ 			os.setDerateFlag(1);
+ 			os.setStatus(1);
+ 			os.setCreateTime(new Date());
+// 			@Query(value="insert into t_oil_station(name,`desc`,address,latitude,longitude,pic_url,phone,city_id,credit,quality,"
+// 					+ "service,coupon_flag,derate_flag,status,create_time) values(?1,?1,?2,?3,?4,?5,?6,?7,5,5,5,1,1,1,now())", nativeQuery=true)
+// 			int insertOs(String osName, String addr, String latitude,String longitude,String picurl, String phone, Long cityId);
+ 			
+ 			osret = mosDao.save(os);
+ 			
+ 			if( osret == null) return -1;
+ 			dParam.setOsId(osret.getId());
+ 			if(dParam.getJian() != null && dParam.getMan() != null)
+ 				r = insertDeprate(dParam);
+ 			if(r < 0){
+ 	 			if(osret != null){
+ 	 				mosDao.delete(osret.getId());
+ 	 			}
+ 	 			return -1;
+ 			}
+ 			return 0;
  		} catch (Exception e) {
  			e.printStackTrace();
+ 			if(osret != null){
+ 				mosDao.delete(osret.getId());
+ 			}
+ 			return -1;
+ 		}
+	}
+
+	public int updatePicUrl_stub(OsParam param, 
+			DerateParam dParam) {
+ 		OilStation_1 osret = null;
+ 		String PICUrl = "www.testurl.com";
+ 		try {
+ 			
+ 			//保存信息
+ 			int r = 0;
+ 			//mosDao.insertOs(param.osName, param.addr, param.latitude, param.longitude,PICUrl,param.phone,Long.valueOf(param.cityId));
+ 			
+ 			OilStation_1 os = new OilStation_1();
+ 			os.setAddress(param.getAddr());
+ 			os.setCityId(param.getCityId()==null?null:Integer.valueOf(param.getCityId()));
+ 			os.setName(param.getOsName());
+ 			//os.setDesc(param.getOsName());
+ 			os.setLatitude(param.getLatitude());
+ 			os.setLongitude(param.getLongitude());
+ 			os.setPicUrl(PICUrl);
+ 			os.setPhone(param.getPhone());
+ 			os.setCredit(5f);
+ 			os.setQuality(5f);
+ 			os.setService(5f);
+ 			os.setCouponFlag(1);
+ 			os.setDerateFlag(1);
+ 			os.setStatus(1);
+ 			os.setCreateTime(new Date());
+// 			@Query(value="insert into t_oil_station(name,`desc`,address,latitude,longitude,pic_url,phone,city_id,credit,quality,"
+// 					+ "service,coupon_flag,derate_flag,status,create_time) values(?1,?1,?2,?3,?4,?5,?6,?7,5,5,5,1,1,1,now())", nativeQuery=true)
+// 			int insertOs(String osName, String addr, String latitude,String longitude,String picurl, String phone, Long cityId);
+ 			
+ 			osret = mosDao.save(os);
+ 			mosDao.updateOSDesc( osret.getName(), osret.getId() );
+ 			
+ 			if( osret == null) return -1;
+ 			dParam.setOsId(osret.getId());
+ 			r = insertDeprate(dParam);
+ 			if(r < 0){
+ 	 			if(osret != null){
+ 	 				mosDao.delete(osret.getId());
+ 	 			}
+ 	 			return -1;
+ 			}
  			return 0;
+ 		} catch (Exception e) {
+ 			e.printStackTrace();
+ 			if(osret != null){
+ 				mosDao.delete(osret.getId());
+ 			}
+ 			return -1;
  		}
 	}
 

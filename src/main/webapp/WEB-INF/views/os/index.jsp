@@ -20,10 +20,17 @@
 		var name=$("#add_os_name").val();
 		var addr=$("#add_os_addr").val();
 		var phone=$("#add_os_phone").val();
+		var man = $("#man").val();
+		var jian = $("#jian").val();
 		
 		if(name.trim().length==0 || addr.trim().length==0 || phone.trim().length==0){
 			alert('请填写名称、地址和电话');
 			return;
+		}
+		
+		if( ( man.trim().length==0 && jian.trim().length!=0 ) ||
+				(man.trim().length!=0 && jian.trim().length==0)){
+			alert('请输入完整的满减金额');
 		}
 		
 		$("#testform").submit();
@@ -75,18 +82,11 @@
 	function query(){
 		var name = $("#c_name").val();
 		var faceLimit = $("#c_face").val();
-		var cityName= $("#c_city").val();
-		var type = $("#c_type").val();
-		//var status = $("#status").val();
-		var startTime = $("#c_startTime").datebox('getValue');
-		var endTime = $("#c_endTime").datebox('getValue');
-		
-		if(startTime.trim().length>0){
-			startTime += ' 00:00:00';
-		}
-		if(endTime.trim().length>0){
-			endTime += ' 23:59:59';
-		}
+		var cityName= $("#c_city").find("option:selected").text();
+// 		var type = $("#c_type").val();
+// 		//var status = $("#status").val();
+// 		var startTime = $("#c_startTime").datebox('getValue');
+// 		var endTime = $("#c_endTime").datebox('getValue');
 		name=encodeURI(name);
 		cityName=encodeURI(cityName);
 // 		$('#dg').datagrid({ url:"${ctx}/m/os/query",
@@ -94,7 +94,7 @@
 // 				'startTime':startTime,'endTime':endTime},
 // 			method:"GET"});
 		$('#dg').datagrid('reload',
-				{'page':1,'rows':15,'osName':name, 'cityName':cityName,'startTime':startTime,'endTime':endTime,'status':-1 });
+				{'page':1,'rows':15,'osName':name, 'cityName':cityName,'status':-1 });
 	}
 	
 	function disOs(){
@@ -191,60 +191,37 @@
 		});
 	}
 	
+	function queryComment( osid ){
+		$("#pageColumn").hide();
+		$("#comments").show();
+		
+    	$('#dg_comment').datagrid({ 
+    		url:'${ctx}/m/os/queryComment', 
+    		method:'GET',
+    		queryParams:{'status':-1, 'osid':osid },
+    		fitCloumns: true , 
+    		nowrap: true , 
+    		singleSelect: true,
+    		pagination:true,//分页控件 
+    		columns:[[ 
+    		{field:'userName',title:'用户名',width:fixWidth(0.15),align:'right'},
+    		{field:'osName',title:'加油站',width:fixWidth(0.2),align:'right'},
+    		{field:'comment',title:'评论',width:fixWidth(0.7),align:'right'}
+    		]] 
+    	});
+	}
+	
+	function commentBack(){
+		$("#comments").hide();
+		$("#pageColumn").show();
+	}
 	
 
     $(document).ready(function(){
     	//$("#restartDialog").dialog('close');
     	$("#restartDialog").hide();
     	$("#showOsDialog").dialog('close');
-    	
-//         $("#file_upload").uploadify({  
-//         	'buttonText' : '选择图片',  
-//             'height' : 30,  
-//             'swf':'${ctx}/static/audio/uploadify.swf',
-//             'uploader' : '${ctx}/m/os/add',  
-//             'width' : 120,  
-//             'fileSizeLimit': '1MB',  
-//             'auto':false,  
-//             'fileObjName'   : 'file',  
-//             'method': 'post',
-//             'fileDesc'       : '支持格式:jpg/gif/jpeg/png/bmp.', //如果配置了以下的'fileExt'属性，那么这个属性是必须的  
-//             'fileExt'        : '*.jpg;*.gif;*.jpeg;*.png;*.bmp',//允许的格式    
-//             'queueID'  : 'some_file_queue',
-//             'onUploadStart' : function(file) {  
-//             	var name = $("#add_os_name").val();
-//             	var addr = $("#add_os_addr").val();
-//             	var phone = $("#add_os_phone").val();
-//             	var latitude = $("#add_os_latitude").val();
-//             	var langitude = $("#add_os_longitude").val();
-//             	var cityId = $("#add_os_city").val();
-            	
-//                 $("#file_upload").uploadify("settings", "formData", {'method':'post','name':name,'addr':addr,'phone':phone,'latitude':latitude,'langitude':langitude,'cityId':cityId});  
-//             },  
-//             'onUploadSuccess' : function(file, data, response) {  
-//             	var o =  eval("("+data+")");
-//             	if(o.code == 200){
-// 	            	alert("创建成功。");
-// 	            	$("#restartDialog").dialog('close');
-//             	}else{
-//             		alert(o.msg);  
-//             	}
-//             },
-//             'onFallback' : function() {//检测FLASH失败调用  
-//                 alert("您未安装FLASH控件，无法上传图片！请安装FLASH控件后再试。");  
-//             },
-//             onComplete: function (event, queueID, fileObj, response, data) {     
-//                 //$('<li></li>').appendTo('.files').text(response);  
-//                 //var picIndexPlus = picIndex++;  
-//                 var uploadPath =response;  
-// //                 $('#picBefore').before(picTpl(picIndexPlus));  
-// //                 var uploadImgPathId = "uploadImgPath" + (picIndexPlus);  
-// //                 document.getElementById(uploadImgPathId).value=uploadPath;  
-//             },
-// 			'onSelect':function(file){
-// 				$("#file_name_").html(file.name);
-//             }
-//         });
+    	$("#comments").hide();
     	
     	$('#dg').datagrid({ 
     		url:'${ctx}/m/os/query', 
@@ -262,9 +239,12 @@
     		{field:'name',title:'名称',width:fixWidth(0.15),align:'right'},
     		{field:'address',title:'地址',width:fixWidth(0.2),align:'right'},
     		{field:'phone',title:'电话',width:fixWidth(0.1),align:'right'},
-    		{field:'cityName',title:'城市',width:fixWidth(0.1),align:'right'},
-    		{field:'status',title:'状态',width:fixWidth(0.1),align:'right'},
+    		{field:'cityName',title:'城市',width:fixWidth(0.05),align:'right'},
+    		{field:'status',title:'状态',width:fixWidth(0.05),align:'right'},
     		{field:'createTime',title:'创建时间',width:fixWidth(0.15),align:'right'},
+    		{field:'latitude',title:'经度',width:fixWidth(0.10),align:'right'},
+    		{field:'longitude',title:'纬度',width:fixWidth(0.10),align:'right'},
+    		{field:'derate',title:'优惠券',width:fixWidth(0.10),align:'right'},
     		{field:'op',title:'操作',width:185,formatter:function(value,rowData,rowIndex){
     			var id = rowData.id;
     			var status = rowData.status;
@@ -275,6 +255,7 @@
     			}else{
     				str += ' <a href="#" onclick="updateStatus(\''+id+'\',1)">生效</a>';
     			}
+    			str += ' <a href="#" onclick="queryComment(\''+id+'\',1)">评论列表</a>';
     			return str;
     		}} 
     		]] 
@@ -292,15 +273,29 @@
 						<td width="100px"><span>名称:</span></td>
 						<td width="150px"><input id="c_name" type="text" style="width: 120px"/></td>
 						<td width="100px"><span>城市:</span></td>
-						<td width="150px"><input id="c_city" type="text" style="width: 120px"/></td>
+						<td width="150px">
+						<select id="c_city" name="c_city" style="width: 150px">
+								<option value="1">上海  </option>
+								<option value="2">南京</option>
+								<option value="3">仪征</option>
+								<option value="4">镇江</option>
+								<option value="5">靖江</option>
+								<option value="6">张家界</option>
+								<option value="7">江阴</option>
+								<option value="8">南通</option>
+								<option value="9">常熟</option>
+								<option value="10">太仓</option>
+								<option value="11">高岗</option>
+							</select>
+						</td>
 					</tr>
-					<tr style="height: 40px;">
-						<td width="100px"><span>开始时间:</span></td>
-						<td width="150px"><input id="c_startTime" class="easyui-datebox"></input></td>
-						<td width="100px"><span>结束时间:</span></td>
-						<td width="150px"><input id="c_endTime" class="easyui-datebox"></input></td>
-						<td colspan="4" width="100px">&nbsp;</td>
-					</tr>
+<!-- 					<tr style="height: 40px;"> -->
+<!-- 						<td width="100px"><span>开始时间:</span></td> -->
+<!-- 						<td width="150px"><input id="c_startTime" class="easyui-datebox"></input></td> -->
+<!-- 						<td width="100px"><span>结束时间:</span></td> -->
+<!-- 						<td width="150px"><input id="c_endTime" class="easyui-datebox"></input></td> -->
+<!-- 						<td colspan="4" width="100px">&nbsp;</td> -->
+<!-- 					</tr> -->
 					<tr style="height: 40px;">
 					    <td colspan="8" style="text-align: right;"><button type="button" onclick="showCreatePage()">添加</button></td>
 						<td colspan="8" style="text-align: right;"><button type="button" onclick="query()">查询</button></td>
@@ -310,6 +305,11 @@
 		</div>
 		<div class="pageColumn" id="pageColumn" style="margin-top: 50px">
 		    <table id="dg"></table>
+		</div>
+		
+		<div class="comments" id="comments" style="margin-top: 50px">
+			<a href="javascript:commentBack();">返回</a>
+		    <table id="dg_comment"></table>
 		</div>
 	</div>
 
@@ -405,6 +405,11 @@
 						<td  style="text-align:left;">
 							<input id="file_upload" name="file" type="file" />
 							<div id="some_file_queue" style="display: none;"></div>
+						</td>
+					</tr>
+					<tr style="height: 30px">
+						<td  colspan="2">
+							满<input id='man'  name='man' type="text"></input>减<input id='jian'   name='jian' type="text"></input>
 						</td>
 					</tr>
 				</table>

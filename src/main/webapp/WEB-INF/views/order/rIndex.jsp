@@ -22,34 +22,15 @@
     }  
 	
 	function showOsDialog(id, status){       
-        $("#update_orderId").val(id);  
-        $("#update_old_status").val(status);  
-        $("#showOsDialog").dialog('open');  
-    	$('#os_dg').datagrid({ 
-    		url:'${ctx}/m/os/query', 
-    		method:'GET',
-    		queryParams:{'status':-1},
-    		fitCloumns: true , 
-    		nowrap: true , 
-    		singleSelect: true,
-    		pagination:true,//分页控件 
-    		columns:[[ 
-    		{field:'id',title:'ID',width:50,formatter:function(value,row,index){
-    		    return "<input name='os_id_redio' type='radio'>";
-    		}}, 
-    		{field:'name',title:'加油站',width:200}, 
-    		{field:'address',title:'地址',width:320,align:'right'},
-    		{field:'cityName',title:'城市',width:100,align:'right'}
-    		]] 
-    	});
+		$("#osDialog").dialog('open');  
     } 
 	
 	function cancel(){       
 		$("#restartDialog").dialog('close');
 	}
 	
-	function cancelOs(){       
-		$("#showOsDialog").dialog('close');
+	function subCancel(){       
+		$("#osDialog").dialog('close');
 	}
 	
 	function query(){
@@ -119,9 +100,47 @@
 		return false;
 	}
 	
-	function addRecharge(){
+	function subRecharge(){
+		var phone = $("#t_user_phone").val();
+		var amount = $("#t_user_amount").val();
+		var _url = "${ctx}/m/order/radd";
+		
+		if( !isMoney(amount) || amount==0){
+			alert("请输入正确的金额");
+			return false;
+		}
+		amount = -1.0 * amount;
+		
+		$.ajax({
+		    type:'POST',
+		    url: _url,
+		    cache:false,  
+		    data: {'phone':phone,'amount':amount} ,
+		    dataType: 'json',
+		    success: function(data){
+		    	if(data.code == 200){
+		    		$("#osDialog").dialog('close');
+		    		alert("扣款成功");
+
+					$("#dgsumdiv").hide();
+					$("#dgdiv").show();
+					$('#dg').datagrid({ url:"${ctx}/m/order/rQuery",
+						queryParams:{'page':1,'rows':15},
+						method:"GET"});
+		    	}else{
+		    		alert(data.msg);  
+		    	}
+		    },  
+		    error : function() {  
+		    	alert("操作异常，请稍后再试。");  
+		    }  
+		});
+	}
+	
+	function addRecharge(  ){
 		var phone = $("#user_phone").val();
 		var amount = $("#user_amount").val();
+		var _url = "${ctx}/m/order/radd";
 		
 		if( !isMoney(amount) || amount==0){
 			alert("请输入正确的金额");
@@ -130,7 +149,7 @@
 		
 		$.ajax({
 		    type:'POST',
-		    url: "${ctx}/m/order/radd",
+		    url: _url,
 		    cache:false,  
 		    data: {'phone':phone,'amount':amount} ,
 		    dataType: 'json',
@@ -185,6 +204,7 @@
     $(document).ready(function(){
     	$("#restartDialog").dialog('close');
     	$("#showOsDialog").dialog('close');
+    	$("#osDialog").dialog('close');
     	$('#dg').datagrid({ 
     		url:'${ctx}/m/order/rQuery', 
     		method:'GET',
@@ -253,6 +273,7 @@
 					</tr>
 					<tr style="height: 40px;">
 					    <td colspan="8" style="text-align: right;"><button type="button" onclick="showRestartDialog()">充值</button></td>
+					    <td colspan="8" style="text-align: right;"><button type="button" onclick="showOsDialog()">扣款</button></td>
 						<td colspan="8" style="text-align: right;"><button type="button" onclick="query()">查询</button></td>
 						<td colspan="8" style="text-align: right;"><button type="button" onclick="querySum()">统计查询</button></td>
 					</tr>
@@ -295,24 +316,34 @@
 		</div>
 	</div>
 	
-	<div id="showOsDialog" class="easyui-dialog" title="分配加油站" style="width: 800px; height: 580px;" >
+		<div id="osDialog" class="easyui-dialog" title="用户扣款" style="width: 500px; height: 250px;" >
 		<div style="margin-left: 5px;margin-right: 5px;margin-top: 5px;">			
 			<div class="data-tips-info">
 				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
-					<tr>
+					<tr style="height: 30px">
+						<td style="width:30%;">
+							手机号：
+						</td>
 						<td  style="text-align:left;">
-							<table id="os_dg"></table>
-							<input type="hidden" id="os_orderId" name="update_orderId"/>
-							<input type="hidden" id="os_old_status" name="update_old_status"/>
+							<input id="t_user_phone" name="t_user_phone"/>
+						</td>
+					</tr>
+					<tr style="height: 30px">
+						<td style="width:30%;">
+							金额：
+						</td>
+						<td  style="text-align:left;">
+							<input id="t_user_amount" name="t_user_amonut"/>
 						</td>
 					</tr>
 				</table>
 				<div style="text-align:right;margin-right:30px;margin-top: 50px">
-					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-finish'" onclick="disOs()">确定</a>
-					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-cancel'" onclick="cancelOs()">取消</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-finish'" onclick="subRecharge()">确定</a>
+					<a href="#" class="easyui-linkbutton" data-options="iconCls:'ope-cancel'" onclick="subCancel()">取消</a>
 				</div>				
 			</div> 		
 		</div>
 	</div>
+	
 </body>
 </html>

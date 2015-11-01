@@ -391,6 +391,15 @@ public class MorderService {
 					return -2;
 				}
 			}
+			Double fund = Double.valueOf(amount);
+			Double fund_left = morderDao.queryUserBankYe(userId);
+			if(fund_left == null || (fund_left+fund)<0.0){
+				return -4;//余额不足
+			}
+			rr = morderDao.updateRecharge(userId, amount);
+			if(rr <= 0){
+				return -3;
+			}
 		}catch(Exception e){
 			return -2;
 		}

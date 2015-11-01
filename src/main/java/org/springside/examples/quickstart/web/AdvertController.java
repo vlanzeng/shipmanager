@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springside.examples.quickstart.contants.ErrorConstants;
 import org.springside.examples.quickstart.contants.HybConstants;
 import org.springside.examples.quickstart.domain.AdvertBean;
@@ -63,26 +64,41 @@ public class AdvertController extends BaseController implements HybConstants{
 		return adverts;
 	}
 	
-	@RequestMapping(value="add", method=RequestMethod.POST)
-	@ResponseBody
+	@RequestMapping(value="/add", method=RequestMethod.POST)
+	//@ResponseBody
 	public String addAdvert( 
-			@RequestParam(required=true) String url,
-			@RequestParam(required=true) String purl,
-			@RequestParam(required=true) String type,
-			@RequestParam(required=true) String title,
+			@RequestParam(required=false) MultipartFile file,
+			@RequestParam(required=false) String url,
+			@RequestParam(required=false) String type,
+			@RequestParam(required=false) String title,
 			@RequestParam(required=false) String os,
 			HttpServletRequest request, HttpServletResponse response
 			){
 		int r = 0; 
 		try{
-		r = mAdvertService.insertAdvert(url, purl, type, title, os);
+		r = mAdvertService.insertAdvert(file, url, type, title, os, request);
 		if(r >= 0){
-			return CommonUtils.printStr(ErrorConstants.SUCCESS);
+			return "redirect:/advert/index";
 		}
 		}catch(Exception e){
-			return CommonUtils.printStr(ErrorConstants.ADVERT_ERROR);
+			return "<html><body>失败</br><a href='javascript:history.go(-1);'>返回</a></body></html>";
 		}
 		
-		return CommonUtils.printStr(ErrorConstants.ADVERT_ERROR);
+		return "<html><body>失败</br><a href='javascript:history.go(-1);'>返回</a></body></html>";
+	}
+	
+	@RequestMapping(value="delete", method=RequestMethod.POST)
+	@ResponseBody
+	public String delete( 
+			@RequestParam(required=true) Long id,
+			HttpServletRequest request, HttpServletResponse response){
+		int r = 0;
+		
+		r = mAdvertService.delete(id);
+		
+		if(r == 0){
+			return CommonUtils.printStr(ErrorConstants.SUCCESS);
+		}else
+			return CommonUtils.printStr(ErrorConstants.ADVERT_ERROR);
 	}
 }

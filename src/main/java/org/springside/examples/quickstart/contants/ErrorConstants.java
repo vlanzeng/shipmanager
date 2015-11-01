@@ -20,6 +20,7 @@ public class ErrorConstants {
 	/**充值失败**/
 	public static final String RECHARGE_PHONE_NOT_EXISTS_ERROR = "10040001";
 	public static final String RECHARGE_GENERAL_ERROR = "10040002";
+	public static final String RECHARGE_NOTENOUGH_ERROR = "10040003";
 	
 	/**添加用户类错误**/
 	public static final String MUSER_ALREADY_EXISTS_ERROR = "10050001";
@@ -57,6 +58,8 @@ public class ErrorConstants {
 			return "该手机已注册";
 		}else if(ADVERT_ERROR.equalsIgnoreCase(code)){
 			return "添加广告错误";
+		}else if(RECHARGE_NOTENOUGH_ERROR.equalsIgnoreCase(code)){
+			return "扣款余额不足";
 		}
 		return "";
 	}

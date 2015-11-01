@@ -133,7 +133,7 @@
 		
 		if( isEmptyStr(userName) || isEmptyStr(phone) ||
 				isEmptyStr(pwd)){
-			alert('请输入用户名、手机号和密码');
+			alert('请输入昵称、手机号和密码');
 			return;
 		}
 		
@@ -204,7 +204,7 @@
     		singleSelect: true,
     		pagination:true,//分页控件 
     		columns:[[ 
-    		{field:'userName',title:'用户名',width:fixWidth(0.2),align:'right'},
+    		{field:'userName',title:'昵称',width:fixWidth(0.2),align:'right'},
     		{field:'phone',title:'手机号',width:fixWidth(0.15),align:'right'},
     		{field:'shipname',title:'船舶名',width:fixWidth(0.2),align:'right'},
     		{field:'shipno',title:'船舶编号',width:fixWidth(0.15),align:'right'},
@@ -236,7 +236,7 @@
     		columns:[[ 
     		{field:'id',title:'ID',width:fixWidth(0.06)}, 
     		{field:'phone',title:'手机号',width:fixWidth(0.18)}, 
-    		{field:'username',title:'用户名',width:fixWidth(0.18)}, 
+    		{field:'username',title:'昵称',width:fixWidth(0.18)}, 
     		{field:'shipname',title:'船舶名',width:fixWidth(0.18)}, 
     		{field:'amount',title:'金额',width:fixWidth(0.1),align:'right'},
     		{field:'createTime',title:'充值时间',width:fixWidth(0.20),align:'right'}
@@ -260,7 +260,7 @@
     		    		{field:'num',title:'数量',width:fixWidth(0.03),align:'right'},
     		    		{field:'status',title:'状态',width:fixWidth(0.06),align:'right'},
     		    		{field:'amount',title:'总价',width:fixWidth(0.10),align:'right'},
-    		    		{field:'userName',title:'用户名',width:fixWidth(0.15),align:'right'},
+    		    		{field:'userName',title:'昵称',width:fixWidth(0.15),align:'right'},
     		    		{field:'osName',title:'加油站',width:fixWidth(0.15),align:'right'},
     		    		{field:'bookTime',title:'预约时间',width:fixWidth(0.1),align:'right'},
     		    		{field:'bookAddr',title:'预约地址',width:fixWidth(0.15),align:'right'},
@@ -286,7 +286,7 @@
 			<div id="coupon_query_id">
 				<table>
 					<tr style="height: 40px;">
-						<td width="100px"><span>用户名:</span></td>
+						<td width="100px"><span>昵称:</span></td>
 						<td width="150px"><input id="u_name" type="text" style="width: 120px"/></td>
 						<td width="100px"><span>手机号:</span></td>
 						<td width="150px"><input id="u_phone" type="text" style="width: 120px"/></td>
@@ -312,7 +312,7 @@
 				<table style="margin-top: 20px;margin-left:20px;margin-right:20px;vertical-align:middle;" width="90%" border="0" cellpadding="0" cellspacing="1">
 					<tr style="height: 30px">
 						<td style="width:30%;">
-							用户名：
+							昵称：
 						</td>
 						<td  style="text-align:left;">
 							<input id="user_name" name="user_name"/>

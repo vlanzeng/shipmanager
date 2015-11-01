@@ -22,11 +22,15 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springside.examples.quickstart.contants.ErrorConstants;
 import org.springside.examples.quickstart.contants.HybConstants;
 import org.springside.examples.quickstart.domain.DataGrid;
+import org.springside.examples.quickstart.domain.DerateParam;
 import org.springside.examples.quickstart.domain.OilStationBean;
+import org.springside.examples.quickstart.domain.OsComment;
 import org.springside.examples.quickstart.domain.OsOilBean;
 import org.springside.examples.quickstart.domain.OsOilParam;
 import org.springside.examples.quickstart.domain.OsParam;
 import org.springside.examples.quickstart.entity.User;
+import org.springside.examples.quickstart.service.McouponService;
+import org.springside.examples.quickstart.service.MderateService;
 import org.springside.examples.quickstart.service.MosService;
 import org.springside.examples.quickstart.service.MuserService;
 import org.springside.examples.quickstart.service.account.ShiroDbRealm.ShiroUser;
@@ -41,7 +45,8 @@ public class MosController extends BaseController implements HybConstants{
     private MosService mosService;
 	@Autowired
 	private MuserService muserService;
-	
+	@Autowired
+	private MderateService mderateService;
 	
 	
 	/**
@@ -90,6 +95,21 @@ public class MosController extends BaseController implements HybConstants{
 		return CommonUtils.printObjStr2(gb);
 	}
 	
+	@RequestMapping(value="queryComment", method=RequestMethod.GET)
+	@ResponseBody
+	public String queryComment(HttpServletRequest request,
+			HttpServletResponse response) throws IOException, ServletException{
+		ShiroUser user = (ShiroUser) SecurityUtils.getSubject().getPrincipal();	
+		Integer[] pageInfo = getPageInfo(request);
+		OsParam param = new OsParam();
+		param.setPage(pageInfo[0]);
+		param.setRows(pageInfo[1]);
+		param.setOsId(request.getParameter("osid"));
+		DataGrid<OsComment> gb = mosService.getOsCommentList(param);
+		return CommonUtils.printObjStr2(gb);
+	}
+	
+	
 	/**
 	 * @param request
 	 * @param response
@@ -113,9 +133,16 @@ public class MosController extends BaseController implements HybConstants{
 		param.latitude = request.getParameter("add_os_latitude");
 		param.longitude = request.getParameter("add_os_longitude");
 		param.cityId = request.getParameter("add_os_city");
+		
+		DerateParam dParam = new DerateParam();
+		String jian = request.getParameter("jian");
+		String man = request.getParameter("man");
+		dParam.setJian(  StringUtils.isEmpty(jian)?null:Integer.valueOf( jian) );
+		dParam.setMan(  StringUtils.isEmpty(man)?null:Integer.valueOf( man) );
+		dParam.setStatus("1");
 		try {
-			int res = mosService.updatePicUrl(file, param, request);
-			if(res > 0){
+			int res = mosService.updatePicUrl(file, param, dParam, request);
+			if(res >= 0){
 				//return CommonUtils.printObjStr(res);
 				return "redirect:/m/os/index";
 			}

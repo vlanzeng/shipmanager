@@ -868,14 +868,20 @@ public class MorderController extends BaseController implements HybConstants{
 	@ResponseBody
 	public String rAdd(HttpServletRequest request,
 			HttpServletResponse response) throws IOException, ServletException{
+		String method = request.getParameter("method");
 		String amount = request.getParameter("amount");
 		String phone = request.getParameter("phone");
+		if(method != null && method.equalsIgnoreCase("sub")){
+			amount = "-"+amount;
+		}
 		try {
 			int res = morderService.recharge(phone, amount);
 			if(res > 0){
 				return CommonUtils.printObjStr(res);
 			}else if(res==-1){
 				return CommonUtils.printStr(ErrorConstants.RECHARGE_PHONE_NOT_EXISTS_ERROR);
+			}else if(res == -4){
+				return CommonUtils.printStr(ErrorConstants.RECHARGE_NOTENOUGH_ERROR);
 			}else{
 				return  CommonUtils.printStr(ErrorConstants.RECHARGE_GENERAL_ERROR);
 			}

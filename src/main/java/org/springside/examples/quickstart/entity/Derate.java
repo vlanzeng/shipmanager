@@ -8,15 +8,16 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "t_derate")
 public class Derate extends IdEntity {
-	private Integer osId;
+	private Long osId;
 	private String info;
 	private Date createTime;
 	private Date updateTime;
+	private String status;
 	
-	public Integer getOsId() {
+	public Long getOsId() {
 		return osId;
 	}
-	public void setOsId(Integer osId) {
+	public void setOsId(Long osId) {
 		this.osId = osId;
 	}
 	public String getInfo() {
@@ -36,5 +37,11 @@ public class Derate extends IdEntity {
 	}
 	public void setUpdateTime(Date updateTime) {
 		this.updateTime = updateTime;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
 	}
 }
